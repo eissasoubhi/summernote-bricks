@@ -1,16 +1,16 @@
 {
   "name": "summernote-bricks",
   "version": "1.0.0",
-  "description": "a summernote extension to add a user friendly components to the editor",
+  "description": "a summernote module to add a user friendly components to the editor",
   "main": "dist/summernote-extensions.dist.js",
   "keywords": [
     "summernote bricks",
     "summernote module",
     "summernote plugin"
   ],
-  "homepage": "https://github.io",
-  "bugs": "https://github.com/owner/project/issues",
-  "repository": "https://github.com/owner/",
+  "homepage": "https://eissasoubhi.github.io/summernote-bricks",
+  "bugs": "https://github.com/eissasoubhi/summernote-bricks/issues",
+  "repository": "https://github.com/eissasoubhi/summernote-bricks",
   "dependencies": {
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
