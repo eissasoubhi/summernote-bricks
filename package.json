@@ -21,7 +21,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "node node_modules/http-server/bin/http-server -p 9090",
-    "watch": "watchify src/summernote-extensions.js -o summernote-extensions.dist.js -v"
+    "watch": "watchify src/summernote-extensions.js -o dist/summernote-extensions.dist.js -v"
   },
   "author": "Eissa Soubhi <eissa.soubhi@gmail.com> (http://eissa-soubhi.com/)",
   "license": "ISC"

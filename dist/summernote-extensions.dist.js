@@ -2160,7 +2160,6 @@ global.SnPlugin = class SnPlugin
         this.summernote_ui = $.summernote.ui;
         this.style_tag_id = 'style#bloc_' + this.name + '_style';
         this.script_tag_id = 'script#bloc_' + this.name + '_script';
-        //contents folders
         this.blocs_contents_folder = _helpers.getConfig().bricks_assets;
         this.common_blocs_contents_folder = this.blocs_contents_folder + '/common';
         this.plugin_contents_folder = this.blocs_contents_folder + '/' + this.name;
@@ -2801,7 +2800,7 @@ global.Thumbnails = class Thumbnails extends SnBtnPlugin
 return module.exports = {
     root_folder: "/",
     lang: "en",
-    bricks_assets: '/dist/bricks_assets',
+    bricks_assets: 'dist/bricks_assets',
     actions_btns_position: 'right',
 }
 },{}],23:[function(require,module,exports){

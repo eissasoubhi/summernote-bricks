@@ -9,8 +9,6 @@ global.PluginContentFile = class PluginContentFile
     setPluginDefaultFiles()
     {
         var plugin = this.plugin;
-        //contents folders
-        _helper
         plugin.blocs_contents_folder = _helpers.getConfig().bricks_assets;
         plugin.common_blocs_contents_folder = plugin.blocs_contents_folder + '/common';
         plugin.plugin_contents_folder = plugin.blocs_contents_folder + '/' + plugin.name;
@@ -23,6 +21,7 @@ global.PluginContentFile = class PluginContentFile
 
     loadContentToAttribute (url, store_attribute)
     {
+
         var plugin = this.plugin;
         // get content from url
 

@@ -27,7 +27,6 @@ global.SnPlugin = class SnPlugin
         this.summernote_ui = $.summernote.ui;
         this.style_tag_id = 'style#bloc_' + this.name + '_style';
         this.script_tag_id = 'script#bloc_' + this.name + '_script';
-        //contents folders
         this.blocs_contents_folder = _helpers.getConfig().bricks_assets;
         this.common_blocs_contents_folder = this.blocs_contents_folder + '/common';
         this.plugin_contents_folder = this.blocs_contents_folder + '/' + this.name;
