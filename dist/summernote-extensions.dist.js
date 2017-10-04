@@ -2801,7 +2801,7 @@ global.Thumbnails = class Thumbnails extends SnBtnPlugin
 return module.exports = {
     root_folder: "/",
     lang: "en",
-    bricks_assets: '/dist/bricks_assets',
+    bricks_assets: 'dist/bricks_assets',
     actions_btns_position: 'right',
 }
 },{}],23:[function(require,module,exports){
