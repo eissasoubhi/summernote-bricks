@@ -1,6 +1,6 @@
 {
   "name": "summernote-bricks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a summernote module to add a user friendly components to the editor",
   "main": "dist/summernote-extensions.dist.js",
   "keywords": [
