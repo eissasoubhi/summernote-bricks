@@ -1,0 +1,47 @@
+<style type="text/css" media="screen" id="bloc_thumbnails_style">
+
+.bloc_thumbnails .thumbnail {
+    position:relative;
+}
+
+.bloc_thumbnails .thumbnail .overly {
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    color:#FFF;
+    text-align:center;
+    background-color:rgba(28,31,36,0.59);
+    transition:all .5s ease-out;
+    -o-transition:all .5s ease-out;
+    -moz-transition:all .5s ease-out;
+    -webkit-transition:all .5s ease-out;
+    height: 100%;
+    display: flex;
+    width: 100%;
+    margin: auto 0 0;
+}
+
+.bloc_thumbnails .thumbnail .overly h3 {
+    font-family:transatstandard;
+    transition:all .5s ease-out;
+    -o-transition:all .5s ease-out;
+    -moz-transition:all .5s ease-out;
+    -webkit-transition:all .5s ease-out;
+    margin: auto;
+}
+
+.bloc_thumbnails a.thumbnail:hover
+,.bloc_thumbnails a.thumbnail:focus
+,.bloc_thumbnails a.thumbnail.active {
+    border-color:#FF4900;
+}
+
+.bloc_thumbnails .thumbnail:hover .overly {
+    opacity: 0;
+}
+
+.bloc_thumbnails .thumbnail:hover .overly h3 {
+
+}
+</style>

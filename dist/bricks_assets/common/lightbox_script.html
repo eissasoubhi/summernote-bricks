@@ -1,0 +1,48 @@
+<script  charset="utf-8" class="bloc_thumbnails_lightbox_plugin_script">
+(function () {
+var __thumbnails_lightbox_plugin_script__ = function($) {
+
+        if(! $('script.bloc_thumbnails_lightbox_plugin_script.bootstrap').length
+            /*checking if bootstrap exists in page*/
+            && ! ($.fn.popover && $.fn.popover))
+        {
+            $('body').append('<script class="bloc_thumbnails_lightbox_plugin_script bootstrap" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ><\/script>');
+        }
+
+        if(! $('script.bloc_thumbnails_lightbox_plugin_script.lightbox').length)
+        {
+            $('body').append('<script class="bloc_thumbnails_lightbox_plugin_script lightbox" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/4.0.1/ekko-lightbox.min.js" ><\/script>');
+        }
+        $('head').append('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/4.0.1/ekko-lightbox.min.css" type="text/css" />');
+
+        if(! $("body").attr('data-haslightboxevent') )
+        {
+            $("body").on('click', '[data-toggle="lightbox"]:not([data-gallery="navigateTo"])', function(e) {
+                if($(this).ekkoLightbox)
+                {
+                    e.preventDefault();
+                    return $(this).ekkoLightbox();
+                }
+                else
+                {
+                   console.warn("lightbox not attached")
+                };
+            }).attr('data-haslightboxevent', "true");
+        }
+
+    }
+
+    if(window.jQuery)
+    {
+        __thumbnails_lightbox_plugin_script__(window.jQuery);
+    }
+    else
+    {
+        document.addEventListener("DOMContentLoaded", function(event){
+            __thumbnails_lightbox_plugin_script__(window.jQuery);
+        });
+    }
+
+})();
+
+</script>

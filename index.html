@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>demo</title>
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="node_modules/summernote/dist/summernote.css" rel="stylesheet">
+    <link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="dist/assets/editable-bloc.css" rel="stylesheet">
+    <style type="text/css">
+        body{
+            padding-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row col-md-8 col-md-offset-2">
+        <div id="summernote"><span></span></div>
+    </div>
+</div>
+
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="node_modules/summernote/dist/summernote.min.js"></script>
+<script src="dist/summernote-extensions.dist.js"></script>
+<script>
+    jQuery(document).ready(function($) {
+         $('#summernote').summernote({
+            height: 300,
+            toolbar: [
+                ['insert', ['bricks']],
+                ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
+                ['misc', [ 'codeview',]]
+            ],
+            bricks: {
+                gallery: {
+                    modal_body_file: "/php/gallery_dynamic_content.html"
+                },
+                thumbnails: {
+                    modal_body_file: "/php/thumbnails_dynamic_content.html"
+                },
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+.editable-bloc{
+    border: 1px solid transparent;
+    position: relative;
+    -webkit-transition: box-shadow .5s ease, border .5s ease;
+    -moz-transition: box-shadow .5s ease, border .5s ease;
+    -ms-transition: box-shadow .5s ease, border .5s ease;
+    -o-transition: box-shadow .5s ease, border .5s ease;
+    transition: box-shadow .5s ease, border .5s ease;
+}
+.editable-bloc:hover{
+    border: 1px solid #d0d0d0;
+    box-shadow: 0px 0px 1px 0px #e2e2e2;
+}
+.editable-bloc .bloc-action-btns button{
+    padding: 0px 5px;
+    margin: 2px;
+}
+.editable-bloc.editing .bloc-action-btns{
+    visibility: visible;
+    opacity: 1;
+}
+.editable-bloc .bloc-action-btns{
+    position: absolute;
+    top: 0;
+    z-index: 1025;
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: visibility .5s ease, opacity .5s ease;
+    -moz-transition: visibility .5s ease, opacity .5s ease;
+    -ms-transition: visibility .5s ease, opacity .5s ease;
+    -o-transition: visibility .5s ease, opacity .5s ease;
+    transition: visibility .5s ease, opacity .5s ease;
+    display: block!important;
+}
+.editable-bloc:hover .bloc-action-btns{
+    visibility: visible;
+    opacity: 1;
+}
+.editable-bloc:after{
+    display: block;
+    content: "";
+    clear: both;
+}
+.removable-line-break{
+    position: relative;
+    border: 1px solid transparent;
+    -webkit-transition: background .5s ease, border .5s ease;
+    -moz-transition: background .5s ease, border .5s ease;
+    -ms-transition: background .5s ease, border .5s ease;
+    -o-transition: background .5s ease, border .5s ease;
+    transition: background .5s ease, border .5s ease;
+}
+
+.removable-line-break.highlight-line-break{
+    background-color: rgba(185, 1, 1, 0.03);
+    border: 1px solid rgba(185, 1, 1, 0.03);
+}
+.whitespace-action-btns{
+    position: absolute;
+    z-index: 999999;
+    right: 10px;
+    top: 0;
+}
+.whitespace-action-btns button.remove{
+    padding: 1px 4px;
+    font-size: 9px;
+    background-color: rgba(217, 83, 79, 0.55);
+    border-color: rgb(241, 143, 139);
+}
+.note-handle .note-control-selection{
+    display: none!important;
+}
+.modal-backdrop{
+    position: fixed;
+}
