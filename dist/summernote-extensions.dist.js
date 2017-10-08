@@ -1271,14 +1271,13 @@ global.Helpers = class Helpers
         lang = config.lang || "en",
         langs = require("../config/langs.js"),
         trans = null;
-
         key = lang+'.'+key;
         // a key with dot notation, eg : en.h2.title
         trans = key.split('.').reduce(function (item,i) {
-            return item[i]
+            return item ? item[i] : {};
         }, langs);
 
-        return trans || key;
+        return trans && !$.isEmptyObject(trans) ? trans : key;
     }
 }
 global._helpers = Helpers.get();
@@ -1319,10 +1318,10 @@ global.Menu = class Menu extends SnBtnPlugin
 
     initProperties(modal)
     {
-        modal.modal_title = _helpers.lang('menu.modal_title');
-        modal.modal_content_add_item = _helpers.lang('menu.modal_content_add_item')
-        modal.modal_content_default_menu_label = _helpers.lang('menu.modal_content_default_menu_label')
-        modal.modal_content_active_item = _helpers.lang('menu.modal_content_active_item')
+        modal.modal_title = _helpers.lang(this.name + '.modal_title');
+        modal.modal_content_add_item = _helpers.lang(this.name + '.modal_content_add_item')
+        modal.modal_content_default_menu_label = _helpers.lang(this.name + '.modal_content_default_menu_label')
+        modal.modal_content_active_item = _helpers.lang(this.name + '.modal_content_active_item')
         modal.max_menu_items = 12;
         modal.min_menu_items = 1;
         modal.refresh_on_open = true;
@@ -1513,7 +1512,7 @@ global.Modal = class Modal
         this.modal_close_btn_text = _helpers.lang("close");
         this.modal_ok_btn_text = _helpers.lang("add");
         this.modal_update_btn_text = _helpers.lang("update");
-        this.style_tag_id = "bloc_" + this.plugin.name + "_style";
+        this.style_tag_id = this.plugin.name + "_style";
         this.style = this.plugin.modal_style;
         this.refresh_on_open = false;
         this.has_been_opened = false;
@@ -1568,7 +1567,7 @@ global.Modal = class Modal
         var plugin = this.plugin;
         var modal_body = plugin.modal_body;
 
-        this.modal.attr('id', "bloc_" + this.plugin.name + "_html");
+        this.modal.attr('id', this.plugin.name + "_html");
 
         if(this.mode == "edit")
         {
@@ -2798,11 +2797,11 @@ global.Thumbnails = class Thumbnails extends SnBtnPlugin
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],22:[function(require,module,exports){
 return module.exports = {
-    root_folder: "/",
     lang: "en",
     bricks_assets: 'dist/bricks_assets',
     actions_btns_position: 'right',
 }
+
 },{}],23:[function(require,module,exports){
 return module.exports = {
     en: {

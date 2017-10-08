@@ -31,10 +31,10 @@ global.Menu = class Menu extends SnBtnPlugin
 
     initProperties(modal)
     {
-        modal.modal_title = _helpers.lang('menu.modal_title');
-        modal.modal_content_add_item = _helpers.lang('menu.modal_content_add_item')
-        modal.modal_content_default_menu_label = _helpers.lang('menu.modal_content_default_menu_label')
-        modal.modal_content_active_item = _helpers.lang('menu.modal_content_active_item')
+        modal.modal_title = _helpers.lang(this.name + '.modal_title');
+        modal.modal_content_add_item = _helpers.lang(this.name + '.modal_content_add_item')
+        modal.modal_content_default_menu_label = _helpers.lang(this.name + '.modal_content_default_menu_label')
+        modal.modal_content_active_item = _helpers.lang(this.name + '.modal_content_active_item')
         modal.max_menu_items = 12;
         modal.min_menu_items = 1;
         modal.refresh_on_open = true;
