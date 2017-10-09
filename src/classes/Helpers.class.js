@@ -84,14 +84,13 @@ global.Helpers = class Helpers
         lang = config.lang || "en",
         langs = require("../config/langs.js"),
         trans = null;
-
         key = lang+'.'+key;
         // a key with dot notation, eg : en.h2.title
         trans = key.split('.').reduce(function (item,i) {
-            return item[i]
+            return item ? item[i] : {};
         }, langs);
 
-        return trans || key;
+        return trans && !$.isEmptyObject(trans) ? trans : key;
     }
 }
 global._helpers = Helpers.get();

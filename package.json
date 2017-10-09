@@ -14,9 +14,14 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
+    "gulp-print": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-template": "^4.0.0",
+    "http-server": "^0.10.0",
     "jquery": "^3.1.1",
     "summernote": "0.8.2",
-    "http-server": "^0.10.0"
+    "watchify": "^3.9.0",
+    "yargs": "^9.0.1"
   },
   "devDependencies": {},
   "scripts": {

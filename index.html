@@ -3,22 +3,186 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>demo</title>
+    <title>Summernote-bricks Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/railscasts.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
     <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="node_modules/summernote/dist/summernote.css" rel="stylesheet">
     <link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="dist/assets/editable-bloc.css" rel="stylesheet">
-    <style type="text/css">
-        body{
-            padding-top: 50px;
-        }
-    </style>
+    <link href="demo/bounce.css" rel="stylesheet">
+    <link href="demo/main.css" rel="stylesheet">
 </head>
 <body>
+<a href="https://github.com/eissasoubhi/summernote-bricks"><img style="position: fixed;top: 0;right: 0;border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
 
-<div class="container">
+<div class="bg"></div>
+<div class="name">
+   Summernote Bricks
+</div>
+
+<div class="container demo">
     <div class="row col-md-8 col-md-offset-2">
+        <div class="arrow bounce">
+            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+        </div>
         <div id="summernote"><span></span></div>
+    </div>
+</div>
+<div class="text_area">
+    <div class="container demo">
+        <video width="100%"  autoplay controls loop>
+          <source src="demo/demo.mp4" type="video/mp4">
+        <img class="img-responsive" src="demo/demo.gif">
+        </video>
+        <p class="text-center">
+            <a href="https://github.com/eissasoubhi/summernote-bricks/archive/gh-pages.zip" class="btn btn-success" download>Download this example</a>
+        </p>
+        <section>
+            <h1>Introdution</h1>
+            <hr>
+            <strong>Summernote bricks</strong> is a module of the summernote plugin to to add a user friendly components to the editor using bootstrap.
+        </section>
+        <section>
+            <h1>Requirements</h1>
+            <hr>
+            <ul>
+                <li>npm</li>
+                <li>watchify (for changing the module)</li>
+                <li>Tested on Windows 10, Google Chrome Version 61 and Firefox 55.0.3 (64-bit) with summernote v0.8.2</li>
+            </ul>
+        </section>
+        <section>
+            <h1>Installation</h1>
+            <hr>
+            <h3>Using NPM</h3>
+            <ul>
+                <li><code>$ npm i summernote-bricks </code></li>
+                <li><code>$ cd node_modules/summernote-bricks</code></li>
+                <li><code>$ npm start</code></li>
+            </ul>
+            <p>
+                Then go to <a target="_blank" href="http://127.0.0.1:9090" title="http://127.0.0.1:9090">http://127.0.0.1:9090</a>
+            </p>
+
+            <h3>Or using GitHub</h3>
+            <ul>
+                <li><a href="https://github.com/eissasoubhi/summernote-bricks" title="Download/Clone">Download/Clone</a> the repo from GitHub</li>
+                <li><code>$ cd summernote-bricks</code></li>
+                <li><code>$ npm start</code></li>
+            </ul>
+            <p>
+                Then go to <a target="_blank" href="http://127.0.0.1:9090" title="http://127.0.0.1:9090">http://127.0.0.1:9090</a>
+            </p>
+        </section>
+        <section>
+            <h1>Usage</h1>
+            <hr>
+            <p>
+                Add the required files :
+            </p>
+            <p>
+                The stylesheet files.
+            </p>
+            <pre class="initial">
+                <code class="html"><!--
+                -->&lt;link href=&quot;node_modules/bootstrap/dist/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+<!--            -->&lt;link href=&quot;node_modules/summernote/dist/summernote.css&quot; rel=&quot;stylesheet&quot;&gt;
+<!--            -->&lt;link href=&quot;node_modules/font-awesome/css/font-awesome.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+<!--            -->&lt;link href=&quot;dist/assets/editable-bloc.css&quot; rel=&quot;stylesheet&quot;&gt;
+<!--        --></code>
+            </pre>
+            <p>
+                Then summernote tag
+            </p>
+            <pre class="initial">
+                <code class="html"><!--
+                -->&lt;div id=&quot;summernote&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;
+<!--        --></code>
+            </pre>
+            <p>
+                The script files.
+            </p>
+            <pre class="initial">
+                <code class="html"><!--
+                    -->&lt;script src=&quot;node_modules/jquery/dist/jquery.min.js&quot;&gt;&lt;/script&gt;
+<!--                -->&lt;script src=&quot;node_modules/bootstrap/dist/js/bootstrap.min.js&quot;&gt;&lt;/script&gt;
+<!--                -->&lt;script src=&quot;node_modules/summernote/dist/summernote.min.js&quot;&gt;&lt;/script&gt;
+<!--                -->&lt;script src=&quot;dist/summernote-extensions.dist.js&quot;&gt;&lt;/script&gt;
+<!--        --></code>
+            </pre>
+            <p>
+                Initialize <a href="https://github.com/summernote/summernote" title="Summernote"> Summernote</a> with the bricks module.
+            </p>
+<pre>
+&lt;script&gt;
+<div class="faded">
+    jQuery(document).ready(function($) {
+         $('#summernote').summernote({
+            toolbar: [
+                ['insert', [<strong>'bricks'</strong>]],
+                ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
+            ],
+            // bricks options
+            <strong>
+            bricks: {
+                gallery: {
+                    modal_body_file: "php/gallery_dynamic_content.html"
+                },
+                thumbnails: {
+                    modal_body_file: "php/thumbnails_dynamic_content.html"
+                },
+            }
+            </strong>
+        });
+    });
+</div>
+&lt;/script&gt;
+</pre>
+            <p>
+                <a href="https://github.com/summernote/summernote" title="More details about Summernote installation and options.">See more details about Summernote installation and options.</a>
+            </p>
+        </section>
+        <section>
+            <h1>Creating custom bricks</h1>
+            <hr>
+            <p>
+                Run <code>$ npm run watch</code> to set watchify to auto-generate the bundle file <i>/dist/summernote-extensions.dist.js</i>.
+            </p>
+            <p>
+                To Create a modalable brick (opens a modal on click) run <code>$ gulp brick --type modalable --name [brick name]</code>.
+            </p>
+            <p>
+                To Create a simple brick (inserts the content immediately to the editor without opening a modal) run <code>$ gulp brick --type simple --name [brick name]</code> or just <code>$ gulp brick --name [brick name]</code>.
+            </p>
+
+            <h3>Simple brick example</h3>
+            <p>
+                <code>$ gulp brick --name header</code>
+            </p>
+            <p>
+                The code above will create the following files :
+                <ul>
+                    <li>src/classes/Header.class.js</li>
+                    <li>dist/bricks_assets/header/html.html</li>
+                    <li>dist/bricks_assets/header/style.html</li>
+                </ul>
+            </p>
+            <p>
+                next require the the <i>Header</i> class you just created in the file <i>src/utility/autoload.js</i>
+            </p>
+            <p>
+                Then go to the file <i>src/summernote-extensions.js</i> and add the the same class to the <i>plugins</i> array : <code>new Header()</code>
+            </p>
+            <p>
+                To edit the inserted html go to <i>dist/bricks_assets/header/html.html</i> file.
+            </p>
+            <p>
+                To edit the style of the inserted html go to <i>dist/bricks_assets/header/style.html</i> file.
+            </p>
+        </section>
     </div>
 </div>
 
@@ -37,10 +201,10 @@
             ],
             bricks: {
                 gallery: {
-                    modal_body_file: "/php/gallery_dynamic_content.html"
+                    modal_body_file: "php/gallery_dynamic_content.html"
                 },
                 thumbnails: {
-                    modal_body_file: "/php/thumbnails_dynamic_content.html"
+                    modal_body_file: "php/thumbnails_dynamic_content.html"
                 },
             }
         });

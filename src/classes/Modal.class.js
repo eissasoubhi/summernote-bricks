@@ -14,7 +14,7 @@ global.Modal = class Modal
         this.modal_close_btn_text = _helpers.lang("close");
         this.modal_ok_btn_text = _helpers.lang("add");
         this.modal_update_btn_text = _helpers.lang("update");
-        this.style_tag_id = "bloc_" + this.plugin.name + "_style";
+        this.style_tag_id = this.plugin.name + "_style";
         this.style = this.plugin.modal_style;
         this.refresh_on_open = false;
         this.has_been_opened = false;
@@ -69,7 +69,7 @@ global.Modal = class Modal
         var plugin = this.plugin;
         var modal_body = plugin.modal_body;
 
-        this.modal.attr('id', "bloc_" + this.plugin.name + "_html");
+        this.modal.attr('id', this.plugin.name + "_html");
 
         if(this.mode == "edit")
         {
