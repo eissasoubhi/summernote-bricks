@@ -116,7 +116,8 @@
             <p>
                 Initialize <a href="https://github.com/summernote/summernote" title="Summernote"> Summernote</a> with the bricks module.
             </p>
-<pre>
+<br>
+<pre  class="initial" id="initialization">
 &lt;script&gt;
 <div class="faded">
     jQuery(document).ready(function($) {
@@ -141,6 +142,7 @@
 </div>
 &lt;/script&gt;
 </pre>
+<br>
             <p>
                 <a href="https://github.com/summernote/summernote" title="More details about Summernote installation and options.">See more details about Summernote installation and options.</a>
             </p>
@@ -149,16 +151,17 @@
             <h1>Creating custom bricks</h1>
             <hr>
             <p>
-                Run <code>$ npm run watch</code> to set watchify to auto-generate the bundle file <i>/dist/summernote-extensions.dist.js</i>.
+                Run <code>$ npm run watch</code> to set watchify to auto-generate the bundle file <b>/dist/summernote-extensions.dist.js</b>.
             </p>
             <p>
                 To Create a modalable brick (opens a modal on click) run <code>$ gulp brick --type modalable --name [brick name]</code>.
             </p>
             <p>
                 To Create a simple brick (inserts the content immediately to the editor without opening a modal) run <code>$ gulp brick --type simple --name [brick name]</code> or just <code>$ gulp brick --name [brick name]</code>.
+                <br><br>
             </p>
 
-            <h3>Simple brick example</h3>
+            <h2>Simple brick example</h2>
             <p>
                 <code>$ gulp brick --name header</code>
             </p>
@@ -171,17 +174,312 @@
                 </ul>
             </p>
             <p>
-                next require the the <i>Header</i> class you just created in the file <i>src/utility/autoload.js</i>
+                Next :
+            </p>
+            <ol>
+                <li>
+                    <p>
+                        Require the the <b>Header</b> class you just created in the file <b>src/utility/autoload.js</b>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Then go to the file <b>src/summernote-extensions.js</b> and add the the same class to the <b>plugins</b> array : <code>new Header()</code>
+                    </p>
+            <pre class="initial">
+<!--    --><div class="faded">
+<!--            -->var plugins = [
+<!--            -->    new H2(),
+<!--            -->    new Panel(),
+<!--            -->    new Menu(),
+<!--            -->    new Gallery(),
+<!--            -->    new Thumbnails(),
+<!--            -->    new ContactForm(),
+<!--            -->    <strong>new Header()</strong>
+<!--            -->];
+<!--     --></div>
+            </pre>
+                </li>
+                <li>
+                    <p> Add the brick localization text in the file <b>src/config/langs.js</b> </p>
+            <pre class="initial">
+<!--    --><div class="faded">
+<!--            -->en: {
+<!--            --><strong>
+    <!--            -->header:{
+        <!--            -->tooltip: "Add a header",
+        <!--            -->label: "Header",
+    <!--            -->},
+    <!--            --></strong>
+    <!--            -->panel:{
+    <!--            -->tooltip: "Add a new panel with text",
+    <!--            -->label: "Panel",
+<!--            -->},
+<!--     --></div>
+            </pre>
+                </li>
+            </ol>
+            <p>
+                To edit the inserted html go to <b>dist/bricks_assets/header/html.html</b> file.
             </p>
             <p>
-                Then go to the file <i>src/summernote-extensions.js</i> and add the the same class to the <i>plugins</i> array : <code>new Header()</code>
+                To edit the style of the inserted html go to <b>dist/bricks_assets/header/style.html</b> file.
+            </p>
+
+            <h3>Modalable brick example</h2>
+            <p>
+                <code>$ gulp brick --type modalable --name something</code>
             </p>
             <p>
-                To edit the inserted html go to <i>dist/bricks_assets/header/html.html</i> file.
+                The code above will create the following files :
+                <ul>
+                    <li>src/classes/Something.class.js</li>
+                    <li>dist/bricks_assets/something/modal.html</li>
+                    <li>dist/bricks_assets/something/modal_body.html</li>
+                    <li>dist/bricks_assets/something/modal_style.html</li>
+                    <li>dist/bricks_assets/something/html.html</li>
+                    <li>dist/bricks_assets/something/style.html</li>
+                </ul>
             </p>
             <p>
-                To edit the style of the inserted html go to <i>dist/bricks_assets/header/style.html</i> file.
+                Next :
             </p>
+            <ol>
+                <li>
+                    <p>
+                        Require the the <b>Something</b> class you just created in the file <b>src/utility/autoload.js</b>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Then go to the file <b>src/summernote-extensions.js</b> and add the the same class to the <b>plugins</b> array : <code>new Something()</code>
+                    </p>
+            <pre class="initial">
+<!--    --><div class="faded">
+<!--            -->var plugins = [
+<!--            -->    new H2(),
+<!--            -->    new Panel(),
+<!--            -->    new Menu(),
+<!--            -->    new Gallery(),
+<!--            -->    new Thumbnails(),
+<!--            -->    new ContactForm(),
+<!--            -->    <strong>new Something()</strong>
+<!--            -->];
+<!--     --></div>
+            </pre>
+                </li>
+                <li>
+                    <p> Add the brick localization text in the file <b>src/config/langs.js</b> </p>
+            <pre class="initial">
+<!--    --><div class="faded">
+<!--            -->en: {
+<!--            --><strong>
+    <!--            -->something:{
+        <!--            -->tooltip: "Add something",
+        <!--            -->label: "Something",
+    <!--            -->},
+    <!--            --></strong>
+    <!--            -->panel:{
+    <!--            -->tooltip: "Add a new panel with text",
+    <!--            -->label: "Panel",
+<!--            -->},
+<!--     --></div>
+            </pre>
+                </li>
+            </ol>
+            <p>
+                To edit the inserted html go to <b>dist/bricks_assets/something/html.html</b> file.
+            <p>
+                To edit the style of the inserted html go to <b>dist/bricks_assets/something/style.html</b> file.
+            </p>
+            </p>
+            <p>
+                To edit the modal go to <b>dist/bricks_assets/something/modal.html</b> file.
+            </p>
+            <p>
+                To edit the modal body html go to <b>dist/bricks_assets/something/modal_body.html</b> file.
+            </p>
+            <p>
+                To edit the modal body style go to <b>dist/bricks_assets/something/modal_style.html</b> file.
+            </p>
+        </section>
+        <section>
+            <h1>Options</h1>
+            <hr>
+            <p>
+                the summernote-bricks options can be passed with <a href="#initialization" title='the summernote editor options with key "bricks"'>the summernote editor options with key "bricks"</a>. or you can put them inside the config file <b>src/config/default.js</b>
+            </p>
+
+            <table class="table table-bordered options-table" >
+                <tr>
+                    <th>
+                        Option
+                    </th>
+                    <th>
+                        description
+                    </th>
+                    <th>
+                        default
+                    </th>
+                    <th>
+                        type
+                    </th>
+                    <th>
+                        example
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        modal_body_file
+                    </td>
+                    <td>
+                        <p>
+                            instead of loading the content from a local HTML file, use this option to load the content from a url.
+                        </p>
+                        <p>
+                            This option must be set for a spicific brick inside an object.
+                        </p>
+                    </td>
+                    <td>
+                        loads the default brick html file <br>
+                        <b>dist/bricks_assets/[brick name]/html.html</b>
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+    <pre class="initial">
+    thumbnails: {
+        modal_body_file: "php/thumbnails_dynamic_content.html"
+    },
+    </pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        lang
+                    </td>
+                    <td>
+                        Localization language in the file <b>src/config/langs.js</b>.
+                        The given value must be in that file as an object.
+                    </td>
+                    <td>
+                        en
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+                        fr
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        bricks_assets
+                    </td>
+                    <td>
+                        The bricks folder path which contains the html and the style files.
+                    </td>
+                    <td>
+                        dist/bricks_assets
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+                        dist/bricks_assets
+                    </td>
+                </tr>
+            </table>
+        </section>
+        <section>
+            <h1>Localization</h1>
+            <hr>
+            <p>
+                the summernote-bricks options can be passed with <a href="#initialization" title='the summernote editor options with key "bricks"'>the summernote editor options with key "bricks"</a>. or you can put them inside the config file
+            </p>
+
+            <table class="table table-bordered options-table" >
+                <tr>
+                    <th>
+                        Option
+                    </th>
+                    <th>
+                        description
+                    </th>
+                    <th>
+                        default
+                    </th>
+                    <th>
+                        type
+                    </th>
+                    <th>
+                        example
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        modal_body_file
+                    </td>
+                    <td>
+                        <p>
+                            instead of loading the content from a local HTML file, use this option to load the content from a url.
+                        </p>
+                        <p>
+                            This option must be set for a spicific brick inside an object.
+                        </p>
+                    </td>
+                    <td>
+                        loads the default brick html file <br>
+                        <b>dist/bricks_assets/[brick name]/html.html</b>
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+    <pre class="initial">
+    thumbnails: {
+        modal_body_file: "php/thumbnails_dynamic_content.html"
+    },
+    </pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        lang
+                    </td>
+                    <td>
+                        Localization language in the file <b>src/config/langs.js</b>.
+                        The given value must be in that file as an object.
+                    </td>
+                    <td>
+                        en
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+                        fr
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        bricks_assets
+                    </td>
+                    <td>
+                        The bricks folder path which contains the html and the style files.
+                    </td>
+                    <td>
+                        dist/bricks_assets
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+                        dist/bricks_assets
+                    </td>
+                </tr>
+            </table>
         </section>
     </div>
 </div>

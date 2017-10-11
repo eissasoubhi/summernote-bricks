@@ -69,3 +69,6 @@ pre.initial{
 .faded strong{
     color: #000;
 }
+.options-table td{
+    font-size: 15px;
+}

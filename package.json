@@ -14,6 +14,7 @@
   "dependencies": {
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
+    "gulp": "^3.9.1",
     "gulp-print": "^2.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-template": "^4.0.0",
