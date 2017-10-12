@@ -429,7 +429,7 @@ global.Thumbnails = class Thumbnails extends SnBtnPlugin
             $thumbnail_item = this.setZoomPropertiesToThumbnailItem($populated_thumbnail_item, user_selected_image);
         }
         else if(modal.image_clique_action === modal.image_none_action)
-        {   // replace link tag with span
+        {   // replace link tag with a span
             $thumbnail_item = this.removeLinkTagFromThumbnailItem($populated_thumbnail_item)
         }
 
@@ -437,6 +437,8 @@ global.Thumbnails = class Thumbnails extends SnBtnPlugin
         {   // remove overly
             $thumbnail_item = this.removeThumbnailItemTitle($populated_thumbnail_item);
         }
+
+        $thumbnail_item.addClass(modal.image_clique_action)
 
         return $thumbnail_item;
     }

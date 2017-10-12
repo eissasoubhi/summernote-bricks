@@ -577,6 +577,7 @@ global.Editor = class Editor
         this.defineOuterEvents();
         this.initEvents();
         this.initEditableContent();
+        this.appendCommonScriptToBody();
         this.page = new Page();
         this.page.editor = this;
     }
@@ -624,6 +625,14 @@ global.Editor = class Editor
                 editable_content.removeEditableFeatures();
             }*/
         }
+    }
+
+    appendCommonScriptToBody()
+    {
+        $.get(_helpers.getConfig().bricks_assets+'/common/script.html', function(script) {
+            if($(script).attr('id') && ! $('body').find('script#'+$(script).attr('id')).length)
+                $('body').append(script);
+        })
     }
 
     getEditableBlocProperties(editable_bloc)
@@ -2773,7 +2782,7 @@ global.Thumbnails = class Thumbnails extends SnBtnPlugin
             $thumbnail_item = this.setZoomPropertiesToThumbnailItem($populated_thumbnail_item, user_selected_image);
         }
         else if(modal.image_clique_action === modal.image_none_action)
-        {   // replace link tag with span
+        {   // replace link tag with a span
             $thumbnail_item = this.removeLinkTagFromThumbnailItem($populated_thumbnail_item)
         }
 
@@ -2781,6 +2790,8 @@ global.Thumbnails = class Thumbnails extends SnBtnPlugin
         {   // remove overly
             $thumbnail_item = this.removeThumbnailItemTitle($populated_thumbnail_item);
         }
+
+        $thumbnail_item.addClass(modal.image_clique_action)
 
         return $thumbnail_item;
     }

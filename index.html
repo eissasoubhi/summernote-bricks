@@ -50,7 +50,7 @@
             <hr>
             <ul>
                 <li>npm</li>
-                <li>watchify (for changing the module)</li>
+                <li>Modern browser that supports Ecmascript 6</li>
                 <li>Tested on Windows 10, Google Chrome Version 61 and Firefox 55.0.3 (64-bit) with summernote v0.8.2</li>
             </ul>
         </section>
@@ -148,6 +148,105 @@
             </p>
         </section>
         <section>
+            <h1>Options</h1>
+            <hr>
+            <p>
+                the summernote-bricks options can be passed with <a href="#initialization" title='the summernote editor options with key "bricks"'>the summernote editor options with key "bricks"</a>. or you can put them inside the config file <b>src/config/default.js</b>
+            </p>
+
+            <table class="table table-bordered options-table" >
+                <tr>
+                    <th>
+                        Option
+                    </th>
+                    <th>
+                        description
+                    </th>
+                    <th>
+                        default
+                    </th>
+                    <th>
+                        type
+                    </th>
+                    <th>
+                        example
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        modal_body_file
+                    </td>
+                    <td>
+                        <p>
+                            instead of loading the content from a local HTML file, use this option to load the content from a url.
+                        </p>
+                        <p>
+                            This option must be set for a spicific brick inside an object.
+                        </p>
+                    </td>
+                    <td>
+                        loads the default brick html file <br>
+                        <b>dist/bricks_assets/[brick name]/html.html</b>
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+    <pre class="initial">
+    thumbnails: {
+        modal_body_file: "php/thumbnails_dynamic_content.html"
+    },
+    </pre>
+                    </td>
+                </tr>
+                <tr id="lang_option">
+                    <td>
+                        lang
+                    </td>
+                    <td>
+                        Localization language in the file <b>src/config/langs.js</b>.
+                        The given value must be in that file as an object.
+                    </td>
+                    <td>
+                        en
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+                        fr
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        bricks_assets
+                    </td>
+                    <td>
+                        The bricks folder path which contains the html and the style files.
+                    </td>
+                    <td>
+                        dist/bricks_assets
+                    </td>
+                    <td>
+                        String
+                    </td>
+                    <td>
+                        dist/bricks_assets
+                    </td>
+                </tr>
+            </table>
+            <br>
+            <p>
+                To retrieve the configuration values use the helper function :
+            </p>
+            <pre class="initial">
+                <code class="Javascript"><!--
+                 -->var configs = _helpers.getConfig();
+<!--             -->var current_lang = configs.lang; // en
+<!--        --></code>
+            </pre>
+        </section>
+        <section>
             <h1>Creating custom bricks</h1>
             <hr>
             <p>
@@ -201,7 +300,7 @@
             </pre>
                 </li>
                 <li>
-                    <p> Add the brick localization text in the file <b>src/config/langs.js</b> </p>
+                    <p> Add the brick <a href="#localization">localization</a> text in the file <b>src/config/langs.js</b> </p>
             <pre class="initial">
 <!--    --><div class="faded">
 <!--            -->en: {
@@ -226,7 +325,7 @@
                 To edit the style of the inserted html go to <b>dist/bricks_assets/header/style.html</b> file.
             </p>
 
-            <h3>Modalable brick example</h2>
+            <h2>Modalable brick example</h2>
             <p>
                 <code>$ gulp brick --type modalable --name something</code>
             </p>
@@ -269,7 +368,7 @@
             </pre>
                 </li>
                 <li>
-                    <p> Add the brick localization text in the file <b>src/config/langs.js</b> </p>
+                    <p> Add the brick <a href="#localization">localization</a> text in the file <b>src/config/langs.js</b> </p>
             <pre class="initial">
 <!--    --><div class="faded">
 <!--            -->en: {
@@ -303,183 +402,44 @@
                 To edit the modal body style go to <b>dist/bricks_assets/something/modal_style.html</b> file.
             </p>
         </section>
-        <section>
-            <h1>Options</h1>
-            <hr>
-            <p>
-                the summernote-bricks options can be passed with <a href="#initialization" title='the summernote editor options with key "bricks"'>the summernote editor options with key "bricks"</a>. or you can put them inside the config file <b>src/config/default.js</b>
-            </p>
-
-            <table class="table table-bordered options-table" >
-                <tr>
-                    <th>
-                        Option
-                    </th>
-                    <th>
-                        description
-                    </th>
-                    <th>
-                        default
-                    </th>
-                    <th>
-                        type
-                    </th>
-                    <th>
-                        example
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        modal_body_file
-                    </td>
-                    <td>
-                        <p>
-                            instead of loading the content from a local HTML file, use this option to load the content from a url.
-                        </p>
-                        <p>
-                            This option must be set for a spicific brick inside an object.
-                        </p>
-                    </td>
-                    <td>
-                        loads the default brick html file <br>
-                        <b>dist/bricks_assets/[brick name]/html.html</b>
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-    <pre class="initial">
-    thumbnails: {
-        modal_body_file: "php/thumbnails_dynamic_content.html"
-    },
-    </pre>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        lang
-                    </td>
-                    <td>
-                        Localization language in the file <b>src/config/langs.js</b>.
-                        The given value must be in that file as an object.
-                    </td>
-                    <td>
-                        en
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-                        fr
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        bricks_assets
-                    </td>
-                    <td>
-                        The bricks folder path which contains the html and the style files.
-                    </td>
-                    <td>
-                        dist/bricks_assets
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-                        dist/bricks_assets
-                    </td>
-                </tr>
-            </table>
-        </section>
-        <section>
+        <section id="localization">
             <h1>Localization</h1>
             <hr>
             <p>
-                the summernote-bricks options can be passed with <a href="#initialization" title='the summernote editor options with key "bricks"'>the summernote editor options with key "bricks"</a>. or you can put them inside the config file
+                After setting the <a href="#lang_option" title="lang option"> lang option</a> in the <a href="#initialization" title='the initialization step'>the initialization step</a> you can customize the shown text for every brick in the file <b>src/config/langs.js</b> .
             </p>
 
-            <table class="table table-bordered options-table" >
-                <tr>
-                    <th>
-                        Option
-                    </th>
-                    <th>
-                        description
-                    </th>
-                    <th>
-                        default
-                    </th>
-                    <th>
-                        type
-                    </th>
-                    <th>
-                        example
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        modal_body_file
-                    </td>
-                    <td>
-                        <p>
-                            instead of loading the content from a local HTML file, use this option to load the content from a url.
-                        </p>
-                        <p>
-                            This option must be set for a spicific brick inside an object.
-                        </p>
-                    </td>
-                    <td>
-                        loads the default brick html file <br>
-                        <b>dist/bricks_assets/[brick name]/html.html</b>
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-    <pre class="initial">
-    thumbnails: {
-        modal_body_file: "php/thumbnails_dynamic_content.html"
-    },
-    </pre>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        lang
-                    </td>
-                    <td>
-                        Localization language in the file <b>src/config/langs.js</b>.
-                        The given value must be in that file as an object.
-                    </td>
-                    <td>
-                        en
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-                        fr
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        bricks_assets
-                    </td>
-                    <td>
-                        The bricks folder path which contains the html and the style files.
-                    </td>
-                    <td>
-                        dist/bricks_assets
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-                        dist/bricks_assets
-                    </td>
-                </tr>
-            </table>
+            <p>
+                You may retrieve lines from language file using the _helpers.lang() helper function. The lang() method accepts the key of the translation string as its first argument with the dot notation. For example, let's retrieve the menu tooltip translation string  from the <b>src/config/langs.js</b> file
+            </p>
+
+            <pre class="initial">
+                <code class="Javascript"><!--
+                 -->_helpers.lang('menu.tooltip');
+<!--        --></code>
+            </pre>
+            <p>
+                If the chosen language is en the lang() function expects the langs file to have something like this :
+            </p>
+            <pre class="initial">
+<!--    --><div class="">
+<!--            -->en: {
+<!--            --><strong>
+    <!--            -->menu:{
+        <!--            -->tooltip: "Add a new menu",
+    <!--            -->},
+    <!--            --></strong>
+    <!--            -->...
+<!--     --></div>
+            </pre>
+            <p>
+                if it doesn't find the requested translation it returns the key prefixed with the language. Example: <i>en.menu.tooltip</i>
+            </p>
+        </section>
+        <section>
+            <h1>License</h1>
+            <hr>
+            The contents of this repository is licensed under <a href="https://opensource.org/licenses/MIT" title="The MIT License">The MIT License</a>
         </section>
     </div>
 </div>

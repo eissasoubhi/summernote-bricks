@@ -23,6 +23,7 @@ global.Editor = class Editor
         this.defineOuterEvents();
         this.initEvents();
         this.initEditableContent();
+        this.appendCommonScriptToBody();
         this.page = new Page();
         this.page.editor = this;
     }
@@ -70,6 +71,14 @@ global.Editor = class Editor
                 editable_content.removeEditableFeatures();
             }*/
         }
+    }
+
+    appendCommonScriptToBody()
+    {
+        $.get(_helpers.getConfig().bricks_assets+'/common/script.html', function(script) {
+            if($(script).attr('id') && ! $('body').find('script#'+$(script).attr('id')).length)
+                $('body').append(script);
+        })
     }
 
     getEditableBlocProperties(editable_bloc)
