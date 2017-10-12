@@ -1,6 +1,6 @@
 {
   "name": "summernote-bricks",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A summernote module to add user-friendly components to the wysiwyg editor",
   "main": "dist/summernote-extensions.dist.js",
   "keywords": [
