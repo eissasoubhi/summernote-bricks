@@ -181,7 +181,7 @@ Next :
  1. Require the **Something** class you just created in the file
     **src/utility/autoload**.
  2. Then go to the file **src/summernote-extensions.js** and add the same
-        class to the **plugins** array : ```javascipt new Something() ```
+        class to the **plugins** array : `new Something()`
 
 ```javascript
  var plugins = [
