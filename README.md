@@ -50,7 +50,7 @@ Add the required files :
 
 **Then Summernote tag.**
 ```HTML
-    <div id="summernote"><span></span></div>
+<div id="summernote"><span></span></div>
 ```
 **The script files.**
 ```HTML
@@ -59,7 +59,7 @@ Add the required files :
 <script src="node_modules/summernote/dist/summernote.min.js"></script>
 <script src="dist/summernote-extensions.dist.js"></script>
 ```
-
+<a name="initialization"></a>
 **Initialize [Summernote](https://github.com/summernote/summernote) with the bricks module.**
 ```HTML
  <script>
@@ -98,7 +98,7 @@ The Summernote-bricks options can be passed with [the Summernote editor options 
 | Option            | description                                                                                                                                                           | default                                                                       | type      | example                                                                   |
 |-----------------  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |-----------------------------------------------------------------------------  |--------   |-------------------------------------------------------------------------  |
 | modal_body_file   | instead of loading the content from a local HTML file, use this option to load the content from a URL.This option must be set for a specific brick inside an object.  | loads the default brick HTML file **dist/bricks_assets/[brick name]/html.html**   | String    | `thumbnails: {modal_body_file: "php/thumbnails_dynamic_content.html",},`     |
-| lang              | Localization language in the file **src/config/langs.js**. The given value must be in that file as an object.                                                             | en                                                                            | String    | fr                                                                        |
+| <a name="lang_option"></a> lang              | Localization language in the file **src/config/langs.js**. The given value must be in that file as an object.                                                             | en                                                                            | String    | fr                                                                        |
 | bricks_assets     | The bricks folder path which contains the HTML and the style files.                                                                                                   | dist/bricks_assets                                                            | String    | dist/bricks_assets                                                        |
 
 To retrieve the configuration values use the helper function :
