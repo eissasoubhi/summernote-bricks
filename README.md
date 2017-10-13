@@ -42,10 +42,10 @@ Usage
 Add the required files :
 **The stylesheet files.**
 ```HTML
-    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="node_modules/summernote/dist/summernote.css" rel="stylesheet">
-    <link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <link href="dist/assets/editable-bloc.css" rel="stylesheet">
+<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="node_modules/summernote/dist/summernote.css" rel="stylesheet">
+<link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="dist/assets/editable-bloc.css" rel="stylesheet">
 ```
 
 **Then Summernote tag.**
@@ -54,37 +54,37 @@ Add the required files :
 ```
 **The script files.**
 ```HTML
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="node_modules/summernote/dist/summernote.min.js"></script>
-    <script src="dist/summernote-extensions.dist.js"></script>
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="node_modules/summernote/dist/summernote.min.js"></script>
+<script src="dist/summernote-extensions.dist.js"></script>
 ```
 
 **Initialize [Summernote](https://github.com/summernote/summernote) with the bricks module.**
 ```HTML
-    <script>
-    
-        jQuery(document).ready(function($) {
-             $('#summernote').summernote({
-                toolbar: [
-                    ['insert', ['bricks']],
-                    ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
-                ],
-                // bricks options
-                
-                bricks: {
-                    gallery: {
-                        modal_body_file: "php/gallery_dynamic_content.html"
-                    },
-                    thumbnails: {
-                        modal_body_file: "php/thumbnails_dynamic_content.html"
-                    },
-                }
-                
-            });
-        });
-    
-    </script>
+ <script>
+
+     jQuery(document).ready(function($) {
+          $('#summernote').summernote({
+             toolbar: [
+                 ['insert', ['bricks']],
+                 ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
+             ],
+             // bricks options
+
+             bricks: {
+                 gallery: {
+                     modal_body_file: "php/gallery_dynamic_content.html"
+                 },
+                 thumbnails: {
+                     modal_body_file: "php/thumbnails_dynamic_content.html"
+                 },
+             }
+
+         });
+     });
+
+ </script>
 ```
 [See more details about Summernote installation and options.](https://github.com/summernote/summernote)
 
@@ -97,15 +97,15 @@ The Summernote-bricks options can be passed with [the Summernote editor options 
 
 | Option            | description                                                                                                                                                           | default                                                                       | type      | example                                                                   |
 |-----------------  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |-----------------------------------------------------------------------------  |--------   |-------------------------------------------------------------------------  |
-| modal_body_file   | instead of loading the content from a local HTML file, use this option to load the content from a URL.This option must be set for a specific brick inside an object.  | loads the default brick HTML file **dist/bricks_assets/[brick name]/html.html**   | String    | ```javascript thumbnails: {,modal_body_file: "php/thumbnails_dynamic_content.html",},```     |
+| modal_body_file   | instead of loading the content from a local HTML file, use this option to load the content from a URL.This option must be set for a specific brick inside an object.  | loads the default brick HTML file **dist/bricks_assets/[brick name]/html.html**   | String    | `thumbnails: {modal_body_file: "php/thumbnails_dynamic_content.html",},`     |
 | lang              | Localization language in the file **src/config/langs.js**. The given value must be in that file as an object.                                                             | en                                                                            | String    | fr                                                                        |
 | bricks_assets     | The bricks folder path which contains the HTML and the style files.                                                                                                   | dist/bricks_assets                                                            | String    | dist/bricks_assets                                                        |
 
 To retrieve the configuration values use the helper function :
 
 ```javascript
-    var configs = _helpers.getConfig();
-    var current_lang = configs.lang; // en
+var configs = _helpers.getConfig();
+var current_lang = configs.lang; // en
 ```
 
 Creating custom bricks
@@ -133,30 +133,30 @@ Next :
  1. Require the **Header** class you just created in the file **src/utility/autoload.js**
  2. Then go to the file **src/summernote-extensions.js** and add the same class to the **plugins** array : `new Header()`
 ```javascript
-          var plugins = [
-            new H2(),
-            new Panel(),
-            new Menu(),
-            new Gallery(),
-            new Thumbnails(),
-            new ContactForm(),
-            new Header()
-        ];
+ var plugins = [
+     new H2(),
+     new Panel(),
+     new Menu(),
+     new Gallery(),
+     new Thumbnails(),
+     new ContactForm(),
+     new Header()
+ ];
 ```
 
  3. Add the brick localization text in the file **src/config/langs.js**
 ```javascript
-         en: {
-    
-        header:{
-            tooltip: "Add a header",
-            label: "Header",
-        },
-        
-        panel:{
-        tooltip: "Add a new panel with text",
-        label: "Panel",
-        },
+ en: {
+
+    header:{
+        tooltip: "Add a header",
+        label: "Header",
+    },
+
+    panel:{
+    tooltip: "Add a new panel with text",
+    label: "Panel",
+ },
 ```
 To edit the inserted HTML go to **dist/bricks_assets/header/html.html** file.
 To edit the style of the inserted HTML go to **dist/bricks_assets/header/style.html** file.
@@ -183,30 +183,30 @@ Next :
         class to the **plugins** array : ```javascipt new Something() ```
 
 ```javascript
-        var plugins = [
-            new H2(),
-            new Panel(),
-            new Menu(),
-            new Gallery(),
-            new Thumbnails(),
-            new ContactForm(),
-            new Something()
-        ];
+ var plugins = [
+     new H2(),
+     new Panel(),
+     new Menu(),
+     new Gallery(),
+     new Thumbnails(),
+     new ContactForm(),
+     new Something()
+ ];
 ```
  3. Add the brick localization text in the file **src/config/langs.js**
  
 ```javascript
-        en: {
-        
-            something:{
-                tooltip: "Add something",
-                label: "Something",
-            },
-            
-            panel:{
-            tooltip: "Add a new panel with text",
-            label: "Panel",
-        },
+ en: {
+
+     something:{
+         tooltip: "Add something",
+         label: "Something",
+     },
+
+     panel:{
+     tooltip: "Add a new panel with text",
+     label: "Panel",
+ },
 ```
 
 To edit the inserted HTML go to **dist/bricks_assets/something/html.html file**.
@@ -226,21 +226,22 @@ After setting the [lang option](#lang_option) in the [initialization step](#init
 
 You may retrieve lines from language file using the _helpers.lang() helper function. The lang() method accepts the key of the translation string as its first argument with the dot notation. For example, let's retrieve the menu tooltip translation string from the **src/config/langs.js** file
 
-```javascript
-    _helpers.lang('menu.tooltip');
+```javascript 
+_helpers.lang('menu.tooltip');
 ```
 
 For example if the chosen language is *en* the lang() function expects the langs file to have something like this :
 
 ```javascript
-    // src/config/langs.js
-    en: {
-    
-        menu:{
-            tooltip: "Add a new menu",
-        },
-        
-        ...
+// src/config/langs.js
+
+en: {
+
+    menu:{
+        tooltip: "Add a new menu",
+    },
+
+    ...
 
 ```
 
