@@ -140,6 +140,7 @@ Next :
      new Gallery(),
      new Thumbnails(),
      new ContactForm(),
+     // Header added
      new Header()
  ];
 ```
@@ -190,6 +191,7 @@ Next :
      new Gallery(),
      new Thumbnails(),
      new ContactForm(),
+     // Something added
      new Something()
  ];
 ```
