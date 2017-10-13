@@ -30,5 +30,5 @@
     "watch": "watchify src/summernote-extensions.js -o dist/summernote-extensions.dist.js -v"
   },
   "author": "Eissa Soubhi <eissa.soubhi@gmail.com> (http://eissa-soubhi.com/)",
-  "license": "ISC"
+  "license": "MIT"
 }
