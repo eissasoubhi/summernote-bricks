@@ -117,6 +117,24 @@ To Create a modalable brick (opens a modal on click) run `$ gulp brick --type mo
 
 To Create a simple brick (inserts the content immediately to the editor without opening a modal) run `$ gulp brick --type simple --name [brick name]` or just `$ gulp brick --name [brick name]`. 
 
+Disabling or removing a brick
+--------------------
+
+To disable a brick, all you need to do is removing it or commenting it out from the the plugins array in the main js file  **src/summernote-extensions.js**
+
+```javascript
+ var plugins = [
+     new H2(),
+     new Panel(),
+     // the Menu brick is disabled
+     // new Menu(),
+     new Gallery(),
+     new Thumbnails(),
+     new ContactForm(),
+     new Header()
+ ];
+```
+
 Simple brick example
 --------------------
 
