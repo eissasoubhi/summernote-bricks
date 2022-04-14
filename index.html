@@ -8,12 +8,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="node_modules/summernote/dist/summernote.css" rel="stylesheet">
-    <link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <link href="dist/assets/editable-bloc.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" >
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+
     <link href="demo/bounce.css" rel="stylesheet">
-    <link href="demo/main.css" rel="stylesheet">
+     <link href="demo/main.css" rel="stylesheet">
 </head>
 <body>
 <a href="https://github.com/eissasoubhi/summernote-bricks"><img style="position: fixed;top: 0;right: 0;border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
@@ -31,443 +30,69 @@
         <div id="summernote"><span></span></div>
     </div>
 </div>
-<div class="text_area">
-    <div class="container demo">
-        <video width="100%"  autoplay controls loop>
-          <source src="demo/demo.mp4" type="video/mp4">
-        <img class="img-responsive" src="demo/demo.gif">
-        </video>
-        <p class="text-center">
-            <a href="https://github.com/eissasoubhi/summernote-bricks/archive/gh-pages.zip" class="btn btn-success" download>Download this example</a>
-        </p>
-        <section>
-            <h1>Introduction</h1>
-            <hr>
-            <strong>Summernote bricks</strong> is a module of the Summernote plugin to add user-friendly components to the editor using bootstrap.
-        </section>
-        <section>
-            <h1>Requirements</h1>
-            <hr>
-            <ul>
-                <li>npm</li>
-                <li>Modern browser that supports ECMAScript 6</li>
-                <li>Tested on Windows 10, Google Chrome Version 61 and Firefox 55.0.3 (64-bit) with Summernote v0.8.2</li>
-            </ul>
-        </section>
-        <section>
-            <h1>Installation</h1>
-            <hr>
-            <h3>Using NPM</h3>
-            <ul>
-                <li><code>$ npm i summernote-bricks </code></li>
-                <li><code>$ cd node_modules/summernote-bricks</code></li>
-                <li><code>$ npm start</code></li>
-            </ul>
-            <p>
-                Then go to <a target="_blank" href="http://127.0.0.1:9090" title="http://127.0.0.1:9090">http://127.0.0.1:9090</a>
-            </p>
 
-            <h3>Or using GitHub</h3>
-            <ul>
-                <li><a href="https://github.com/eissasoubhi/summernote-bricks" title="Download/Clone">Download/Clone</a> the repo from GitHub</li>
-                <li><code>$ cd summernote-bricks</code></li>
-                <li><code>$ npm start</code></li>
-            </ul>
-            <p>
-                Then go to <a target="_blank" href="http://127.0.0.1:9090" title="http://127.0.0.1:9090">http://127.0.0.1:9090</a>
-            </p>
-        </section>
-        <section>
-            <h1>Usage</h1>
-            <hr>
-            <p>
-                Add the required files :
-            </p>
-            <p>
-                The stylesheet files.
-            </p>
-            <pre class="initial">
-                <code class="html"><!--
-                -->&lt;link href=&quot;node_modules/bootstrap/dist/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;
-<!--            -->&lt;link href=&quot;node_modules/summernote/dist/summernote.css&quot; rel=&quot;stylesheet&quot;&gt;
-<!--            -->&lt;link href=&quot;node_modules/font-awesome/css/font-awesome.min.css&quot; rel=&quot;stylesheet&quot;&gt;
-<!--            -->&lt;link href=&quot;dist/assets/editable-bloc.css&quot; rel=&quot;stylesheet&quot;&gt;
-<!--        --></code>
-            </pre>
-            <p>
-                Then Summernote tag
-            </p>
-            <pre class="initial">
-                <code class="html"><!--
-                -->&lt;div id=&quot;summernote&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;
-<!--        --></code>
-            </pre>
-            <p>
-                The script files.
-            </p>
-            <pre class="initial">
-                <code class="html"><!--
-                    -->&lt;script src=&quot;node_modules/jquery/dist/jquery.min.js&quot;&gt;&lt;/script&gt;
-<!--                -->&lt;script src=&quot;node_modules/bootstrap/dist/js/bootstrap.min.js&quot;&gt;&lt;/script&gt;
-<!--                -->&lt;script src=&quot;node_modules/summernote/dist/summernote.min.js&quot;&gt;&lt;/script&gt;
-<!--                -->&lt;script src=&quot;dist/summernote-extensions.dist.js&quot;&gt;&lt;/script&gt;
-<!--        --></code>
-            </pre>
-            <p>
-                Initialize <a href="https://github.com/summernote/summernote" title="Summernote"> Summernote</a> with the bricks module.
-            </p>
-<br>
-<pre  class="initial" id="initialization">
-&lt;script&gt;
-<div class="faded">
-    jQuery(document).ready(function($) {
-         $('#summernote').summernote({
-            toolbar: [
-                ['insert', [<strong>'bricks'</strong>]],
-                ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
-            ],
-            // bricks options
-            <strong>
-            bricks: {
-                gallery: {
-                    modal_body_file: "php/gallery_dynamic_content.html"
-                },
-                thumbnails: {
-                    modal_body_file: "php/thumbnails_dynamic_content.html"
-                },
-            }
-            </strong>
-        });
-    });
-</div>
-&lt;/script&gt;
-</pre>
-<br>
-            <p>
-                <a href="https://github.com/summernote/summernote" title="More details about Summernote installation and options.">See more details about Summernote installation and options.</a>
-            </p>
-        </section>
-        <section>
-            <h1>Options</h1>
-            <hr>
-            <p>
-                The Summernote-bricks options can be passed with <a href="#initialization" title='the Summernote editor options with key "bricks"'>the Summernote editor options with key "bricks"</a>. or you can put them inside the config file <b>src/config/default.js</b>
-            </p>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
-            <table class="table table-bordered options-table" >
-                <tr>
-                    <th>
-                        Option
-                    </th>
-                    <th>
-                        description
-                    </th>
-                    <th>
-                        default
-                    </th>
-                    <th>
-                        type
-                    </th>
-                    <th>
-                        example
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        modal_body_file
-                    </td>
-                    <td>
-                        <p>
-                            instead of loading the content from a local HTML file, use this option to load the content from a URL.
-                        </p>
-                        <p>
-                            This option must be set for a specific brick inside an object.
-                        </p>
-                    </td>
-                    <td>
-                        loads the default brick HTML file <br>
-                        <b>dist/bricks_assets/[brick name]/html.html</b>
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-    <pre class="initial">
-    thumbnails: {
-        modal_body_file: "php/thumbnails_dynamic_content.html"
-    },
-    </pre>
-                    </td>
-                </tr>
-                <tr id="lang_option">
-                    <td>
-                        lang
-                    </td>
-                    <td>
-                        Localization language in the file <b>src/config/langs.js</b>.
-                        The given value must be in that file as an object.
-                    </td>
-                    <td>
-                        en
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-                        fr
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        bricks_assets
-                    </td>
-                    <td>
-                        The bricks folder path which contains the HTML and the style files.
-                    </td>
-                    <td>
-                        dist/bricks_assets
-                    </td>
-                    <td>
-                        String
-                    </td>
-                    <td>
-                        dist/bricks_assets
-                    </td>
-                </tr>
-            </table>
-            <br>
-            <p>
-                To retrieve the configuration values use the helper function :
-            </p>
-            <pre class="initial">
-                <code class="Javascript"><!--
-                 -->var configs = _helpers.getConfig();
-<!--             -->var current_lang = configs.lang; // en
-<!--        --></code>
-            </pre>
-        </section>
-        <section>
-            <h1>Creating custom bricks</h1>
-            <hr>
-            <p>
-                Run <code>$ npm run watch</code> to set watchify to auto-generate the bundle file <b>/dist/summernote-extensions.dist.js</b>.
-            </p>
-            <p>
-                To Create a modalable brick (opens a modal on click) run <code>$ gulp brick --type modalable --name [brick name]</code>.
-            </p>
-            <p>
-                To Create a simple brick (inserts the content immediately to the editor without opening a modal) run <code>$ gulp brick --type simple --name [brick name]</code> or just <code>$ gulp brick --name [brick name]</code>.
-                <br><br>
-            </p>
+<!--<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>-->
+<script src="./summernote-bs4.js"></script>
+<!-- <script src="dist/summernote-extensions.dist.js"></script> -->
+<script type="text/javascript">
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.onload = function () {
+        init()
+    };
+    script.src = 'dist/summernote-extensions.min.js?v='+Date.now();
 
-            <h2>Simple brick example</h2>
-            <p>
-                <code>$ gulp brick --name header</code>
-            </p>
-            <p>
-                The code above will create the following files :
-                <ul>
-                    <li>src/classes/Header.class.js</li>
-                    <li>dist/bricks_assets/header/html.html</li>
-                    <li>dist/bricks_assets/header/style.html</li>
-                </ul>
-            </p>
-            <p>
-                Next :
-            </p>
-            <ol>
-                <li>
-                    <p>
-                        Require the <b>Header</b> class you just created in the file <b>src/utility/autoload.js</b>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Then go to the file <b>src/summernote-extensions.js</b> and add the same class to the <b>plugins</b> array : <code>new Header()</code>
-                    </p>
-            <pre class="initial">
-<!--    --><div class="faded">
-<!--            -->var plugins = [
-<!--            -->    new H2(),
-<!--            -->    new Panel(),
-<!--            -->    new Menu(),
-<!--            -->    new Gallery(),
-<!--            -->    new Thumbnails(),
-<!--            -->    new ContactForm(),
-<!--            -->    <strong>new Header()</strong>
-<!--            -->];
-<!--     --></div>
-            </pre>
-                </li>
-                <li>
-                    <p> Add the brick <a href="#localization">localization</a> text in the file <b>src/config/langs.js</b> </p>
-            <pre class="initial">
-<!--    --><div class="faded">
-<!--            -->en: {
-<!--            --><strong>
-    <!--            -->header:{
-        <!--            -->tooltip: "Add a header",
-        <!--            -->label: "Header",
-    <!--            -->},
-    <!--            --></strong>
-    <!--            -->panel:{
-    <!--            -->tooltip: "Add a new panel with text",
-    <!--            -->label: "Panel",
-<!--            -->},
-<!--     --></div>
-            </pre>
-                </li>
-            </ol>
-            <p>
-                To edit the inserted HTML go to <b>dist/bricks_assets/header/html.html</b> file.
-            </p>
-            <p>
-                To edit the style of the inserted HTML go to <b>dist/bricks_assets/header/style.html</b> file.
-            </p>
-
-            <h2>Modalable brick example</h2>
-            <p>
-                <code>$ gulp brick --type modalable --name something</code>
-            </p>
-            <p>
-                The code above will create the following files :
-                <ul>
-                    <li>src/classes/Something.class.js</li>
-                    <li>dist/bricks_assets/something/modal.html</li>
-                    <li>dist/bricks_assets/something/modal_body.html</li>
-                    <li>dist/bricks_assets/something/modal_style.html</li>
-                    <li>dist/bricks_assets/something/html.html</li>
-                    <li>dist/bricks_assets/something/style.html</li>
-                </ul>
-            </p>
-            <p>
-                Next :
-            </p>
-            <ol>
-                <li>
-                    <p>
-                        Require the <b>Something</b> class you just created in the file <b>src/utility/autoload.js</b>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Then go to the file <b>src/summernote-extensions.js</b> and add the same class to the <b>plugins</b> array : <code>new Something()</code>
-                    </p>
-            <pre class="initial">
-<!--    --><div class="faded">
-<!--            -->var plugins = [
-<!--            -->    new H2(),
-<!--            -->    new Panel(),
-<!--            -->    new Menu(),
-<!--            -->    new Gallery(),
-<!--            -->    new Thumbnails(),
-<!--            -->    new ContactForm(),
-<!--            -->    <strong>new Something()</strong>
-<!--            -->];
-<!--     --></div>
-            </pre>
-                </li>
-                <li>
-                    <p> Add the brick <a href="#localization">localization</a> text in the file <b>src/config/langs.js</b> </p>
-            <pre class="initial">
-<!--    --><div class="faded">
-<!--            -->en: {
-<!--            --><strong>
-    <!--            -->something:{
-        <!--            -->tooltip: "Add something",
-        <!--            -->label: "Something",
-    <!--            -->},
-    <!--            --></strong>
-    <!--            -->panel:{
-    <!--            -->tooltip: "Add a new panel with text",
-    <!--            -->label: "Panel",
-<!--            -->},
-<!--     --></div>
-            </pre>
-                </li>
-            </ol>
-            <p>
-                To edit the inserted HTML go to <b>dist/bricks_assets/something/html.html</b> file.
-            <p>
-                To edit the style of the inserted HTML go to <b>dist/bricks_assets/something/style.html</b> file.
-            </p>
-            </p>
-            <p>
-                To edit the modal go to <b>dist/bricks_assets/something/modal.html</b> file.
-            </p>
-            <p>
-                To edit the modal body HTML go to <b>dist/bricks_assets/something/modal_body.html</b> file.
-            </p>
-            <p>
-                To edit the modal body style go to <b>dist/bricks_assets/something/modal_style.html</b> file.
-            </p>
-        </section>
-        <section id="localization">
-            <h1>Localization</h1>
-            <hr>
-            <p>
-                After setting the <a href="#lang_option" title="lang option"> lang option</a> in the <a href="#initialization" title='initialization step'>initialization step</a> you can customize the shown text for every brick in the file <b>src/config/langs.js</b> .
-            </p>
-
-            <p>
-                You may retrieve lines from language file using the _helpers.lang() helper function. The lang() method accepts the key of the translation string as its first argument with the dot notation. For example, let's retrieve the menu tooltip translation string  from the <b>src/config/langs.js</b> file
-            </p>
-
-            <pre class="initial">
-                <code class="Javascript"><!--
-                 -->_helpers.lang('menu.tooltip');
-<!--        --></code>
-            </pre>
-            <p>
-                For example if the chosen language is en the lang() function expects the langs file to have something like this :
-            </p>
-            <pre class="initial">
-<!--    --><div class="">
-<!--            -->// src/config/langs.js
-<!--            -->en: {
-<!--            --><strong>
-    <!--            -->menu:{
-        <!--            -->tooltip: "Add a new menu",
-    <!--            -->},
-    <!--            --></strong>
-    <!--            -->...
-<!--     --></div>
-            </pre>
-            <p>
-                if it doesn't find the requested translation it returns the key prefixed with the language. Example: <i>en.menu.tooltip</i>
-            </p>
-        </section>
-        <section>
-            <h1>License</h1>
-            <hr>
-            The contents of this repository is licensed under <a href="https://opensource.org/licenses/MIT" title="The MIT License">The MIT License</a>
-        </section>
-    </div>
-</div>
-
-<script src="node_modules/jquery/dist/jquery.min.js"></script>
-<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="node_modules/summernote/dist/summernote.min.js"></script>
-<script src="dist/summernote-extensions.dist.js"></script>
+    document.getElementsByTagName('body')[0].appendChild(script);
+</script>
 <script>
-    jQuery(document).ready(function($) {
-         $('#summernote').summernote({
-            height: 300,
-            toolbar: [
-                ['insert', ['bricks']],
-                ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
-                ['misc', [ 'codeview',]]
-            ],
-            bricks: {
-                gallery: {
-                    modal_body_file: "php/gallery_dynamic_content.html"
+    function init(argument) {
+        jQuery(document).ready(function($) {
+             $('#summernote').summernote({
+                height: 300,
+                width: 800,
+                toolbar: [
+                    ['insert', ['summernoteBricks']],
+                    ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
+                    ['misc', [ 'codeview',]]
+                ],
+                summernoteBricks: {
+                    subBricks: [
+                        'summernote-gallery'
+                    ],
+                    buttonLabel: '<i class="fa fa-puzzle-piece"></i> SN bricks'
                 },
-                thumbnails: {
-                    modal_body_file: "php/thumbnails_dynamic_content.html"
+                 summernoteGallery: {
+                    source: {
+                        // data: [],
+                        url: 'http://eissasoubhi.github.io/summernote-gallery/server/example.json',
+                        responseDataKey: 'data',
+                        nextPageKey: 'links.next',
+                    },
+                    modal: {
+                        loadOnScroll: true,
+                        maxHeight: 300,
+                        title: "La galerie d'images",
+                        close_text: 'Fermer',
+                        ok_text: 'Ajouter',
+                        selectAll_text: 'Sélectionner Tout',
+                        deselectAll_text: 'Désélectionner Tout',
+                        noImageSelected_msg: 'No image was selected, please select one by clicking it!',
+                    },
+                     buttonLabel: '<i class="fa fa-file-image-o"></i> SN Gallery'
                 },
-            }
+                 callbacks: {
+                    onInit: function(a, b) {
+                      // console.log('Summernote is launched', $(this).data('summernote').options['summernoteBricks'], a);
+                        console.log('Summernote is launched')
+                    }
+                  }
+            });
         });
-    });
+    }
 </script>
 </body>
 </html>

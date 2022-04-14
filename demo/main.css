@@ -2,6 +2,7 @@ body{
     background-color: #222;
     color: #292929;
     padding-top: 140px;
+    height: 1000px;
 }
 .bg{
     background: url(https://unsplash.it/g/2000/1000/?random&blur&gravity=center);
@@ -11,7 +12,7 @@ body{
     left: 0;
     right: 0;
     top: 0;
-    bottom: 700px;
+    bottom: 0px;
     margin: auto;
     background-size: cover;
     z-index: -10;
@@ -72,3 +73,6 @@ pre.initial{
 .options-table td{
     font-size: 15px;
 }
+/*.note-editor.note-frame {*/
+/*    background-color: #FFF;*/
+/*}*/
