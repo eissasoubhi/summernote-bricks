@@ -11,13 +11,14 @@
   "homepage": "https://eissasoubhi.github.io/summernote-bricks",
   "bugs": "https://github.com/eissasoubhi/summernote-bricks/issues",
   "repository": "https://github.com/eissasoubhi/summernote-bricks",
-  "engines" : {
-    "node" : "16.x.x",
-    "npm" : "8.5.x"
+  "engines": {
+    "node": "16.x.x",
+    "npm": "8.5.x"
   },
   "dependencies": {
     "@types/summernote": "^0.8.2",
-    "summernote-gallery": "^2.1.1"
+    "summernote-gallery": "^2.1.1",
+    "summernote-heading": "^1.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.1",
