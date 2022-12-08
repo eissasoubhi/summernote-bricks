@@ -1,4 +1,4 @@
-import SummernoteGallery from "summernote-gallery/src/Module"
+import SummernoteGallery from "summernote-gallery/dist/module"
 import SummernoteHeading from "summernote-heading/dist/module"
 
 export default {
