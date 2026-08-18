@@ -6,24 +6,14 @@ export default class SummernoteBricksPlugin {
     }
 
     getPlugin() {
-        var plugin = {};
-        var _this = this;
-        let options = this.summernoteBricks.options
-        let summernoteBricks = this.summernoteBricks
+        const plugin = {};
+        const summernoteBricks = this.summernoteBricks;
+        const name = summernoteBricks.options.name;
 
-        plugin[options.name] = function(context) {
-            let buttonLabel = context.options[options.name]?.buttonLabel || _this.summernoteBricks.options.buttonLabel
-
-            _this.summernoteBricks.options.buttonLabel = buttonLabel
-
-            context.memo('button.' + options.name, summernoteBricks.createDropdown());
-
-            this.events = {
-                'summernote.keyup': function() {},
-                'summernote.init': function() {}
-            };
-
-            this.initialize = function() {};
+        plugin[name] = function(context) {
+            context.memo('button.' + name, function() {
+                return summernoteBricks.createDropdown(context);
+            });
         }
 
         return plugin;
