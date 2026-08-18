@@ -44,6 +44,18 @@ for (const variant of variants) {
       await expect(brick.locator('style')).toHaveCount(0);
     });
 
+    test('moves focus into a labeled heading form', async ({ page }) => {
+      const form = await openHeadingDialog(page, 0);
+      const title = form.getByLabel('Title');
+
+      await expect(title).toBeFocused();
+      await expect(form.getByLabel('Level')).toHaveClass(/snb-heading-form__level/);
+      await expect(title).toHaveClass(/snb-heading-form__title/);
+      await expect(form.getByLabel('Subtitle')).toHaveClass(/snb-heading-form__subtitle/);
+      await expect(form.getByLabel('Anchor')).toHaveClass(/snb-heading-form__anchor/);
+      await expect(form.locator('[role="alert"]')).toHaveCount(1);
+    });
+
     test('round-trips persisted heading HTML through destroy and recreate', async ({ page }) => {
       await openHeadingDialog(page, 0);
       await saveHeading(page, { level: 3, title: 'Persistent heading', subtitle: 'Round trip', anchor: 'persistent-heading' });
