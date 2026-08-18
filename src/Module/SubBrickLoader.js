@@ -5,18 +5,24 @@ import BrickRegistry from "./BrickRegistry"
 export default class SubBrickLoader {
     constructor(registry) {
         this.registry = registry || new BrickRegistry({
-            'summernote-gallery': SummernoteGallery,
-            'summernote-heading': SummernoteHeading,
+            'summernote-gallery': () => new SummernoteGallery('summernoteGallery'),
+            'summernote-heading': () => new SummernoteHeading('summernoteHeading'),
         });
     }
 
-    register(name, Brick) {
-        this.registry.register(name, Brick);
+    register(name, factory) {
+        this.registry.register(name, factory);
         return this;
     }
 
     loadSubBrick(name) {
-        return this.registry.resolve(name);
+        const brick = this.registry.create(name);
+
+        if (typeof brick.getPlugin !== 'function' || typeof brick.createButton !== 'function') {
+            throw new TypeError(`Brick "${name}" must expose getPlugin() and createButton().`);
+        }
+
+        return brick;
     }
 
     names() {
