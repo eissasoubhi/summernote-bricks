@@ -2,46 +2,34 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const BrickRegistry = require('../src/Module/BrickRegistry');
 
-function createGallery() {
-  return { name: 'gallery' };
-}
+test('resolves official aliases to Summernote button names', () => {
+  const registry = new BrickRegistry({
+    'summernote-gallery': 'summernoteGallery'
+  });
 
-function createCustom() {
-  return { name: 'custom' };
-}
-
-test('registers, resolves and creates bricks through factories', () => {
-  const registry = new BrickRegistry({ gallery: createGallery });
-
-  assert.equal(registry.resolve('gallery'), createGallery);
-  assert.deepEqual(registry.create('gallery'), { name: 'gallery' });
-  assert.deepEqual(registry.names(), ['gallery']);
+  assert.equal(registry.resolve('summernote-gallery'), 'summernoteGallery');
+  assert.deepEqual(registry.names(), ['summernote-gallery']);
 });
 
-test('supports future brick factories without changing the registry', () => {
+test('passes through a direct Summernote button name', () => {
   const registry = new BrickRegistry();
 
-  registry.register('custom', createCustom);
-
-  assert.equal(registry.has('custom'), true);
-  assert.deepEqual(registry.create('custom'), { name: 'custom' });
+  assert.equal(registry.resolve('myCustomButton'), 'myCustomButton');
 });
 
-test('fails fast with a useful error for an unknown brick', () => {
-  const registry = new BrickRegistry({ gallery: createGallery });
-
-  assert.throws(
-    () => registry.resolve('missing'),
-    /Unknown Summernote brick "missing".*gallery/
-  );
-});
-
-test('rejects invalid registrations and empty factory results', () => {
+test('supports custom aliases without core changes', () => {
   const registry = new BrickRegistry();
 
-  assert.throws(() => registry.register('', createCustom), TypeError);
+  registry.register('my-company-brick', 'myCompanyBrick');
+
+  assert.equal(registry.has('my-company-brick'), true);
+  assert.equal(registry.resolve('my-company-brick'), 'myCompanyBrick');
+});
+
+test('rejects invalid aliases', () => {
+  const registry = new BrickRegistry();
+
+  assert.throws(() => registry.register('', 'button'), TypeError);
+  assert.throws(() => registry.register('invalid', ''), TypeError);
   assert.throws(() => registry.register('invalid', {}), TypeError);
-
-  registry.register('empty', () => null);
-  assert.throws(() => registry.create('empty'), /did not return a plugin instance/);
 });
