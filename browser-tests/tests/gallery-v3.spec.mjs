@@ -43,6 +43,31 @@ for (const variant of variants) {
       await expect(gallery.locator('style')).toHaveCount(0);
     });
 
+    test('round-trips persisted gallery HTML through destroy and recreate', async ({ page }) => {
+      await openGalleryDialog(page, 0);
+      await chooseImageAndSave(page, 'Mountain');
+
+      const persistedHtml = await page.evaluate(() => $('#gallery-a').summernote('code'));
+      expect(persistedHtml).toContain('data-snb-brick="gallery"');
+      expect(persistedHtml).toContain('data-snb-version="3"');
+      expect(persistedHtml).toContain('<figure');
+      expect(persistedHtml).not.toContain('snb-brick-actions');
+      expect(persistedHtml).not.toContain('<style');
+
+      await page.evaluate(() => {
+        window.destroyGalleryEditor('#gallery-a');
+        window.createGalleryEditor('#gallery-a');
+      });
+
+      const recreated = page.locator('.note-editable').nth(0).locator('[data-snb-brick="gallery"][data-snb-version="3"]');
+      await expect(recreated).toHaveCount(1);
+      await expect(recreated.locator('img')).toHaveAttribute('data-snb-image-id', 'mountain');
+      await expect(recreated.locator('figcaption')).toHaveText('Mountain caption');
+
+      const reserializedHtml = await page.evaluate(() => $('#gallery-a').summernote('code'));
+      expect(reserializedHtml).toBe(persistedHtml);
+    });
+
     test('searches through the source adapter', async ({ page }) => {
       const dialog = await openGalleryDialog(page, 0);
       await dialog.locator('.snb-gallery-v3-form__query').fill('ocean');
