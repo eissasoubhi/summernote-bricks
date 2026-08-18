@@ -1,7 +1,4 @@
-
 import SummernoteBricks from "./SummernoteBricks";
-import SummernoteGallery from "summernote-gallery/src/Module"
-
 
 export default class SummernoteBricksPlugin {
     constructor(options) {
@@ -15,7 +12,6 @@ export default class SummernoteBricksPlugin {
         let summernoteBricks = this.summernoteBricks
 
         plugin[options.name] = function(context) {
-
             let buttonLabel = context.options[options.name]?.buttonLabel || _this.summernoteBricks.options.buttonLabel
 
             _this.summernoteBricks.options.buttonLabel = buttonLabel
@@ -23,17 +19,11 @@ export default class SummernoteBricksPlugin {
             context.memo('button.' + options.name, summernoteBricks.createDropdown());
 
             this.events = {
-                'summernote.keyup': function(we, e) {
-
-                },
-                'summernote.init': function(we, e) {
-
-                }
+                'summernote.keyup': function() {},
+                'summernote.init': function() {}
             };
 
-            this.initialize = function() {
-
-            };
+            this.initialize = function() {};
         }
 
         return plugin;
