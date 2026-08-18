@@ -18,7 +18,7 @@ The design optimizes for four properties:
 Owns:
 
 - the Bricks toolbar/dropdown UX;
-- the registry of known brick constructors;
+- the registry of named brick factories;
 - composition of configured bricks;
 - ecosystem-level examples and compatibility tests.
 
@@ -49,27 +49,29 @@ Because this package is shared by public bricks, changes to its effective public
 `BrickRegistry` is deliberately small:
 
 ```text
-register(name, constructor)
+register(name, factory)
 resolve(name)
+create(name)
 has(name)
 names()
 ```
 
+Factories are used instead of raw constructors because different standalone plugins can require different initialization arguments. The official registrations currently initialize Gallery as `summernoteGallery` and Heading as `summernoteHeading`.
+
 The registry knows **nothing** about Gallery or Heading behavior. Official bricks are only default registrations.
 
-Consumers can add a custom constructor through the `summernoteBricks.brickTypes` option and reference it from `subBricks`.
+Consumers can add a custom factory through the `summernoteBricks.brickFactories` option and reference it from `subBricks`.
 
-This is the first step toward a formal public brick descriptor. A later major release can evolve the contract to a shape such as:
+A factory must return the integration surface currently consumed by the aggregator:
 
 ```ts
-interface SummernoteBrickDefinition {
-  name: string;
-  createPlugin(): SummernotePlugin;
-  createButton(context: SummernoteContext): HTMLElement | JQuery;
+interface SummernoteBrickIntegration {
+  getPlugin(): object;
+  createButton(): unknown;
 }
 ```
 
-The exact interface should be frozen only after integration tests exist for Gallery and Heading. Avoid prematurely publishing a large framework API.
+This is intentionally a small transitional contract. A later major release may formalize a richer descriptor once browser/integration tests exist for Gallery and Heading. Avoid prematurely publishing a large framework API.
 
 ## Initialization lifecycle
 
@@ -132,7 +134,7 @@ Re-evaluate a monorepo only if most future changes consistently require synchron
 
 Breaking changes to any of these require a major version:
 
-- brick constructor/public integration contract;
+- brick factory/public integration contract;
 - Summernote option names or data shapes;
 - generated/persisted brick HTML that consumers may store;
 - package entrypoints;
