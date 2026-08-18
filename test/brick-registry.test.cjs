@@ -2,27 +2,33 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const BrickRegistry = require('../src/Module/BrickRegistry');
 
-class GalleryBrick {}
-class CustomBrick {}
+function createGallery() {
+  return { name: 'gallery' };
+}
 
-test('registers and resolves brick constructors', () => {
-  const registry = new BrickRegistry({ gallery: GalleryBrick });
+function createCustom() {
+  return { name: 'custom' };
+}
 
-  assert.equal(registry.resolve('gallery'), GalleryBrick);
+test('registers, resolves and creates bricks through factories', () => {
+  const registry = new BrickRegistry({ gallery: createGallery });
+
+  assert.equal(registry.resolve('gallery'), createGallery);
+  assert.deepEqual(registry.create('gallery'), { name: 'gallery' });
   assert.deepEqual(registry.names(), ['gallery']);
 });
 
-test('supports registering future bricks without changing the registry', () => {
+test('supports future brick factories without changing the registry', () => {
   const registry = new BrickRegistry();
 
-  registry.register('custom', CustomBrick);
+  registry.register('custom', createCustom);
 
   assert.equal(registry.has('custom'), true);
-  assert.equal(registry.resolve('custom'), CustomBrick);
+  assert.deepEqual(registry.create('custom'), { name: 'custom' });
 });
 
 test('fails fast with a useful error for an unknown brick', () => {
-  const registry = new BrickRegistry({ gallery: GalleryBrick });
+  const registry = new BrickRegistry({ gallery: createGallery });
 
   assert.throws(
     () => registry.resolve('missing'),
@@ -30,9 +36,12 @@ test('fails fast with a useful error for an unknown brick', () => {
   );
 });
 
-test('rejects invalid registrations', () => {
+test('rejects invalid registrations and empty factory results', () => {
   const registry = new BrickRegistry();
 
-  assert.throws(() => registry.register('', CustomBrick), TypeError);
+  assert.throws(() => registry.register('', createCustom), TypeError);
   assert.throws(() => registry.register('invalid', {}), TypeError);
+
+  registry.register('empty', () => null);
+  assert.throws(() => registry.create('empty'), /did not return a plugin instance/);
 });
