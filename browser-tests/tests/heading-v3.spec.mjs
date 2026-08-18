@@ -51,7 +51,7 @@ for (const variant of variants) {
       const persistedHtml = await page.evaluate(() => $('#editor-a').summernote('code'));
       expect(persistedHtml).toContain('data-snb-brick="heading"');
       expect(persistedHtml).toContain('data-snb-version="3"');
-      expect(persistedHtml).toContain('<h3 id="persistent-heading">Persistent heading</h3>');
+      expect(persistedHtml).toContain('<h3 class="snb-heading__title" id="persistent-heading">Persistent heading</h3>');
       expect(persistedHtml).not.toContain('snb-brick-actions');
       expect(persistedHtml).not.toContain('<style');
 
