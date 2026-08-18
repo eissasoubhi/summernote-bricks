@@ -23,16 +23,17 @@ for (const variant of variants) {
       await editor.getByRole('button', { name: /insert heading/i }).click();
 
       const headingForm = page.locator('.snb-heading-form:visible');
-      await expect(headingForm.getByLabel('Title')).toBeFocused();
-      await headingForm.getByLabel('Title').fill('Composed heading');
-      await headingForm.getByLabel('Subtitle').fill('Shared editor');
+      const title = headingForm.getByLabel('Title', { exact: true });
+      await expect(title).toBeFocused();
+      await title.fill('Composed heading');
+      await headingForm.getByLabel('Subtitle', { exact: true }).fill('Shared editor');
       await page.locator('.snb-heading-form__save:visible').click();
 
       await openBricksMenu(page);
       await editor.getByRole('button', { name: /insert gallery/i }).click();
 
       const galleryForm = page.locator('.snb-gallery-v3-form:visible');
-      await expect(galleryForm.getByLabel('Search images')).toBeFocused();
+      await expect(galleryForm.getByLabel('Search images', { exact: true })).toBeFocused();
       await expect(galleryForm.getByRole('option', { name: /mountain/i })).toHaveCount(1);
       await galleryForm.getByRole('option', { name: /mountain/i }).click();
       await page.locator('.snb-gallery-v3-form__save:visible').click();
