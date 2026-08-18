@@ -61,10 +61,10 @@ The configured bricks are registered and rendered inside the Bricks dropdown.
 
 ## Register a custom brick
 
-The v2 registry accepts additional brick constructors through `brickTypes`. This means a future/private brick does **not** require a new `switch` case in Summernote Bricks.
+The v2 registry accepts additional **factory functions** through `brickFactories`. A factory can initialize its plugin with whatever constructor arguments it needs, so future/private bricks do **not** require a new `switch` case in Summernote Bricks.
 
 ```js
-import MySummernoteBrick from './MySummernoteBrick';
+import MySummernotePlugin from './MySummernotePlugin';
 
 $('#summernote').summernote({
   toolbar: [
@@ -75,14 +75,14 @@ $('#summernote').summernote({
       'summernote-gallery',
       'my-company-brick'
     ],
-    brickTypes: {
-      'my-company-brick': MySummernoteBrick
+    brickFactories: {
+      'my-company-brick': () => new MySummernotePlugin('myCompanyBrick')
     }
   }
 });
 ```
 
-A registered constructor is expected to provide the same integration surface used by the existing standalone brick modules: it can be instantiated and must expose the plugin/button integration consumed by the aggregator.
+A factory must return an integration object exposing `getPlugin()` and `createButton()`, matching the surface already used by the official Gallery and Heading module wrappers.
 
 The public brick contract will be formalized further before the stable v2 release. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -140,7 +140,7 @@ Compatibility is being made explicit as part of the modernization work. Do not i
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). Architecture changes should preserve the standalone nature of individual bricks and avoid adding concrete brick knowledge to the registry core.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Architecture changes should preserve the standalone nature of individual bricks and avoid adding concrete brick behavior to the registry core.
 
 ## Releases
 
