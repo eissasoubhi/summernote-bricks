@@ -34,10 +34,11 @@ for (const variant of variants) {
       const firstEditable = page.locator('.note-editable').nth(0);
       const secondEditable = page.locator('.note-editable').nth(1);
       const brick = firstEditable.locator('[data-snb-brick="heading"][data-snb-version="3"]');
+      const heading = brick.locator('h3');
 
-      await expect(brick.locator('h3')).toHaveText('Architecture');
+      await expect(heading).toHaveText('Architecture');
+      await expect(heading).toHaveAttribute('id', 'architecture');
       await expect(brick.locator('.snb-heading__subtitle')).toHaveText('Summernote native');
-      await expect(brick).toHaveAttribute('id', 'architecture');
       await expect(secondEditable.locator('[data-snb-brick="heading"]')).toHaveCount(0);
       await expect(brick.locator('.snb-brick-actions')).toHaveCount(0);
       await expect(brick.locator('style')).toHaveCount(0);
@@ -70,9 +71,10 @@ for (const variant of variants) {
       await openHeadingDialog(page, 0);
       await saveHeading(page, { title: 'Recreated editor' });
 
-      const firstEditable = page.locator('.note-editable').nth(0);
+      const firstEditor = page.locator('.note-editor').nth(0);
+      const firstEditable = firstEditor.locator('.note-editable');
       await expect(firstEditable.locator('[data-snb-brick="heading"] h2')).toHaveText('Recreated editor');
-      await expect(firstEditable.getByRole('button', { name: /insert heading/i })).toHaveCount(1);
+      await expect(firstEditor.getByRole('button', { name: /insert heading/i })).toHaveCount(1);
     });
   });
 }
