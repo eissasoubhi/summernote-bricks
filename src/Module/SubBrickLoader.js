@@ -1,31 +1,38 @@
-import SummernoteGallery from "summernote-gallery/dist/module"
-import SummernoteHeading from "summernote-heading/dist/module"
-import BrickRegistry from "./BrickRegistry"
+const BrickRegistry = require('./BrickRegistry');
 
-export default class SubBrickLoader {
+class SubBrickLoader {
     constructor(registry) {
         this.registry = registry || new BrickRegistry({
-            'summernote-gallery': () => new SummernoteGallery('summernoteGallery'),
-            'summernote-heading': () => new SummernoteHeading('summernoteHeading'),
+            'summernote-gallery': 'summernoteGallery',
+            'summernote-heading': 'summernoteHeading',
         });
     }
 
-    register(name, factory) {
-        this.registry.register(name, factory);
+    register(name, buttonName) {
+        this.registry.register(name, buttonName);
         return this;
     }
 
-    loadSubBrick(name) {
-        const brick = this.registry.create(name);
+    resolveButtonName(name) {
+        return this.registry.resolve(name);
+    }
 
-        if (typeof brick.getPlugin !== 'function' || typeof brick.createButton !== 'function') {
-            throw new TypeError(`Brick "${name}" must expose getPlugin() and createButton().`);
+    loadButton(context, name) {
+        const buttonName = this.resolveButtonName(name);
+        const buttonMemo = context.memo(`button.${buttonName}`);
+
+        if (!buttonMemo) {
+            throw new Error(
+                `Summernote brick "${name}" requires the "${buttonName}" button to be registered before editor initialization.`
+            );
         }
 
-        return brick;
+        return typeof buttonMemo === 'function' ? buttonMemo() : buttonMemo;
     }
 
     names() {
         return this.registry.names();
     }
 }
+
+module.exports = SubBrickLoader;
