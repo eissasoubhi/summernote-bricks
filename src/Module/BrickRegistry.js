@@ -1,52 +1,36 @@
 class BrickRegistry {
-    constructor(factories) {
-        this.factories = Object.create(null);
-        const initialFactories = factories || {};
+    constructor(aliases) {
+        this.aliases = Object.create(null);
+        const initialAliases = aliases || {};
 
-        Object.keys(initialFactories).forEach((name) => {
-            this.register(name, initialFactories[name]);
+        Object.keys(initialAliases).forEach((name) => {
+            this.register(name, initialAliases[name]);
         });
     }
 
-    register(name, factory) {
+    register(name, buttonName) {
         if (typeof name !== 'string' || !name.trim()) {
-            throw new TypeError('A brick name must be a non-empty string.');
+            throw new TypeError('A brick alias must be a non-empty string.');
         }
 
-        if (typeof factory !== 'function') {
-            throw new TypeError(`Brick "${name}" must be registered with a factory function.`);
+        if (typeof buttonName !== 'string' || !buttonName.trim()) {
+            throw new TypeError(`Brick "${name}" must reference a non-empty Summernote button name.`);
         }
 
-        this.factories[name] = factory;
+        this.aliases[name] = buttonName;
         return this;
     }
 
     has(name) {
-        return Object.prototype.hasOwnProperty.call(this.factories, name);
+        return Object.prototype.hasOwnProperty.call(this.aliases, name);
     }
 
     resolve(name) {
-        if (!this.has(name)) {
-            const available = this.names();
-            const suffix = available.length ? ` Available bricks: ${available.join(', ')}.` : '';
-            throw new Error(`Unknown Summernote brick "${name}".${suffix}`);
-        }
-
-        return this.factories[name];
-    }
-
-    create(name) {
-        const brick = this.resolve(name)();
-
-        if (!brick) {
-            throw new Error(`Brick factory "${name}" did not return a plugin instance.`);
-        }
-
-        return brick;
+        return this.has(name) ? this.aliases[name] : name;
     }
 
     names() {
-        return Object.keys(this.factories);
+        return Object.keys(this.aliases);
     }
 }
 
