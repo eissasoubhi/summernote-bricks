@@ -44,6 +44,43 @@ for (const variant of variants) {
       await expect(brick.locator('style')).toHaveCount(0);
     });
 
+    test('moves focus into a labeled heading form', async ({ page }) => {
+      const form = await openHeadingDialog(page, 0);
+      const title = form.getByLabel('Title', { exact: true });
+
+      await expect(title).toBeFocused();
+      await expect(form.getByLabel('Level', { exact: true })).toHaveClass(/snb-heading-form__level/);
+      await expect(title).toHaveClass(/snb-heading-form__title/);
+      await expect(form.getByLabel('Subtitle', { exact: true })).toHaveClass(/snb-heading-form__subtitle/);
+      await expect(form.getByLabel('Anchor', { exact: true })).toHaveClass(/snb-heading-form__anchor/);
+      await expect(form.locator('[role="alert"]')).toHaveCount(1);
+    });
+
+    test('round-trips persisted heading HTML through destroy and recreate', async ({ page }) => {
+      await openHeadingDialog(page, 0);
+      await saveHeading(page, { level: 3, title: 'Persistent heading', subtitle: 'Round trip', anchor: 'persistent-heading' });
+
+      const persistedHtml = await page.evaluate(() => $('#editor-a').summernote('code'));
+      expect(persistedHtml).toContain('data-snb-brick="heading"');
+      expect(persistedHtml).toContain('data-snb-version="3"');
+      expect(persistedHtml).toContain('<h3 class="snb-heading__title" id="persistent-heading">Persistent heading</h3>');
+      expect(persistedHtml).not.toContain('snb-brick-actions');
+      expect(persistedHtml).not.toContain('<style');
+
+      await page.evaluate(() => {
+        window.destroyEditor('#editor-a');
+        window.createEditor('#editor-a');
+      });
+
+      const recreated = page.locator('.note-editable').nth(0).locator('[data-snb-brick="heading"][data-snb-version="3"]');
+      await expect(recreated.locator('h3')).toHaveText('Persistent heading');
+      await expect(recreated.locator('h3')).toHaveAttribute('id', 'persistent-heading');
+      await expect(recreated.locator('.snb-heading__subtitle')).toHaveText('Round trip');
+
+      const reserializedHtml = await page.evaluate(() => $('#editor-a').summernote('code'));
+      expect(reserializedHtml).toBe(persistedHtml);
+    });
+
     test('edits a brick and participates in Summernote undo history', async ({ page }) => {
       await openHeadingDialog(page, 0);
       await saveHeading(page, { title: 'Before edit' });
