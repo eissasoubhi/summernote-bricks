@@ -14,7 +14,7 @@ export default class SummernoteBricks
         this.subBricks = []
         this.subBrickLoader = new SubBrickLoader()
 
-        // Add the sub-bricks to the summernote plugins.
+        // Add the sub-bricks to the Summernote plugin registry.
         this.loadSubBricks()
     }
 
@@ -46,20 +46,18 @@ export default class SummernoteBricks
     loadSubBricks() {
         let options = this.options.SNOptions[this.options.name] || {};
         let subBricks = options.subBricks || []
-        let brickTypes = options.brickTypes || {}
+        let brickFactories = options.brickFactories || {}
 
-        Object.keys(brickTypes).forEach((name) => {
-            this.subBrickLoader.register(name, brickTypes[name])
+        Object.keys(brickFactories).forEach((name) => {
+            this.subBrickLoader.register(name, brickFactories[name])
         })
 
         $.each(subBricks, (index, subBrick) => {
-            let SubBrick = this.subBrickLoader.loadSubBrick(subBrick)
-            this.subBricks.push(new SubBrick())
+            this.subBricks.push(this.subBrickLoader.loadSubBrick(subBrick))
         })
 
         for (let i = 0; i < this.subBricks.length; i++) {
-            let subBrick = this.subBricks[i]
-            let plugin = subBrick.getPlugin()
+            let plugin = this.subBricks[i].getPlugin()
             $.extend($.summernote.plugins, plugin);
         }
     }
