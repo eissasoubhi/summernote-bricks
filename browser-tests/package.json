@@ -6,7 +6,7 @@
     "test": "playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "1.55.0",
+    "@playwright/test": "1.62.0",
     "bootstrap": "5.3.8",
     "jquery": "3.7.1",
     "summernote": "0.9.1"
