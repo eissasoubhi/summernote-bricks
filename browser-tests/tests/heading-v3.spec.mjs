@@ -46,13 +46,13 @@ for (const variant of variants) {
 
     test('moves focus into a labeled heading form', async ({ page }) => {
       const form = await openHeadingDialog(page, 0);
-      const title = form.getByLabel('Title');
+      const title = form.getByLabel('Title', { exact: true });
 
       await expect(title).toBeFocused();
-      await expect(form.getByLabel('Level')).toHaveClass(/snb-heading-form__level/);
+      await expect(form.getByLabel('Level', { exact: true })).toHaveClass(/snb-heading-form__level/);
       await expect(title).toHaveClass(/snb-heading-form__title/);
-      await expect(form.getByLabel('Subtitle')).toHaveClass(/snb-heading-form__subtitle/);
-      await expect(form.getByLabel('Anchor')).toHaveClass(/snb-heading-form__anchor/);
+      await expect(form.getByLabel('Subtitle', { exact: true })).toHaveClass(/snb-heading-form__subtitle/);
+      await expect(form.getByLabel('Anchor', { exact: true })).toHaveClass(/snb-heading-form__anchor/);
       await expect(form.locator('[role="alert"]')).toHaveCount(1);
     });
 
