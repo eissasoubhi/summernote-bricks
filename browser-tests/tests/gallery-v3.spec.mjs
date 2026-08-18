@@ -43,6 +43,22 @@ for (const variant of variants) {
       await expect(gallery.locator('style')).toHaveCount(0);
     });
 
+    test('focuses the labeled search control and supports Enter search', async ({ page }) => {
+      const dialog = await openGalleryDialog(page, 0);
+      const query = dialog.getByLabel('Search images');
+
+      await expect(query).toBeFocused();
+      await expect(query).toHaveClass(/snb-gallery-v3-form__query/);
+      await expect(dialog.locator('[role="status"]')).toHaveCount(1);
+      await expect(dialog.locator('[role="alert"]')).toHaveCount(1);
+      await expect(dialog.locator('[role="listbox"][aria-multiselectable="true"]')).toHaveCount(1);
+
+      await query.fill('ocean');
+      await query.press('Enter');
+      await expect(dialog.getByRole('option', { name: /ocean/i })).toHaveCount(1);
+      await expect(dialog.getByRole('option', { name: /mountain/i })).toHaveCount(0);
+    });
+
     test('round-trips persisted gallery HTML through destroy and recreate', async ({ page }) => {
       await openGalleryDialog(page, 0);
       await chooseImageAndSave(page, 'Mountain');
