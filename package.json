@@ -1,12 +1,22 @@
 {
   "name": "summernote-bricks",
   "version": "2.0.0",
-  "description": "A summernote module to add user-friendly components to the wysiwyg editor",
+  "description": "An extensible Summernote brick registry and toolbar for composing standalone editor plugins.",
   "main": "dist/summernote-extensions.min.js",
+  "browser": "dist/summernote-extensions.min.js",
+  "files": [
+    "dist",
+    "summernote-bricks.css",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "summernote bricks",
+    "summernote blocks",
     "summernote module",
-    "summernote plugin"
+    "summernote plugin",
+    "wysiwyg",
+    "page builder"
   ],
   "homepage": "https://eissasoubhi.github.io/summernote-bricks",
   "bugs": "https://github.com/eissasoubhi/summernote-bricks/issues",
@@ -34,7 +44,9 @@
   "scripts": {
     "start": "node node_modules/http-serve/bin/http-serve -a 127.0.0.1 -p 9090",
     "build": "webpack --mode=production",
-    "dev": "webpack --mode development --watch"
+    "dev": "webpack --mode development --watch",
+    "test": "node --test test/*.test.cjs",
+    "check": "npm run build && npm test"
   },
   "author": "Eissa Soubhi <eissa.soubhi@gmail.com> (http://eissa-soubhi.com/)",
   "license": "MIT"
