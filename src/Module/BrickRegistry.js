@@ -1,28 +1,28 @@
 class BrickRegistry {
-    constructor(bricks) {
-        this.bricks = Object.create(null);
-        const initialBricks = bricks || {};
+    constructor(factories) {
+        this.factories = Object.create(null);
+        const initialFactories = factories || {};
 
-        Object.keys(initialBricks).forEach((name) => {
-            this.register(name, initialBricks[name]);
+        Object.keys(initialFactories).forEach((name) => {
+            this.register(name, initialFactories[name]);
         });
     }
 
-    register(name, Brick) {
+    register(name, factory) {
         if (typeof name !== 'string' || !name.trim()) {
             throw new TypeError('A brick name must be a non-empty string.');
         }
 
-        if (typeof Brick !== 'function') {
-            throw new TypeError(`Brick "${name}" must be a constructor.`);
+        if (typeof factory !== 'function') {
+            throw new TypeError(`Brick "${name}" must be registered with a factory function.`);
         }
 
-        this.bricks[name] = Brick;
+        this.factories[name] = factory;
         return this;
     }
 
     has(name) {
-        return Object.prototype.hasOwnProperty.call(this.bricks, name);
+        return Object.prototype.hasOwnProperty.call(this.factories, name);
     }
 
     resolve(name) {
@@ -32,11 +32,21 @@ class BrickRegistry {
             throw new Error(`Unknown Summernote brick "${name}".${suffix}`);
         }
 
-        return this.bricks[name];
+        return this.factories[name];
+    }
+
+    create(name) {
+        const brick = this.resolve(name)();
+
+        if (!brick) {
+            throw new Error(`Brick factory "${name}" did not return a plugin instance.`);
+        }
+
+        return brick;
     }
 
     names() {
-        return Object.keys(this.bricks);
+        return Object.keys(this.factories);
     }
 }
 
