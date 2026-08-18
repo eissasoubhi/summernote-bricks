@@ -2,12 +2,12 @@
 
 ## Goals
 
-Summernote Bricks is an ecosystem, not a single monolithic editor plugin. The architecture should make it cheap to add a new brick while keeping each brick independently useful.
+Summernote Bricks is an ecosystem, not a monolithic editor plugin. The architecture should make it cheap to add a new brick while keeping every brick independently useful.
 
 The design optimizes for four properties:
 
-1. **Standalone bricks** — Gallery, Heading and future bricks can be installed without the aggregator.
-2. **Small public contracts** — the aggregator depends on a brick integration contract, not brick internals.
+1. **Standalone bricks** — Gallery, Heading and future plugins work without the aggregator.
+2. **Use upstream contracts first** — Bricks composes standard Summernote button memos rather than inventing a parallel constructor framework.
 3. **Shared infrastructure without duplication** — reusable modal/editor/validation behavior belongs in the shared runtime.
 4. **Explicit compatibility** — Summernote, Bootstrap, jQuery and browser compatibility is tested rather than assumed.
 
@@ -18,12 +18,13 @@ The design optimizes for four properties:
 Owns:
 
 - the Bricks toolbar/dropdown UX;
-- the registry of named brick factories;
-- composition of configured bricks;
+- optional aliases from product/package names to Summernote button names;
+- composition of already-registered Summernote plugin buttons;
 - ecosystem-level examples and compatibility tests.
 
 Must not own:
 
+- Gallery/Heading instantiation;
 - Gallery data loading;
 - Heading rendering;
 - brick-specific modal forms;
@@ -32,68 +33,71 @@ Must not own:
 
 ### `summernote-gallery`
 
-Owns Gallery-specific source loading, selection UX, image data and Gallery templates.
+Owns Gallery-specific source loading, selection UX, image data and Gallery templates. It registers its own `summernoteGallery` button with Summernote.
 
 ### `summernote-heading`
 
-Owns Heading-specific form data, templates and editing behavior.
+Owns Heading-specific form data, templates and editing behavior. It registers its own `summernoteHeading` button with Summernote.
 
 ### `snb-components`
 
-Contains shared lower-level runtime concepts such as editor helpers, editable brick behavior, modal abstractions, validation, messaging and extension contracts.
+Contains shared lower-level runtime concepts such as editor helpers, editable brick behavior, modal abstractions, validation, messaging and extensions.
 
-Because this package is shared by public bricks, changes to its effective public API must be treated as ecosystem changes even while its repository remains private.
+Because public bricks rely on it, changes to its effective public API are ecosystem changes even while its repository remains private.
 
-## Brick registry
+## Composition contract
 
-`BrickRegistry` is deliberately small:
+Summernote already exposes a memo mechanism:
 
 ```text
-register(name, factory)
-resolve(name)
-create(name)
-has(name)
+context.memo('button.somePlugin', factory)
+context.memo('button.somePlugin') -> factory
+```
+
+Bricks builds on that contract.
+
+`BrickRegistry` is only an alias map:
+
+```text
+register(alias, summernoteButtonName)
+resolve(aliasOrButtonName)
+has(alias)
 names()
 ```
 
-Factories are used instead of raw constructors because different standalone plugins can require different initialization arguments. The official registrations currently initialize Gallery as `summernoteGallery` and Heading as `summernoteHeading`.
+Official convenience aliases are:
 
-The registry knows **nothing** about Gallery or Heading behavior. Official bricks are only default registrations.
-
-Consumers can add a custom factory through the `summernoteBricks.brickFactories` option and reference it from `subBricks`.
-
-A factory must return the integration surface currently consumed by the aggregator:
-
-```ts
-interface SummernoteBrickIntegration {
-  getPlugin(): object;
-  createButton(): unknown;
-}
+```text
+summernote-gallery -> summernoteGallery
+summernote-heading -> summernoteHeading
 ```
 
-This is intentionally a small transitional contract. A later major release may formalize a richer descriptor once browser/integration tests exist for Gallery and Heading. Avoid prematurely publishing a large framework API.
+An unrecognized name is treated as a direct Summernote button name. Therefore a third-party plugin does not need a Bricks-specific class, interface or release in this repository.
+
+Consumers can also define aliases with `summernoteBricks.brickAliases`.
 
 ## Initialization lifecycle
 
-The historical v1 plugin initialized global Summernote UI state too early. The current v2 aggregator works around plugin registration timing by decorating `$.fn.summernote` before the editor starts.
+The historical v1 plugin initialized global Summernote UI state too early. The earlier v2 prototype worked around timing by replacing `$.fn.summernote` and injecting concrete sub-plugins before delegating to Summernote.
 
-That decorator is a **known transitional implementation detail**, not the desired long-term public architecture.
+The current architecture removes that decorator. Bricks is registered through the normal Summernote plugin registry and memoizes only its own toolbar button. The Bricks button factory resolves the configured child-button memos when Summernote renders the toolbar.
 
-Before removing it, tests must prove that:
+This keeps lifecycle ownership with Summernote and removes deep imports/concrete plugin construction from the aggregator.
 
-- sub-plugins are available before toolbar memoization;
+Integration tests must still prove:
+
+- all plugin modules are registered before editor initialization;
+- child button memos can be resolved when Bricks renders;
 - multiple editors on the same page are isolated correctly;
-- destroying and recreating an editor does not leak plugin state;
-- custom bricks are registered deterministically;
-- standalone Gallery/Heading behavior is unchanged.
-
-The preferred end state is normal Summernote plugin registration without globally replacing `$.fn.summernote`, if Summernote's lifecycle permits it.
+- destroying and recreating an editor does not leak state;
+- custom direct button names and aliases work;
+- standalone Gallery/Heading behavior remains unchanged.
 
 ## Bootstrap compatibility
 
-Do not equate Summernote's Bootstrap support with Bricks support.
+Do not equate Summernote's Bootstrap support with Bricks ecosystem support.
 
-The shared runtime currently calls the jQuery Bootstrap modal API (`$modal.modal(...)`). Bootstrap 5 removed the jQuery plugin API, so Bootstrap 5 support requires a modal adapter or a shared runtime refactor.
+The shared runtime currently calls the jQuery Bootstrap modal API (`$modal.modal(...)`). Bootstrap 5 removed that jQuery plugin API, so Bootstrap 5 support requires a modal adapter or a shared runtime refactor.
 
 Recommended abstraction:
 
@@ -104,7 +108,7 @@ ModalController
   onHidden(element, callback)
 ```
 
-Adapters can then implement Bootstrap 3/4 jQuery behavior and Bootstrap 5 native behavior separately. Gallery and Heading should not each implement this compatibility logic.
+Adapters can then implement Bootstrap 3/4 jQuery behavior and Bootstrap 5 native behavior separately. Gallery and Heading should not duplicate this compatibility logic.
 
 ## Dependency direction
 
@@ -113,20 +117,23 @@ Allowed:
 ```text
 summernote-gallery  ---> snb-components
 summernote-heading  ---> snb-components
-summernote-bricks   ---> gallery / heading public integration surfaces
+summernote-bricks   ---> Summernote context/button contract
 ```
 
 Avoid:
 
 ```text
+summernote-bricks ---> concrete brick internals
 gallery ---> heading
 heading ---> gallery
 snb-components ---> concrete bricks
 ```
 
+The `summernote-gallery` / `summernote-heading` dependency declarations that remain in the current v2 package are transitional convenience dependencies. Once the lockfile/toolchain migration is isolated and validated, they should be reconsidered as optional/peer/example dependencies rather than runtime imports.
+
 ## Repository strategy
 
-Keep the public packages in separate repositories for now. They already have independent users, history and release versions. Standardize CI, contribution rules and release conventions across them instead of forcing a monorepo migration immediately.
+Keep the public packages in separate repositories for now. They already have independent users, history and release versions. Standardize CI, contribution rules and release conventions instead of forcing a monorepo migration immediately.
 
 Re-evaluate a monorepo only if most future changes consistently require synchronized commits/releases across all packages.
 
@@ -134,10 +141,10 @@ Re-evaluate a monorepo only if most future changes consistently require synchron
 
 Breaking changes to any of these require a major version:
 
-- brick factory/public integration contract;
 - Summernote option names or data shapes;
 - generated/persisted brick HTML that consumers may store;
 - package entrypoints;
-- supported host dependency ranges when existing users are dropped.
+- supported host dependency ranges when existing users are dropped;
+- the naming/shape of documented Bricks composition options.
 
 Internal refactors that preserve those contracts can remain minor/patch releases according to semantic versioning.
