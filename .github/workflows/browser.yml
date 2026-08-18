@@ -5,10 +5,12 @@ on:
     branches:
       - 'agent/v3-browser-harness'
       - 'agent/v3-gallery-browser'
+      - 'agent/v3-composition-browser'
   pull_request:
     branches:
       - agent/modernization-baseline
       - agent/v3-browser-harness
+      - agent/v3-gallery-browser
 
 permissions:
   contents: read
