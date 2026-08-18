@@ -1,0 +1,51 @@
+name: Browser compatibility
+
+on:
+  push:
+    branches:
+      - 'agent/v3-browser-harness'
+  pull_request:
+    branches:
+      - agent/modernization-baseline
+
+permissions:
+  contents: read
+
+jobs:
+  heading-v3:
+    name: Summernote 0.9.1 / Heading v3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout compatibility harness
+        uses: actions/checkout@v6
+
+      - name: Checkout Heading v3 proof
+        uses: actions/checkout@v6
+        with:
+          repository: eissasoubhi/summernote-heading
+          ref: agent/v3-summernote-native
+          path: vendor/summernote-heading
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Build Heading v3
+        working-directory: vendor/summernote-heading
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install browser harness
+        working-directory: browser-tests
+        run: npm install
+
+      - name: Install Playwright browsers
+        working-directory: browser-tests
+        run: npx playwright install --with-deps
+
+      - name: Run Summernote browser matrix
+        working-directory: browser-tests
+        run: npm test
