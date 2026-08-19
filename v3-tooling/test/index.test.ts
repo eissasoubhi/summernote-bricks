@@ -5,6 +5,7 @@ import {
   registerSummernoteBricks,
   type JQueryLike,
   type SummernoteContext,
+  type SummernotePluginConstructor,
   type SummernoteUi,
 } from '../src/index';
 
@@ -49,6 +50,11 @@ function contextWithButtons(buttons: Record<string, unknown>, options: Record<st
   };
 }
 
+function instantiate(plugin: SummernotePluginConstructor | undefined, context: SummernoteContext): object {
+  if (!plugin) throw new Error('Expected Summernote plugin constructor to be registered.');
+  return new plugin(context);
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -68,6 +74,15 @@ describe('BrickRegistry', () => {
 });
 
 describe('Summernote Bricks plugin', () => {
+  it('registers a constructable plugin, matching Summernote Context.module()', () => {
+    const jquery = fakeJquery();
+    const plugin = createSummernoteBricksPlugin(jquery);
+    const context = contextWithButtons({});
+
+    expect(() => instantiate(plugin.summernoteBricks, context)).not.toThrow();
+    expect(context.memo('button.summernoteBricks')).toBeTypeOf('function');
+  });
+
   it('composes already-registered child button memos', () => {
     const jquery = fakeJquery();
     const plugin = createSummernoteBricksPlugin(jquery, {
@@ -79,7 +94,7 @@ describe('Summernote Bricks plugin', () => {
       thirdParty: () => ({ id: 'custom' }),
     });
 
-    plugin.summernoteBricks?.(context);
+    instantiate(plugin.summernoteBricks, context);
     const factory = context.memo('button.summernoteBricks') as () => { kind: string; children: unknown[] };
     const rendered = factory();
 
@@ -91,7 +106,7 @@ describe('Summernote Bricks plugin', () => {
     const jquery = fakeJquery();
     const plugin = createSummernoteBricksPlugin(jquery, { subBricks: ['summernote-gallery'] });
     const context = contextWithButtons({});
-    plugin.summernoteBricks?.(context);
+    instantiate(plugin.summernoteBricks, context);
     const factory = context.memo('button.summernoteBricks') as () => unknown;
     expect(factory).toThrow(/summernoteGallery/);
   });
@@ -114,9 +129,9 @@ describe('Summernote Bricks plugin', () => {
     expect(jquery.summernote?.plugins.summernoteBricks).toBeTypeOf('function');
 
     jquery.summernote!.ui = fakeUi();
-    const plugin = jquery.summernote!.plugins.summernoteBricks as (context: SummernoteContext) => void;
+    const plugin = jquery.summernote!.plugins.summernoteBricks as SummernotePluginConstructor;
     const context = contextWithButtons({});
-    expect(() => plugin(context)).not.toThrow();
+    expect(() => new plugin(context)).not.toThrow();
     expect(context.memo('button.summernoteBricks')).toBeTypeOf('function');
   });
 
