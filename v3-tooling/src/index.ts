@@ -144,3 +144,19 @@ export function registerSummernoteBricks(
   if (!jquery.summernote) throw new Error('Summernote must be loaded before Summernote Bricks.');
   Object.assign(jquery.summernote.plugins, createSummernoteBricksPlugin(jquery, configured));
 }
+
+function detectBrowserJQuery(): JQueryLike | undefined {
+  const globals = globalThis as typeof globalThis & {
+    jQuery?: JQueryLike;
+    $?: JQueryLike;
+  };
+  return globals.jQuery ?? globals.$;
+}
+
+// Script-tag builds must behave like a normal Summernote plugin: loading the
+// artifact after jQuery + Summernote is enough to register the plugin. Module
+// consumers can still call registerSummernoteBricks() explicitly.
+const browserJQuery = detectBrowserJQuery();
+if (browserJQuery?.summernote) {
+  registerSummernoteBricks(browserJQuery);
+}
