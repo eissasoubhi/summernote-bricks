@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test';
 const variants = [
   { name: 'bs5', path: '/browser-tests/fixtures/bs5-composition.html' },
   { name: 'lite', path: '/browser-tests/fixtures/lite-composition.html' },
+  { name: 'bs4', path: '/browser-tests/fixtures/bs4-composition.html' },
+  { name: 'bs3', path: '/browser-tests/fixtures/bs3-composition.html' },
 ];
 
 async function openBricksMenu(page) {
