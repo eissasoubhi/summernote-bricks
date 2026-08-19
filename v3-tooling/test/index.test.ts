@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   BrickRegistry,
   createSummernoteBricksPlugin,
@@ -43,6 +43,10 @@ function contextWithButtons(buttons: Record<string, unknown>, options: Record<st
     },
   };
 }
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('BrickRegistry', () => {
   it('resolves aliases and keeps direct Summernote button names unchanged', () => {
@@ -90,6 +94,16 @@ describe('Summernote Bricks plugin', () => {
   it('registers through Summernote plugins without replacing $.fn.summernote', () => {
     const jquery = fakeJquery();
     registerSummernoteBricks(jquery);
+    expect(jquery.summernote?.plugins.summernoteBricks).toBeTypeOf('function');
+  });
+
+  it('auto-registers when the browser artifact is loaded after jQuery and Summernote', async () => {
+    const jquery = fakeJquery();
+    vi.stubGlobal('jQuery', jquery);
+    vi.resetModules();
+
+    await import('../src/index');
+
     expect(jquery.summernote?.plugins.summernoteBricks).toBeTypeOf('function');
   });
 });
