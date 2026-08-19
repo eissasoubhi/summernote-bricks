@@ -12,7 +12,7 @@ export interface SummernoteUi {
 export interface JQueryLike {
   extend<T extends object>(target: T, ...sources: object[]): T;
   summernote?: {
-    ui: SummernoteUi;
+    ui?: SummernoteUi;
     plugins: Record<string, unknown>;
   };
 }
@@ -106,20 +106,20 @@ export function createSummernoteBricksPlugin(
   jquery: JQueryLike,
   configured: Partial<BricksOptions> = {},
 ): Record<string, (context: SummernoteContext) => void> {
-  if (!jquery.summernote?.ui) {
-    throw new Error('Summernote UI must be loaded before Summernote Bricks is registered.');
-  }
-
   const name = configured.name ?? DEFAULT_OPTIONS.name;
   const loader = new BrickButtonLoader();
 
   return {
     [name](context: SummernoteContext) {
+      const ui = jquery.summernote?.ui;
+      if (!ui) {
+        throw new Error('Summernote UI must be available when Summernote Bricks initializes.');
+      }
+
       context.memo(`button.${name}`, () => {
         const options = mergedOptions(context, configured);
         Object.entries(options.brickAliases).forEach(([alias, buttonName]) => loader.register(alias, buttonName));
         const components = options.subBricks.map((brick) => loader.load(context, brick));
-        const ui = jquery.summernote!.ui;
         return ui.buttonGroup([
           ui.button({
             className: 'dropdown-toggle',
@@ -153,9 +153,9 @@ function detectBrowserJQuery(): JQueryLike | undefined {
   return globals.jQuery ?? globals.$;
 }
 
-// Script-tag builds must behave like a normal Summernote plugin: loading the
-// artifact after jQuery + Summernote is enough to register the plugin. Module
-// consumers can still call registerSummernoteBricks() explicitly.
+// Script-tag builds register as soon as Summernote's plugin registry exists.
+// Summernote 0.9.x may populate $.summernote.ui later, during editor setup, so
+// UI access is deliberately deferred until the plugin instance initializes.
 const browserJQuery = detectBrowserJQuery();
 if (browserJQuery?.summernote) {
   registerSummernoteBricks(browserJQuery);
