@@ -11,6 +11,7 @@ on:
       - 'agent/v3-bs4-bs3-standalone'
       - 'agent/v3-packed-artifact-browser'
       - 'agent/v3-public-package-browser'
+      - 'agent/v3-all-public-packages-browser'
   pull_request:
     branches:
       - agent/modernization-baseline
@@ -21,18 +22,26 @@ on:
       - agent/v3-bs4-bs3-matrix
       - agent/v3-bs4-bs3-standalone
       - agent/v3-packed-artifact-browser
+      - agent/v3-public-package-browser
 
 permissions:
   contents: read
 
 jobs:
   v3-plugins:
-    name: Summernote 0.9.1 / public Heading + Gallery v3 packages
+    name: Summernote 0.9.1 / public Bricks + Heading + Gallery packages
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout compatibility harness
         uses: actions/checkout@v6
+
+      - name: Checkout Bricks v3 public package candidate
+        uses: actions/checkout@v6
+        with:
+          repository: eissasoubhi/summernote-bricks
+          ref: agent/v3-public-package
+          path: vendor/summernote-bricks-public
 
       - name: Checkout Heading v3 public package candidate
         uses: actions/checkout@v6
@@ -48,21 +57,29 @@ jobs:
           ref: agent/v3-public-package
           path: vendor/summernote-gallery
 
-      - name: Setup legacy Node for Bricks build
-        uses: actions/setup-node@v7
-        with:
-          node-version: 16.20.2
-          cache: npm
-
-      - name: Build Bricks from tested source
-        run: |
-          npm ci
-          npm run build
-
-      - name: Setup Node for v3 plugins and browser harness
+      - name: Setup Node for v3 packages and browser harness
         uses: actions/setup-node@v7
         with:
           node-version: 22
+
+      - name: Build and pack public Bricks v3 candidate
+        run: |
+          cd vendor/summernote-bricks-public/v3-tooling
+          npm install
+          npm run check
+          cd ..
+          rm -rf .release-stage dist/v3
+          mkdir -p .release-stage/dist dist/v3/packed
+          cp -R v3-tooling/dist/. .release-stage/dist/
+          cp README.md LICENSE .release-stage/
+          cp package.v3.json .release-stage/package.json
+          cd .release-stage
+          npm pack --pack-destination ../dist/v3 >/dev/null
+          cd ..
+          tar -xzf dist/v3/*.tgz -C dist/v3/packed
+          test -f dist/v3/packed/package/dist/summernote-bricks.umd.cjs
+          mkdir -p ../../dist
+          cp dist/v3/packed/package/dist/summernote-bricks.umd.cjs ../../dist/summernote-extensions.min.js
 
       - name: Build and pack public Heading v3 candidate
         run: |
