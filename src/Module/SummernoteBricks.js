@@ -34,7 +34,15 @@ export default class SummernoteBricks
             components.push(this.subBrickLoader.loadButton(context, subBricks[i]))
         }
 
-        const dropdown = $.summernote.ui.buttonGroup([
+        // Summernote 0.9.x dropdown renderers consume `items`, not the historical
+        // `contents` option. Render an empty native Summernote dropdown first,
+        // then append the already-rendered plugin buttons so their click handlers
+        // are preserved across BS3/BS4/BS5/Lite UI implementations.
+        const dropdown = $.summernote.ui.dropdown({
+            items: []
+        });
+
+        const group = $.summernote.ui.buttonGroup([
             $.summernote.ui.button({
                 className: 'dropdown-toggle',
                 contents: options.buttonLabel,
@@ -43,12 +51,11 @@ export default class SummernoteBricks
                     toggle: 'dropdown'
                 }
             }),
-            $.summernote.ui.dropdown({
-                contents: components,
-                className: 'dropdown-style'
-            })
-        ])
+            dropdown
+        ]).render();
 
-        return dropdown.render()
+        $(group).find('.note-dropdown-menu').append(components);
+
+        return group
     }
 }
