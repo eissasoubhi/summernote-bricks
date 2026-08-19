@@ -9,6 +9,7 @@ on:
       - 'agent/v3-vite-artifact-browser'
       - 'agent/v3-bs4-bs3-matrix'
       - 'agent/v3-bs4-bs3-standalone'
+      - 'agent/v3-packed-artifact-browser'
   pull_request:
     branches:
       - agent/modernization-baseline
@@ -17,13 +18,14 @@ on:
       - agent/v3-composition-browser
       - agent/v3-vite-artifact-browser
       - agent/v3-bs4-bs3-matrix
+      - agent/v3-bs4-bs3-standalone
 
 permissions:
   contents: read
 
 jobs:
   v3-plugins:
-    name: Summernote 0.9.1 / Heading + Gallery v3 (Vite artifacts)
+    name: Summernote 0.9.1 / Heading + Gallery v3 (packed artifacts)
     runs-on: ubuntu-latest
 
     steps:
@@ -60,21 +62,29 @@ jobs:
         with:
           node-version: 22
 
-      - name: Build Heading v3 Vite artifact
+      - name: Build and pack Heading v3 artifact
         working-directory: vendor/summernote-heading/v3-tooling
         run: |
           npm install
           npm run check
-          mkdir -p ../dist/v3
-          cp dist/index.umd.cjs ../dist/v3/summernote-heading.js
+          rm -rf .pack ../dist/v3
+          mkdir -p .pack ../dist/v3/packed
+          npm pack --pack-destination .pack >/dev/null
+          tar -xzf .pack/*.tgz -C ../dist/v3/packed
+          test -f ../dist/v3/packed/package/dist/index.umd.cjs
+          cp ../dist/v3/packed/package/dist/index.umd.cjs ../dist/v3/summernote-heading.js
 
-      - name: Build Gallery v3 Vite artifact
+      - name: Build and pack Gallery v3 artifact
         working-directory: vendor/summernote-gallery/v3-tooling
         run: |
           npm install
           npm run check
-          mkdir -p ../dist/v3
-          cp dist/index.umd.cjs ../dist/v3/summernote-gallery.js
+          rm -rf .pack ../dist/v3
+          mkdir -p .pack ../dist/v3/packed
+          npm pack --pack-destination .pack >/dev/null
+          tar -xzf .pack/*.tgz -C ../dist/v3/packed
+          test -f ../dist/v3/packed/package/dist/index.umd.cjs
+          cp ../dist/v3/packed/package/dist/index.umd.cjs ../dist/v3/summernote-gallery.js
 
       - name: Install browser harness
         working-directory: browser-tests
