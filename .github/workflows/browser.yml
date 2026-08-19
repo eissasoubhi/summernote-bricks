@@ -80,14 +80,14 @@ jobs:
 
       - name: Install browser harness
         working-directory: browser-tests
-        run: npm install
+        run: npm ci
 
       - name: Cache Playwright browser binaries
         id: playwright-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('browser-tests/package.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('browser-tests/package-lock.json') }}
 
       - name: Install Playwright system dependencies
         working-directory: browser-tests
