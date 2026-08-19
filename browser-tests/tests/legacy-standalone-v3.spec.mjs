@@ -18,13 +18,14 @@ for (const variant of headingVariants) {
 
       const editor = page.locator('.note-editor').first();
       await editor.getByRole('button', { name: /insert heading/i }).click();
-      const form = page.locator('.snb-heading-form:visible');
+      const dialog = page.getByRole('dialog', { name: 'Heading' });
+      const form = dialog.locator('.snb-heading-form');
       await expect(form.getByLabel('Title', { exact: true })).toBeFocused();
       await form.getByLabel('Level', { exact: true }).selectOption('3');
       await form.getByLabel('Title', { exact: true }).fill('Legacy interface heading');
       await form.getByLabel('Subtitle', { exact: true }).fill('Standalone');
       await form.getByLabel('Anchor', { exact: true }).fill('legacy-interface-heading');
-      await form.locator('.snb-heading-form__save').click();
+      await dialog.getByRole('button', { name: 'Save', exact: true }).click();
 
       const brick = page.locator('.note-editable').first().locator('[data-snb-brick="heading"][data-snb-version="3"]');
       await expect(brick.locator('h3')).toHaveText('Legacy interface heading');
@@ -53,7 +54,8 @@ for (const variant of galleryVariants) {
 
       const editor = page.locator('.note-editor').first();
       await editor.getByRole('button', { name: /insert gallery/i }).click();
-      const form = page.locator('.snb-gallery-v3-form:visible');
+      const dialog = page.getByRole('dialog', { name: 'Image gallery' });
+      const form = dialog.locator('.snb-gallery-v3-form');
       const query = form.getByLabel('Search images');
       await expect(query).toBeFocused();
       await expect(form.locator('.snb-gallery-v3-form__item')).toHaveCount(2);
@@ -61,7 +63,7 @@ for (const variant of galleryVariants) {
       await query.press('Enter');
       await expect(form.getByRole('option', { name: /mountain/i })).toHaveCount(1);
       await form.getByRole('option', { name: /mountain/i }).click();
-      await form.locator('.snb-gallery-v3-form__save').click();
+      await dialog.getByRole('button', { name: 'Insert', exact: true }).click();
 
       const editable = page.locator('.note-editable').first();
       const gallery = editable.locator('[data-snb-brick="gallery"][data-snb-version="3"]');
