@@ -4,14 +4,14 @@
   "private": true,
   "type": "module",
   "files": ["dist"],
-  "main": "./dist/summernote-bricks.umd.js",
+  "main": "./dist/summernote-bricks.umd.cjs",
   "module": "./dist/summernote-bricks.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/summernote-bricks.js",
-      "require": "./dist/summernote-bricks.umd.js"
+      "require": "./dist/summernote-bricks.umd.cjs"
     }
   },
   "scripts": {
