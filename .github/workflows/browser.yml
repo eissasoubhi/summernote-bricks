@@ -1,0 +1,105 @@
+name: Browser compatibility
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  v3-plugins:
+    name: Summernote 0.9.1 / root Bricks + Heading + Gallery packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+    env:
+      HOME: /root
+
+    steps:
+      - name: Checkout Bricks and compatibility harness
+        uses: actions/checkout@v6
+
+      - name: Checkout Heading root package
+        uses: actions/checkout@v6
+        with:
+          repository: eissasoubhi/summernote-heading
+          ref: main
+          path: vendor/summernote-heading
+
+      - name: Checkout Gallery root package
+        uses: actions/checkout@v6
+        with:
+          repository: eissasoubhi/summernote-gallery
+          ref: master
+          path: vendor/summernote-gallery
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Build and pack Bricks root package
+        run: |
+          npm ci
+          npm run check
+          rm -rf .browser-package
+          mkdir -p .browser-package/extracted
+          npm pack --ignore-scripts --pack-destination .browser-package >/dev/null
+          tar -xzf .browser-package/*.tgz -C .browser-package/extracted
+          test -f .browser-package/extracted/package/dist/summernote-bricks.umd.cjs
+          cp .browser-package/extracted/package/dist/summernote-bricks.umd.cjs dist/summernote-extensions.min.js
+
+      - name: Build and pack Heading root package
+        run: |
+          cd vendor/summernote-heading
+          npm ci
+          npm run check
+          rm -rf .browser-package
+          mkdir -p .browser-package/extracted
+          npm pack --ignore-scripts --pack-destination .browser-package >/dev/null
+          tar -xzf .browser-package/*.tgz -C .browser-package/extracted
+          test -f .browser-package/extracted/package/dist/index.umd.cjs
+          mkdir -p dist/v3
+          cp .browser-package/extracted/package/dist/index.umd.cjs dist/v3/summernote-heading.js
+
+      - name: Build and pack Gallery root package
+        run: |
+          cd vendor/summernote-gallery
+          npm ci
+          npm run check
+          rm -rf .browser-package
+          mkdir -p .browser-package/extracted
+          npm pack --ignore-scripts --pack-destination .browser-package >/dev/null
+          tar -xzf .browser-package/*.tgz -C .browser-package/extracted
+          test -f .browser-package/extracted/package/dist/index.umd.cjs
+          mkdir -p dist/v3
+          cp .browser-package/extracted/package/dist/index.umd.cjs dist/v3/summernote-gallery.js
+
+      - name: Install browser harness
+        working-directory: browser-tests
+        run: npm ci
+
+      - name: Run Summernote browser matrix
+        working-directory: browser-tests
+        run: npm test
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-failure-${{ github.run_attempt }}
+          path: |
+            browser-tests/playwright-report
+            browser-tests/test-results
+          if-no-files-found: warn
+          retention-days: 7

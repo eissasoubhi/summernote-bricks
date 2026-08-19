@@ -1,276 +1,172 @@
-Summernote Bricks
-=================
+# Summernote Bricks
 
+Summernote Bricks is an **optional composer for registered Summernote plugin buttons**. It groups compatible standalone plugins under one toolbar dropdown without owning their runtime or persisted content.
 
-Introduction
-----------
+## v3 status
 
-Summernote bricks is a module of the Summernote plugin to add user-friendly components to the editor using bootstrap.
+The `develop` branch contains the consolidated **3.0.0 release-candidate source line**. The historical `master` branch remains the published legacy line until the v3 promotion gates are complete.
 
-See the demo here https://eissasoubhi.github.io/summernote-bricks/  
+**No v3 npm package or GitHub Release has been published yet.** Do not assume that `npm install summernote-bricks@3` is available until a release is explicitly approved.
 
-Requirements
-----------
+The maintained v3 reference platform is **Summernote 0.9.1**. Browser integration is validated across:
 
- - npm
- - Modern browser that supports ECMAScript 6
- - Tested on Windows 10, Google Chrome Version 61 and Firefox 55.0.3 (64-bit) with summernote v0.8.2
+- Summernote BS3, BS4, BS5 and Lite builds;
+- Chromium, Firefox and WebKit;
+- standalone Heading and Gallery usage;
+- Bricks + Heading + Gallery composition;
+- multiple editors, create/edit, undo, focus/accessibility, destroy/recreate and semantic HTML round-trips.
 
+## Ecosystem model
 
-Installation
--------------
-
-**Using NPM**
-
- 1. `$ npm i summernote-bricks`
- 2. `$ cd node_modules/summernote-bricks`
- 3. `$ npm start`
-
-Then go to http://127.0.0.1:9090
-
-**Or using GitHub**
-
- 1. [Download/Clone](https://github.com/eissasoubhi/summernote-bricks) the repo from GitHub
- 2. `$ cd summernote-bricks`
- 3. `$ npm start`
-
-Then go to http://127.0.0.1:9090
-
-Usage
-=====
-
-Add the required files :
-**The stylesheet files.**
-```HTML
-<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="node_modules/summernote/dist/summernote.css" rel="stylesheet">
-<link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-<link href="dist/assets/editable-bloc.css" rel="stylesheet">
+```text
+                   standard Summernote plugin API
+                            |
+            +---------------+---------------+
+            |                               |
+  summernote-gallery                 summernote-heading
+  registers button                   registers button
+  summernoteGallery                  summernoteHeading
+            |                               |
+            +---------------+---------------+
+                            |
+                     summernote-bricks
+                   groups existing buttons
 ```
 
-**Then Summernote tag.**
-```HTML
-<div id="summernote"><span></span></div>
-```
-**The script files.**
-```HTML
-<script src="node_modules/jquery/dist/jquery.min.js"></script>
-<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="node_modules/summernote/dist/summernote.min.js"></script>
-<script src="dist/summernote-extensions.dist.js"></script>
-```
-<a name="initialization"></a>
-**Initialize [Summernote](https://github.com/summernote/summernote) with the bricks module.**
-```HTML
- <script>
+A brick must work without `summernote-bricks`. Bricks is convenience UX, not the runtime owner of Gallery, Heading or future plugins.
 
-     jQuery(document).ready(function($) {
-          $('#summernote').summernote({
-             toolbar: [
-                 ['insert', ['bricks']],
-                 ['font style', ['fontname', 'fontsize', 'color', 'bold', 'italic', 'underline',]],
-             ],
-             // bricks options
+`SNB-components` is an independent optional shared-core project. Heading and Gallery do not currently depend on it, and v3 does not add that coupling without demonstrated shared runtime value.
 
-             bricks: {
-                 gallery: {
-                     modal_body_file: "php/gallery_dynamic_content.html"
-                 },
-                 thumbnails: {
-                     modal_body_file: "php/thumbnails_dynamic_content.html"
-                 },
-             }
+## Host dependencies
 
-         });
-     });
+The v3 package contract declares jQuery and Summernote as host peer dependencies:
 
- </script>
-```
-[See more details about Summernote installation and options.](https://github.com/summernote/summernote)
-
-
-Options
-=======
-
-The Summernote-bricks options can be passed with [the Summernote editor options with key "bricks".](#initialization) or you can put them inside the config file src/config/default.js
-
-
-| Option            | description                                                                                                                                                           | default                                                                       | type      | example                                                                   |
-|-----------------  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |-----------------------------------------------------------------------------  |--------   |-------------------------------------------------------------------------  |
-|<a name="lang_option"></a> modal_body_file   | instead of loading the content from a local HTML file, use this option to load the content from a URL.This option must be set for a specific brick inside an object.  | loads the default brick HTML file **dist/bricks_assets/[brick name]/html.html**   | String    | `thumbnails: {modal_body_file: "php/thumbnails_dynamic_content.html",},`     |
-|  lang              | Localization language in the file **src/config/langs.js**. The given value must be in that file as an object.                                                             | en                                                                            | String    | fr                                                                        |
-| bricks_assets     | The bricks folder path which contains the HTML and the style files.                                                                                                   | dist/bricks_assets                                                            | String    | dist/bricks_assets                                                        |
-
-To retrieve the configuration values use the helper function :
-
-```javascript
-var configs = _helpers.getConfig();
-var current_lang = configs.lang; // en
+```json
+{
+  "jquery": ">=3.6.0 <4",
+  "summernote": ">=0.9.1 <0.10"
+}
 ```
 
-Creating custom bricks
-======================
+Concrete Bootstrap requirements come from the Summernote build you choose. Bricks itself does not call Bootstrap modal APIs directly.
 
-Run `$ npm run watch` to set watchify to auto-generate the bundle file **/dist/summernote-extensions.dist.js**.
+## Browser usage
 
-To Create a modalable brick (opens a modal on click) run `$ gulp brick --type modalable --name [brick name]`.
+Load jQuery, the matching Summernote build, each standalone plugin bundle, and then Bricks **before initializing the editor**.
 
-To Create a simple brick (inserts the content immediately to the editor without opening a modal) run `$ gulp brick --type simple --name [brick name]` or just `$ gulp brick --name [brick name]`. 
+The v3 release-candidate build outputs are:
 
-Disabling or removing a brick
---------------------
-
-To disable a brick, all you need to do is removing it or commenting it out from the the plugins array in the main js file  **src/summernote-extensions.js**
-
-```javascript
- var plugins = [
-     new H2(),
-     new Panel(),
-     // the Menu brick is disabled
-     // new Menu(),
-     new Gallery(),
-     new Thumbnails(),
-     new ContactForm(),
-     new Header()
- ];
+```text
+summernote-heading/dist/index.umd.cjs
+summernote-gallery/dist/index.umd.cjs
+summernote-bricks/dist/summernote-bricks.umd.cjs
 ```
 
-Simple brick example
---------------------
+Example once those packages are available from your chosen source:
 
-    $ gulp brick --name header
-
-The code above will create the following files :
-
- - src/classes/Header.class.js
- - dist/bricks_assets/header/html.html
- - dist/bricks_assets/header/style.html
-
-Next :
-
- 1. Require the **Header** class you just created in the file **src/utility/autoload.js**
- 2. Then go to the file **src/summernote-extensions.js** and add the same class to the **plugins** array : `new Header()`
-```javascript
- var plugins = [
-     new H2(),
-     new Panel(),
-     new Menu(),
-     new Gallery(),
-     new Thumbnails(),
-     new ContactForm(),
-     // Header added
-     new Header()
- ];
+```html
+<script src="path/to/jquery.js"></script>
+<script src="path/to/summernote.js"></script>
+<script src="path/to/summernote-heading/dist/index.umd.cjs"></script>
+<script src="path/to/summernote-gallery/dist/index.umd.cjs"></script>
+<script src="path/to/summernote-bricks/dist/summernote-bricks.umd.cjs"></script>
 ```
 
- 3. Add the brick localization text in the file **src/config/langs.js**
-```javascript
- en: {
+Then configure the normal Summernote toolbar:
 
-    header:{
-        tooltip: "Add a header",
-        label: "Header",
-    },
-
-    panel:{
-    tooltip: "Add a new panel with text",
-    label: "Panel",
- },
-```
-To edit the inserted HTML go to **dist/bricks_assets/header/html.html** file.
-To edit the style of the inserted HTML go to **dist/bricks_assets/header/style.html** file.
-
-Modalable brick example
------------------------
-
-    $ gulp brick --type modalable --name something
-
-The code above will create the following files :
-
- - src/classes/Something.class.
- - dist/bricks_assets/something/modal.
- - dist/bricks_assets/something/modal_body.
- - dist/bricks_assets/something/modal_style.
- - dist/bricks_assets/something/html.
- - dist/bricks_assets/something/style.html
-
-Next :
-
- 1. Require the **Something** class you just created in the file
-    **src/utility/autoload**.
- 2. Then go to the file **src/summernote-extensions.js** and add the same
-        class to the **plugins** array : `new Something()`
-
-```javascript
- var plugins = [
-     new H2(),
-     new Panel(),
-     new Menu(),
-     new Gallery(),
-     new Thumbnails(),
-     new ContactForm(),
-     // Something added
-     new Something()
- ];
-```
- 3. Add the brick localization text in the file **src/config/langs.js**
- 
-```javascript
- en: {
-
-     something:{
-         tooltip: "Add something",
-         label: "Something",
-     },
-
-     panel:{
-     tooltip: "Add a new panel with text",
-     label: "Panel",
- },
+```js
+$('#summernote').summernote({
+  toolbar: [
+    ['extensions', ['summernoteBricks']]
+  ],
+  summernoteBricks: {
+    buttonLabel: '<i class="fa fa-puzzle-piece"></i> Bricks',
+    subBricks: [
+      'summernote-gallery',
+      'summernote-heading'
+    ]
+  }
+});
 ```
 
-To edit the inserted HTML go to **dist/bricks_assets/something/html.html file**.
+The package-style aliases resolve to the standard Summernote button memo names `summernoteGallery` and `summernoteHeading`.
 
-To edit the style of the inserted HTML go to **dist/bricks_assets/something/style.html** file.
+## Custom bricks
 
-To edit the modal go to **dist/bricks_assets/something/modal.html** file.
+Bricks does not need to import or instantiate a custom plugin. If your plugin registers a normal Summernote button memo, list that button name directly:
 
-To edit the modal body HTML go to **dist/bricks_assets/something/modal_body.html** file.
+```js
+// Your plugin registers: context.memo('button.myCompanyBrick', ...)
 
-To edit the modal body style go to **dist/bricks_assets/something/modal_style.html** file.
-
-Localization
-============
-
-After setting the [lang option](#lang_option) in the [initialization step](#initialization) you can customize the shown text for every brick in the file **src/config/langs.js** .
-
-You may retrieve lines from language file using the _helpers.lang() helper function. The lang() method accepts the key of the translation string as its first argument with the dot notation. For example, let's retrieve the menu tooltip translation string from the **src/config/langs.js** file
-
-```javascript 
-_helpers.lang('menu.tooltip');
+$('#summernote').summernote({
+  toolbar: [
+    ['extensions', ['summernoteBricks']]
+  ],
+  summernoteBricks: {
+    subBricks: ['summernoteGallery', 'myCompanyBrick']
+  }
+});
 ```
 
-For example if the chosen language is *en* the lang() function expects the langs file to have something like this :
+You can also provide a stable alias without changing Bricks core:
 
-```javascript
-// src/config/langs.js
-
-en: {
-
-    menu:{
-        tooltip: "Add a new menu",
-    },
-
-    ...
-
+```js
+summernoteBricks: {
+  subBricks: ['my-company-brick'],
+  brickAliases: {
+    'my-company-brick': 'myCompanyBrick'
+  }
+}
 ```
 
-if it doesn't find the requested translation it returns the key prefixed with the language. Example:  
-*en.menu.tooltip*
+This deliberately reuses Summernote's plugin/memo contract instead of publishing a second framework-specific constructor API.
 
-License
-=======
+## Persisted content
 
+The v3 ecosystem keeps editor implementation details out of saved content. Heading and Gallery persist semantic HTML marked with `data-snb-brick` and `data-snb-version`; editor controls and implementation `<style>` blocks are not persisted.
 
-----------
-The contents of this repository is licensed under [The MIT License](https://opensource.org/licenses/MIT)
+Legacy content conversion is explicit and opt-in. See [`docs/V3_UPGRADE.md`](docs/V3_UPGRADE.md) before migrating existing installations.
+
+## Development
+
+The consolidated Bricks v3 root uses strict TypeScript, Vite and Vitest on current Node LTS lines.
+
+```bash
+npm ci
+npm run check
+```
+
+`npm run check` performs typechecking, unit tests, the Vite/TypeScript build and package-shape validation.
+
+The maintained browser harness lives in `browser-tests/` and exercises the real packed Bricks, Heading and Gallery artifacts across the supported Summernote/browser matrix in GitHub Actions.
+
+## Architecture and release gates
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — package boundaries and Summernote-native architecture.
+- [`docs/PRODUCT_ROADMAP.md`](docs/PRODUCT_ROADMAP.md) — product direction.
+- [`docs/V3_UPGRADE.md`](docs/V3_UPGRADE.md) — installation, legacy migration and rollback guidance.
+- [`RELEASING.md`](RELEASING.md) — release process.
+- [Issue #3](https://github.com/eissasoubhi/summernote-bricks/issues/3) — authoritative ecosystem roadmap and current promotion gates.
+
+A public v3 release requires green deterministic package validation, the full maintained browser matrix, documented migration/rollback, and explicit release approval. Source consolidation does **not** publish npm packages or GitHub Releases automatically.
+
+## Repository roles
+
+| Repository | Responsibility |
+| --- | --- |
+| `summernote-bricks` | Optional composition/dropdown UX for registered Summernote plugin buttons |
+| `summernote-gallery` | Standalone backend-agnostic Gallery plugin |
+| `summernote-heading` | Standalone semantic Heading plugin |
+| `SNB-components` | Independent optional shared core |
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Future bricks should use standard Summernote plugin registration instead of adding concrete dependencies to Bricks core.
+
+## Security
+
+See [`SECURITY.md`](SECURITY.md).
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).

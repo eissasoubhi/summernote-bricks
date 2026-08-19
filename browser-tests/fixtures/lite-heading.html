@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Summernote Bricks Lite compatibility fixture</title>
+  <link rel="stylesheet" href="/browser-tests/node_modules/summernote/dist/summernote-lite.css">
+</head>
+<body>
+  <textarea id="editor-a"></textarea>
+  <textarea id="editor-b"></textarea>
+
+  <script src="/browser-tests/node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="/browser-tests/node_modules/summernote/dist/summernote-lite.js"></script>
+  <script src="/vendor/summernote-heading/dist/v3/summernote-heading.js"></script>
+  <script>
+    window.createEditor = function (selector) {
+      $(selector).summernote({
+        height: 180,
+        toolbar: [['insert', ['summernoteHeading']]],
+      });
+    };
+
+    window.destroyEditor = function (selector) {
+      $(selector).summernote('destroy');
+    };
+
+    window.undoEditor = function (selector) {
+      $(selector).summernote('undo');
+    };
+
+    window.createEditor('#editor-a');
+    window.createEditor('#editor-b');
+  </script>
+</body>
+</html>

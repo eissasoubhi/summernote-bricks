@@ -14,28 +14,22 @@
       "require": "./dist/summernote-bricks.umd.cjs"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "peerDependencies": {
     "jquery": ">=3.6.0 <4",
     "summernote": ">=0.9.1 <0.10"
   },
-  "scripts": {
-    "typecheck": "tsc -p v3-tooling/tsconfig.json --noEmit",
-    "test": "vitest run v3-tooling/test/index.test.ts",
-    "build:js": "vite build --config v3-tooling/vite.config.ts",
-    "build:types": "tsc -p v3-tooling/tsconfig.build.json",
-    "build": "npm run build:js && npm run build:types",
-    "pack:check": "node scripts/validate-v3-root-package.mjs",
-    "check": "npm run typecheck && npm test && npm run build && npm run pack:check"
-  },
-  "devDependencies": {
-    "@types/node": "^24.0.0",
-    "jsdom": "^26.1.0",
-    "typescript": "^5.9.2",
-    "vite": "^8.0.0",
-    "vitest": "^4.0.0"
-  },
-  "keywords": ["summernote", "summernote-plugin", "wysiwyg", "editor", "bricks"],
+  "keywords": [
+    "summernote",
+    "summernote-plugin",
+    "wysiwyg",
+    "editor",
+    "bricks"
+  ],
   "homepage": "https://github.com/eissasoubhi/summernote-bricks#readme",
   "bugs": "https://github.com/eissasoubhi/summernote-bricks/issues",
   "repository": "https://github.com/eissasoubhi/summernote-bricks",

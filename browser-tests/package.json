@@ -1,0 +1,16 @@
+{
+  "name": "summernote-bricks-browser-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.0",
+    "bootstrap": "5.3.8",
+    "bootstrap4": "npm:bootstrap@4.6.2",
+    "bootstrap3": "npm:bootstrap@3.4.1",
+    "jquery": "3.7.1",
+    "summernote": "0.9.1"
+  }
+}
