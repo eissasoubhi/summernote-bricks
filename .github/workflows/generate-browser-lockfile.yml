@@ -1,0 +1,34 @@
+name: Generate browser harness lockfile
+
+on:
+  push:
+    branches:
+      - agent/v3-browser-ci-post-merge
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/v3-browser-ci-post-merge
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Generate browser harness lockfile
+        working-directory: browser-tests
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Validate clean browser harness install
+        working-directory: browser-tests
+        run: npm ci --ignore-scripts
+      - name: Commit validated lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add browser-tests/package-lock.json
+          git rm .github/workflows/generate-browser-lockfile.yml
+          git commit -m "build: lock browser compatibility dependencies"
+          git push origin HEAD:agent/v3-browser-ci-post-merge
