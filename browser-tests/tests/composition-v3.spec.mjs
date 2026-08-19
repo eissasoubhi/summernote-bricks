@@ -34,6 +34,7 @@ for (const variant of variants) {
 
       const galleryForm = page.locator('.snb-gallery-v3-form:visible');
       await expect(galleryForm.getByLabel('Search images', { exact: true })).toBeFocused();
+      await expect(galleryForm.locator('.snb-gallery-v3-form__item')).toHaveCount(2);
       await expect(galleryForm.getByRole('option', { name: /mountain/i })).toHaveCount(1);
       await galleryForm.getByRole('option', { name: /mountain/i }).click();
       await page.locator('.snb-gallery-v3-form__save:visible').click();
