@@ -40,21 +40,21 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-bricks
-          ref: agent/v3-public-package
+          ref: 4d66fcbb8a4fa24523834e51844473c1de7b2041
           path: vendor/summernote-bricks-public
 
       - name: Checkout Heading v3 public package candidate
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-heading
-          ref: agent/v3-public-package
+          ref: f8e4496f6b75b17d5b4122f8fb2c7df4d23581a4
           path: vendor/summernote-heading
 
       - name: Checkout Gallery v3 public package candidate
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-gallery
-          ref: agent/v3-public-package
+          ref: 14185c50733aded837f8f42081f2fd08145989f4
           path: vendor/summernote-gallery
 
       - name: Setup Node for v3 packages and browser harness
