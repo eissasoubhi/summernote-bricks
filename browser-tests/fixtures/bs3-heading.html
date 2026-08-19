@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Summernote Heading v3 BS3 compatibility fixture</title>
+  <link rel="stylesheet" href="/browser-tests/node_modules/bootstrap3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/browser-tests/node_modules/summernote/dist/summernote-bs3.css">
+</head>
+<body>
+  <main class="container">
+    <textarea id="editor-a"></textarea>
+    <textarea id="editor-b"></textarea>
+  </main>
+  <script src="/browser-tests/node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="/browser-tests/node_modules/bootstrap3/dist/js/bootstrap.min.js"></script>
+  <script src="/browser-tests/node_modules/summernote/dist/summernote-bs3.js"></script>
+  <script src="/vendor/summernote-heading/dist/v3/summernote-heading.js"></script>
+  <script>
+    window.createEditor = function (selector) {
+      $(selector).summernote({ height: 180, toolbar: [['insert', ['summernoteHeading']]] });
+    };
+    window.destroyEditor = (selector) => $(selector).summernote('destroy');
+    window.undoEditor = (selector) => $(selector).summernote('undo');
+    $(function () { window.createEditor('#editor-a'); window.createEditor('#editor-b'); });
+  </script>
+</body>
+</html>
