@@ -3,10 +3,12 @@ name: Browser compatibility
 on:
   push:
     branches:
-      - agent/v3-browser-ci-post-merge
+      - develop
+      - master
   pull_request:
     branches:
       - develop
+      - master
 
 permissions:
   contents: read
