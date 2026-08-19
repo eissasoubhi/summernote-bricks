@@ -29,6 +29,7 @@
     "check": "npm run typecheck && npm test && npm run build && npm run pack:check"
   },
   "devDependencies": {
+    "@types/node": "^24.0.0",
     "jsdom": "^26.1.0",
     "typescript": "^5.9.2",
     "vite": "^8.0.0",
