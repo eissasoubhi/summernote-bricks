@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
+import vm from 'node:vm';
 import { execFileSync } from 'node:child_process';
 
 const root = path.resolve(import.meta.dirname, '..');
@@ -55,5 +56,45 @@ if (typeof esm.registerSummernoteBricks !== 'function') throw new Error('ESM ent
 const require = createRequire(path.join(staged, 'package.json'));
 const cjs = require(path.join(staged, 'dist/summernote-bricks.umd.cjs'));
 if (typeof cjs.registerSummernoteBricks !== 'function') throw new Error('CommonJS entrypoint does not expose registerSummernoteBricks.');
+
+// Exercise the actual packaged UMD in browser-global mode. Summernote 0.9.x can
+// expose its plugin registry before $.summernote.ui is populated, so script-tag
+// registration must succeed at that point and defer UI access until the plugin
+// instance is created by the editor.
+const browserJquery = {
+  extend(target, ...sources) {
+    return Object.assign(target, ...sources);
+  },
+  summernote: { plugins: {} },
+};
+const browserSandbox = { jQuery: browserJquery, $: browserJquery };
+const umdSource = await readFile(path.join(staged, 'dist/summernote-bricks.umd.cjs'), 'utf8');
+vm.runInNewContext(umdSource, browserSandbox, { filename: 'summernote-bricks.umd.cjs' });
+
+const browserPlugin = browserJquery.summernote.plugins.summernoteBricks;
+if (typeof browserPlugin !== 'function') {
+  throw new Error('Browser UMD did not auto-register summernoteBricks with the Summernote plugin registry.');
+}
+
+browserJquery.summernote.ui = {
+  button: () => ({ render: () => ({}) }),
+  dropdown: () => ({}),
+  buttonGroup: () => ({ render: () => ({}) }),
+};
+const memos = new Map();
+const browserContext = {
+  options: {},
+  memo(key, value) {
+    if (arguments.length === 2) {
+      memos.set(key, value);
+      return value;
+    }
+    return memos.get(key);
+  },
+};
+browserPlugin(browserContext);
+if (typeof browserContext.memo('button.summernoteBricks') !== 'function') {
+  throw new Error('Browser UMD did not register the summernoteBricks button after deferred UI setup.');
+}
 
 console.log(`Validated ${files.size} files in summernote-bricks@${manifest.version}.`);
