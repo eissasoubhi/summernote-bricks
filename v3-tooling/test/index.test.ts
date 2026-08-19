@@ -5,7 +5,22 @@ import {
   registerSummernoteBricks,
   type JQueryLike,
   type SummernoteContext,
+  type SummernoteUi,
 } from '../src/index';
+
+function fakeUi(): SummernoteUi {
+  return {
+    button(options) {
+      return { render: () => ({ kind: 'button', options }) };
+    },
+    dropdown(options) {
+      return { kind: 'dropdown', options };
+    },
+    buttonGroup(children) {
+      return { render: () => ({ kind: 'group', children }) };
+    },
+  };
+}
 
 function fakeJquery(): JQueryLike {
   return {
@@ -14,17 +29,7 @@ function fakeJquery(): JQueryLike {
     },
     summernote: {
       plugins: {},
-      ui: {
-        button(options) {
-          return { render: () => ({ kind: 'button', options }) };
-        },
-        dropdown(options) {
-          return { kind: 'dropdown', options };
-        },
-        buttonGroup(children) {
-          return { render: () => ({ kind: 'group', children }) };
-        },
-      },
+      ui: fakeUi(),
     },
   };
 }
@@ -97,8 +102,31 @@ describe('Summernote Bricks plugin', () => {
     expect(jquery.summernote?.plugins.summernoteBricks).toBeTypeOf('function');
   });
 
-  it('auto-registers when the browser artifact is loaded after jQuery and Summernote', async () => {
-    const jquery = fakeJquery();
+  it('can register before Summernote UI is populated and resolve UI at plugin initialization', () => {
+    const jquery: JQueryLike = {
+      extend(target, ...sources) {
+        return Object.assign(target, ...sources);
+      },
+      summernote: { plugins: {} },
+    };
+
+    registerSummernoteBricks(jquery);
+    expect(jquery.summernote?.plugins.summernoteBricks).toBeTypeOf('function');
+
+    jquery.summernote!.ui = fakeUi();
+    const plugin = jquery.summernote!.plugins.summernoteBricks as (context: SummernoteContext) => void;
+    const context = contextWithButtons({});
+    expect(() => plugin(context)).not.toThrow();
+    expect(context.memo('button.summernoteBricks')).toBeTypeOf('function');
+  });
+
+  it('auto-registers when the browser artifact is loaded after the Summernote plugin registry exists', async () => {
+    const jquery: JQueryLike = {
+      extend(target, ...sources) {
+        return Object.assign(target, ...sources);
+      },
+      summernote: { plugins: {} },
+    };
     vi.stubGlobal('jQuery', jquery);
     vi.resetModules();
 
