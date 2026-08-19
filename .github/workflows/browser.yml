@@ -12,6 +12,7 @@ on:
       - 'agent/v3-packed-artifact-browser'
       - 'agent/v3-public-package-browser'
       - 'agent/v3-all-public-packages-browser'
+      - 'agent/playwright-browser-cache'
   pull_request:
     branches:
       - agent/modernization-baseline
@@ -23,6 +24,7 @@ on:
       - agent/v3-bs4-bs3-standalone
       - agent/v3-packed-artifact-browser
       - agent/v3-public-package-browser
+      - agent/v3-all-public-packages-browser
 
 permissions:
   contents: read
@@ -121,9 +123,21 @@ jobs:
         working-directory: browser-tests
         run: npm install
 
-      - name: Install Playwright browsers
+      - name: Cache Playwright browser binaries
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('browser-tests/package.json') }}
+
+      - name: Install Playwright system dependencies
         working-directory: browser-tests
-        run: npx playwright install --with-deps
+        run: npx playwright install-deps chromium firefox webkit
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: browser-tests
+        run: npx playwright install chromium firefox webkit
 
       - name: Run Summernote browser matrix
         working-directory: browser-tests
