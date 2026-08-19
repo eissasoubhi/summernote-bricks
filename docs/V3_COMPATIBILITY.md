@@ -16,10 +16,10 @@ This document records compatibility that is **proved by the repository browser s
 | --- | --- | --- | --- | --- |
 | `summernote-bs5` | Bootstrap 5 | ✅ green | ✅ green | ✅ green |
 | `summernote-lite` | Summernote Lite | ✅ green | ✅ green | ✅ green |
-| `summernote-bs4` | Bootstrap 4.6.2 | ✅ green | 🚧 PR #13 | 🚧 PR #13 |
-| `summernote-bs3` | Bootstrap 3.4.1 | ✅ green | 🚧 PR #13 | 🚧 PR #13 |
+| `summernote-bs4` | Bootstrap 4.6.2 | ✅ green | ✅ green | ✅ green |
+| `summernote-bs3` | Bootstrap 3.4.1 | ✅ green | ✅ green | ✅ green |
 
-The BS3/BS4 fixtures use pinned local npm dependencies rather than CDNs so release verification is reproducible.
+The BS3/BS4 fixtures use pinned local npm dependencies rather than CDNs so release verification is reproducible. Summernote 0.9.1 exposes BS3 through its generic `summernote.js` / `summernote.css` distribution; it does not publish `summernote-bs3.js` / `summernote-bs3.css` files.
 
 ## Behaviors covered
 
@@ -46,4 +46,4 @@ The current browser gates collectively verify:
 
 ## Release rule
 
-A green composition test is not enough to claim standalone plugin compatibility. Historical BS3/BS4 support becomes release-complete only when PR #13's standalone Heading/Gallery matrix is green across all three browsers.
+Compatibility claims require both standalone and composed browser gates. The current Summernote 0.9.1 matrix is green for BS3, BS4, BS5 and Lite across Chromium, Firefox and WebKit. Future host/editor upgrades must rerun the same matrix before the documented range is widened.
