@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Summernote Gallery v3 BS4 compatibility fixture</title>
+  <link rel="stylesheet" href="/browser-tests/node_modules/bootstrap4/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/browser-tests/node_modules/summernote/dist/summernote-bs4.css">
+</head>
+<body>
+  <main class="container py-4">
+    <textarea id="gallery-a"></textarea>
+    <textarea id="gallery-b"></textarea>
+  </main>
+  <script src="/browser-tests/node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="/browser-tests/node_modules/bootstrap4/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/browser-tests/node_modules/summernote/dist/summernote-bs4.js"></script>
+  <script src="/vendor/summernote-gallery/dist/v3/summernote-gallery.js"></script>
+  <script>
+    const images = [
+      { id: 'mountain', src: '/browser-tests/fixtures/mountain.jpg', alt: 'Mountain', title: 'Mountain', caption: 'Mountain caption' },
+      { id: 'ocean', src: '/browser-tests/fixtures/ocean.jpg', alt: 'Ocean', title: 'Ocean', caption: 'Ocean caption' }
+    ];
+    const source = { list: async ({ query = '' }) => ({ items: images.filter((image) => image.title.toLowerCase().includes(query.toLowerCase())) }) };
+    window.createGalleryEditor = function (selector) {
+      $(selector).summernote({ height: 180, toolbar: [['insert', ['summernoteGallery']]], summernoteGallery: { source } });
+    };
+    window.destroyGalleryEditor = (selector) => $(selector).summernote('destroy');
+    window.undoGalleryEditor = (selector) => $(selector).summernote('undo');
+    $(function () { window.createGalleryEditor('#gallery-a'); window.createGalleryEditor('#gallery-b'); });
+  </script>
+</body>
+</html>

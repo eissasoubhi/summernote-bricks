@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Summernote Bricks v3 composition BS3 fixture</title>
+  <link rel="stylesheet" href="/browser-tests/node_modules/bootstrap3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/browser-tests/node_modules/summernote/dist/summernote.css">
+</head>
+<body>
+  <main class="container" style="padding-top: 24px;">
+    <textarea id="composition-editor"></textarea>
+  </main>
+  <script src="/browser-tests/node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="/browser-tests/node_modules/bootstrap3/dist/js/bootstrap.min.js"></script>
+  <script src="/browser-tests/node_modules/summernote/dist/summernote.js"></script>
+  <script src="/vendor/summernote-heading/dist/v3/summernote-heading.js"></script>
+  <script src="/vendor/summernote-gallery/dist/v3/summernote-gallery.js"></script>
+  <script src="/dist/summernote-extensions.min.js"></script>
+  <script>
+    const images = [
+      { id: 'mountain', src: '/browser-tests/fixtures/mountain.jpg', alt: 'Mountain', title: 'Mountain', caption: 'Mountain caption' },
+      { id: 'ocean', src: '/browser-tests/fixtures/ocean.jpg', alt: 'Ocean', title: 'Ocean', caption: 'Ocean caption' }
+    ];
+    const source = {
+      list: async ({ query = '' }) => ({ items: images.filter((image) => image.title.toLowerCase().includes(query.toLowerCase())) })
+    };
+
+    $(function () {
+      $('#composition-editor').summernote({
+        height: 220,
+        toolbar: [['insert', ['summernoteBricks']]],
+        summernoteBricks: {
+          buttonLabel: 'Insert brick',
+          subBricks: ['summernoteHeading', 'summernoteGallery']
+        },
+        summernoteGallery: { source }
+      });
+    });
+  </script>
+</body>
+</html>
