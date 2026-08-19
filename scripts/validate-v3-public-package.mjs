@@ -59,8 +59,8 @@ if (typeof cjs.registerSummernoteBricks !== 'function') throw new Error('CommonJ
 
 // Exercise the actual packaged UMD in browser-global mode. Summernote 0.9.x can
 // expose its plugin registry before $.summernote.ui is populated, so script-tag
-// registration must succeed at that point and defer UI access until the plugin
-// instance is created by the editor.
+// registration must succeed at that point and defer UI access until Summernote
+// constructs the plugin with `new ModuleClass(context)` during Context.module().
 const browserJquery = {
   extend(target, ...sources) {
     return Object.assign(target, ...sources);
@@ -92,7 +92,7 @@ const browserContext = {
     return memos.get(key);
   },
 };
-browserPlugin(browserContext);
+new browserPlugin(browserContext);
 if (typeof browserContext.memo('button.summernoteBricks') !== 'function') {
   throw new Error('Browser UMD did not register the summernoteBricks button after deferred UI setup.');
 }
