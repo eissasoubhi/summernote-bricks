@@ -13,6 +13,22 @@ The v3 line currently covers:
 
 Heading and Gallery are standalone Summernote plugins. Bricks composes already-registered plugin buttons. SNB-components remains a small shared utility package and must not become a second editor framework.
 
+### Release-wave boundary
+
+The first integrated RC wave is defined by the packages that execute together in the browser compatibility matrix:
+
+- `summernote-heading`
+- `summernote-gallery`
+- `summernote-bricks`
+
+`SNB-components` is **not** a required dependency of that wave unless a concrete v3 plugin starts importing it. The current Heading v3 and Gallery v3 sources only import their own local modules and interact with Summernote through the host contract, so forcing `snb-components` into their dependency graph would create coupling that the runtime does not need.
+
+Therefore:
+
+- the `snb-components@3.0.0-rc.0` package candidate may be validated and released independently;
+- Heading/Gallery must not add `snb-components` merely to synchronize version numbers or release dates;
+- if shared code is adopted later, the importing package must add an explicit dependency and the exact integrated tarballs must be re-run through the browser matrix before release.
+
 ## Host compatibility
 
 The release candidate targets Summernote 0.9.1 and must stay green on:
@@ -69,11 +85,13 @@ A stable v3 release must document any information intentionally dropped during m
 
 1. Validate staged public package manifests and tarballs.
 2. Run the full browser matrix against those staged public tarballs.
-3. Promote the historical root manifests/build entrypoints in synchronized draft PRs.
+3. Promote the historical root manifests/build entrypoints for Heading and Gallery in synchronized draft PRs.
 4. Rebuild and repack from the promoted roots.
 5. Run the full browser matrix again against those exact promoted-root tarballs.
-6. Prepare release notes and migration examples.
-7. Publish only after explicit approval.
+6. Promote Bricks packaging only after its composed browser gate consumes the exact Heading/Gallery promoted-root tarballs.
+7. Treat `snb-components` as an independent RC unless a concrete runtime import makes it part of the integrated dependency graph.
+8. Prepare release notes and migration examples.
+9. Publish only after explicit approval.
 
 ## Stop conditions
 
