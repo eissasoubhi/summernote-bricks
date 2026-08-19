@@ -1,0 +1,42 @@
+name: V3 toolchain
+
+on:
+  push:
+    branches:
+      - 'agent/v3-bricks-toolchain'
+      - 'agent/v3-public-package'
+  pull_request:
+    branches:
+      - 'agent/modernization-baseline'
+      - 'agent/v3-bricks-toolchain'
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+
+    defaults:
+      run:
+        working-directory: v3-tooling
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate v3 toolchain and public package
+        run: npm run check

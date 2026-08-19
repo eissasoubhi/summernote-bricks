@@ -1,74 +1,54 @@
 import SubBrickLoader from "./SubBrickLoader";
-import SummernoteGallery from "summernote-gallery/src/Module"
-// implements SummernotePluginInterface
+
+// Composes already-registered Summernote plugin buttons under one dropdown.
 export default class SummernoteBricks
 {
     constructor(options) {
         this.options = $.extend({
             name: 'summernoteBricks',
             buttonLabel: '<i class="fa fa-puzzle-piece"></i> SN bricks',
-            tooltip: 'summernote bricks Dropdown',
-            SNOptions: {}
+            tooltip: 'Summernote bricks',
+            brickAliases: {}
         }, options);
-        this.plugins = []
-        this.subBricks = []
-
-
-        // Add the sub-bricks to the summernote plugins
-        this.loadSubBricks()
+        this.subBrickLoader = new SubBrickLoader()
     }
 
-    createDropdown() {
+    getOptions(context) {
+        return $.extend({}, this.options, context.options[this.options.name] || {});
+    }
 
-        let components = [];
+    registerAliases(aliases) {
+        Object.keys(aliases || {}).forEach((name) => {
+            this.subBrickLoader.register(name, aliases[name])
+        })
+    }
 
-        for (let i = 0; i < this.subBricks.length; i++) {
-            components.push(this.subBricks[i].createButton())
+    createDropdown(context) {
+        const options = this.getOptions(context);
+        const subBricks = options.subBricks || [];
+        const components = [];
+
+        this.registerAliases(options.brickAliases);
+
+        for (let i = 0; i < subBricks.length; i++) {
+            components.push(this.subBrickLoader.loadButton(context, subBricks[i]))
         }
 
-        let dropdown = $.summernote.ui.buttonGroup([
-            /* create a button */
+        const dropdown = $.summernote.ui.buttonGroup([
             $.summernote.ui.button({
                 className: 'dropdown-toggle',
-                contents: this.options.buttonLabel,
-                tooltip: this.options.tooltip,
-                click: function () {
-                    console.log('summernote bricks button clicked')
-                },
+                contents: options.buttonLabel,
+                tooltip: options.tooltip,
                 data: {
                     toggle: 'dropdown'
                 }
             }),
-            /* create a dropdown */
             $.summernote.ui.dropdown({
                 contents: components,
-                className: 'dropdown-style',
-                callback: function($dropdown) {
-
-                }
+                className: 'dropdown-style'
             })
         ])
 
         return dropdown.render()
-    }
-
-    loadSubBricks() {
-
-        let options = this.options.SNOptions[this.options.name] || {};
-        let subBricks = options.subBricks || []
-
-        $.each(subBricks, (index, subBrick) => {
-
-            let SubBrick = SubBrickLoader.loadSubBrick(subBrick)
-
-            this.subBricks.push(new SubBrick())
-        })
-
-        for (let i = 0; i < this.subBricks.length; i++) {
-            let subBrick = this.subBricks[i]
-            let plugin = subBrick.getPlugin()
-            // console.log('plugin', plugin)
-            $.extend($.summernote.plugins, plugin);
-        }
     }
 }
