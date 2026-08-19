@@ -1,15 +1,16 @@
 name: Promote browser harness
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/v3-browser-ci-post-merge
+      - develop
 
 permissions:
   contents: write
 
 jobs:
   promote:
+    if: github.head_ref == 'agent/v3-browser-ci-post-merge'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout target branch
