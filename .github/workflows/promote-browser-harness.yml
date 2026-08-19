@@ -1,0 +1,36 @@
+name: Promote browser harness
+
+on:
+  push:
+    branches:
+      - agent/v3-browser-ci-post-merge
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/v3-browser-ci-post-merge
+      - name: Checkout validated historical harness
+        uses: actions/checkout@v6
+        with:
+          repository: eissasoubhi/summernote-bricks
+          ref: agent/v3-root-packages-browser
+          path: .harness-source
+      - name: Copy harness only
+        run: |
+          rm -rf browser-tests
+          cp -R .harness-source/browser-tests ./browser-tests
+          rm -rf .harness-source
+      - name: Commit harness
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add browser-tests
+          git commit -m "test: restore full Summernote browser matrix"
+          git push origin HEAD:agent/v3-browser-ci-post-merge
