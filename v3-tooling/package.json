@@ -18,7 +18,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build": "vite build && tsc -p tsconfig.build.json",
-    "check": "npm run typecheck && npm test && npm run build && npm pack --dry-run"
+    "public:check": "node ../scripts/validate-v3-public-package.mjs",
+    "check": "npm run typecheck && npm test && npm run build && npm pack --dry-run && npm run public:check"
   },
   "devDependencies": {
     "jsdom": "^26.1.0",
