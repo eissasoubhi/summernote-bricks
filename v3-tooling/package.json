@@ -1,0 +1,29 @@
+{
+  "name": "summernote-bricks-v3-tooling",
+  "version": "3.0.0-rc.0",
+  "private": true,
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/summernote-bricks.umd.js",
+  "module": "./dist/summernote-bricks.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/summernote-bricks.js",
+      "require": "./dist/summernote-bricks.umd.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "check": "npm run typecheck && npm test && npm run build && npm pack --dry-run"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.0.0"
+  }
+}
