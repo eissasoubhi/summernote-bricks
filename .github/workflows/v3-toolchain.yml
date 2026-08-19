@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - 'agent/v3-bricks-toolchain'
+      - 'agent/v3-public-package'
   pull_request:
     branches:
       - 'agent/modernization-baseline'
+      - 'agent/v3-bricks-toolchain'
 
 permissions:
   contents: read
@@ -36,5 +38,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Validate v3 toolchain
+      - name: Validate v3 toolchain and public package
         run: npm run check
