@@ -6,36 +6,38 @@ on:
       - 'agent/v3-browser-harness'
       - 'agent/v3-gallery-browser'
       - 'agent/v3-composition-browser'
+      - 'agent/v3-vite-artifact-browser'
   pull_request:
     branches:
       - agent/modernization-baseline
       - agent/v3-browser-harness
       - agent/v3-gallery-browser
+      - agent/v3-composition-browser
 
 permissions:
   contents: read
 
 jobs:
   v3-plugins:
-    name: Summernote 0.9.1 / Heading + Gallery v3
+    name: Summernote 0.9.1 / Heading + Gallery v3 (Vite artifacts)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout compatibility harness
         uses: actions/checkout@v6
 
-      - name: Checkout Heading v3 proof
+      - name: Checkout Heading v3 Vite proof
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-heading
-          ref: agent/v3-summernote-native
+          ref: agent/v3-vite-toolchain
           path: vendor/summernote-heading
 
-      - name: Checkout Gallery v3 proof
+      - name: Checkout Gallery v3 Vite proof
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-gallery
-          ref: agent/v3-summernote-native
+          ref: agent/v3-vite-toolchain
           path: vendor/summernote-gallery
 
       - name: Setup legacy Node for Bricks build
@@ -54,17 +56,21 @@ jobs:
         with:
           node-version: 22
 
-      - name: Build Heading v3
-        working-directory: vendor/summernote-heading
+      - name: Build Heading v3 Vite artifact
+        working-directory: vendor/summernote-heading/v3-tooling
         run: |
           npm ci
-          npm run build
+          npm run check
+          mkdir -p ../dist/v3
+          cp dist/index.umd.cjs ../dist/v3/summernote-heading.js
 
-      - name: Build Gallery v3
-        working-directory: vendor/summernote-gallery
+      - name: Build Gallery v3 Vite artifact
+        working-directory: vendor/summernote-gallery/v3-tooling
         run: |
           npm ci
-          npm run build
+          npm run check
+          mkdir -p ../dist/v3
+          cp dist/index.umd.cjs ../dist/v3/summernote-gallery.js
 
       - name: Install browser harness
         working-directory: browser-tests
