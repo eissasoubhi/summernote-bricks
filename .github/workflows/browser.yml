@@ -13,6 +13,7 @@ on:
       - 'agent/v3-public-package-browser'
       - 'agent/v3-all-public-packages-browser'
       - 'agent/playwright-browser-cache'
+      - 'agent/v3-root-packages-browser'
   pull_request:
     branches:
       - agent/modernization-baseline
@@ -25,99 +26,84 @@ on:
       - agent/v3-packed-artifact-browser
       - agent/v3-public-package-browser
       - agent/v3-all-public-packages-browser
+      - agent/playwright-browser-cache
 
 permissions:
   contents: read
 
 jobs:
   v3-plugins:
-    name: Summernote 0.9.1 / public Bricks + Heading + Gallery packages
+    name: Summernote 0.9.1 / promoted root Bricks + Heading + Gallery packages
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout compatibility harness
         uses: actions/checkout@v6
 
-      - name: Checkout Bricks v3 public package candidate
+      - name: Checkout promoted Bricks root package
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-bricks
-          ref: 578a65b7a3706458773d2fcebb0ca38b861b2b3c
-          path: vendor/summernote-bricks-public
+          ref: cbdd33db58681e4d268852b1ae815be8e63b631e
+          path: vendor/summernote-bricks-root
 
-      - name: Checkout Heading v3 public package candidate
+      - name: Checkout promoted Heading root package
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-heading
-          ref: f8e4496f6b75b17d5b4122f8fb2c7df4d23581a4
+          ref: 5126d188d4f620adf29c949e2a69d1a19cbcf3ec
           path: vendor/summernote-heading
 
-      - name: Checkout Gallery v3 public package candidate
+      - name: Checkout promoted Gallery root package
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-gallery
-          ref: 14185c50733aded837f8f42081f2fd08145989f4
+          ref: 58d2d9bca574ea07439fe53424fe2a194a9cfda9
           path: vendor/summernote-gallery
 
-      - name: Setup Node for v3 packages and browser harness
+      - name: Setup Node for root packages and browser harness
         uses: actions/setup-node@v7
         with:
           node-version: 22
 
-      - name: Build and pack public Bricks v3 candidate
+      - name: Build and pack promoted Bricks root package
         run: |
-          cd vendor/summernote-bricks-public/v3-tooling
+          cd vendor/summernote-bricks-root
           npm install
           npm run check
-          cd ..
-          rm -rf .release-stage dist/v3
-          mkdir -p .release-stage/dist dist/v3/packed
-          cp -R v3-tooling/dist/. .release-stage/dist/
-          cp README.md LICENSE .release-stage/
-          cp package.v3.json .release-stage/package.json
-          cd .release-stage
-          npm pack --pack-destination ../dist/v3 >/dev/null
-          cd ..
-          tar -xzf dist/v3/*.tgz -C dist/v3/packed
-          test -f dist/v3/packed/package/dist/summernote-bricks.umd.cjs
+          rm -rf .browser-package
+          mkdir -p .browser-package/extracted
+          npm pack --ignore-scripts --pack-destination .browser-package >/dev/null
+          tar -xzf .browser-package/*.tgz -C .browser-package/extracted
+          test -f .browser-package/extracted/package/dist/summernote-bricks.umd.cjs
           mkdir -p ../../dist
-          cp dist/v3/packed/package/dist/summernote-bricks.umd.cjs ../../dist/summernote-extensions.min.js
+          cp .browser-package/extracted/package/dist/summernote-bricks.umd.cjs ../../dist/summernote-extensions.min.js
 
-      - name: Build and pack public Heading v3 candidate
+      - name: Build and pack promoted Heading root package
         run: |
-          cd vendor/summernote-heading/v3-tooling
+          cd vendor/summernote-heading
           npm install
           npm run check
-          cd ..
-          rm -rf .release-stage dist/v3
-          mkdir -p .release-stage/dist dist/v3/packed
-          cp -R v3-tooling/dist/. .release-stage/dist/
-          cp README.md LICENSE .release-stage/
-          cp package.v3.json .release-stage/package.json
-          cd .release-stage
-          npm pack --pack-destination ../dist/v3 >/dev/null
-          cd ..
-          tar -xzf dist/v3/*.tgz -C dist/v3/packed
-          test -f dist/v3/packed/package/dist/index.umd.cjs
-          cp dist/v3/packed/package/dist/index.umd.cjs dist/v3/summernote-heading.js
+          rm -rf .browser-package
+          mkdir -p .browser-package/extracted
+          npm pack --ignore-scripts --pack-destination .browser-package >/dev/null
+          tar -xzf .browser-package/*.tgz -C .browser-package/extracted
+          test -f .browser-package/extracted/package/dist/index.umd.cjs
+          mkdir -p dist/v3
+          cp .browser-package/extracted/package/dist/index.umd.cjs dist/v3/summernote-heading.js
 
-      - name: Build and pack public Gallery v3 candidate
+      - name: Build and pack promoted Gallery root package
         run: |
-          cd vendor/summernote-gallery/v3-tooling
+          cd vendor/summernote-gallery
           npm install
           npm run check
-          cd ..
-          rm -rf .release-stage dist/v3
-          mkdir -p .release-stage/dist dist/v3/packed
-          cp -R v3-tooling/dist/. .release-stage/dist/
-          cp README.md LICENSE .release-stage/
-          cp package.v3.json .release-stage/package.json
-          cd .release-stage
-          npm pack --pack-destination ../dist/v3 >/dev/null
-          cd ..
-          tar -xzf dist/v3/*.tgz -C dist/v3/packed
-          test -f dist/v3/packed/package/dist/index.umd.cjs
-          cp dist/v3/packed/package/dist/index.umd.cjs dist/v3/summernote-gallery.js
+          rm -rf .browser-package
+          mkdir -p .browser-package/extracted
+          npm pack --ignore-scripts --pack-destination .browser-package >/dev/null
+          tar -xzf .browser-package/*.tgz -C .browser-package/extracted
+          test -f .browser-package/extracted/package/dist/index.umd.cjs
+          mkdir -p dist/v3
+          cp .browser-package/extracted/package/dist/index.umd.cjs dist/v3/summernote-gallery.js
 
       - name: Install browser harness
         working-directory: browser-tests
