@@ -1,6 +1,9 @@
 name: Browser compatibility
 
 on:
+  push:
+    branches:
+      - agent/v3-browser-ci-post-merge
   pull_request:
     branches:
       - develop
