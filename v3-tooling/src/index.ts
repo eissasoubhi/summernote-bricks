@@ -25,6 +25,8 @@ export interface BricksOptions {
   brickAliases: Record<string, string>;
 }
 
+export type SummernotePluginConstructor = new (context: SummernoteContext) => object;
+
 const DEFAULT_ALIASES: Record<string, string> = {
   'summernote-gallery': 'summernoteGallery',
   'summernote-heading': 'summernoteHeading',
@@ -105,12 +107,12 @@ function mergedOptions(context: SummernoteContext, configured: Partial<BricksOpt
 export function createSummernoteBricksPlugin(
   jquery: JQueryLike,
   configured: Partial<BricksOptions> = {},
-): Record<string, (context: SummernoteContext) => void> {
+): Record<string, SummernotePluginConstructor> {
   const name = configured.name ?? DEFAULT_OPTIONS.name;
   const loader = new BrickButtonLoader();
 
-  return {
-    [name](context: SummernoteContext) {
+  class SummernoteBricksPlugin {
+    constructor(context: SummernoteContext) {
       const ui = jquery.summernote?.ui;
       if (!ui) {
         throw new Error('Summernote UI must be available when Summernote Bricks initializes.');
@@ -133,8 +135,10 @@ export function createSummernoteBricksPlugin(
           }),
         ]).render();
       });
-    },
-  };
+    }
+  }
+
+  return { [name]: SummernoteBricksPlugin };
 }
 
 export function registerSummernoteBricks(
