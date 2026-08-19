@@ -84,6 +84,27 @@ for (const variant of variants) {
       expect(reserializedHtml).toBe(persistedHtml);
     });
 
+    test('preserves legacy gallery markup until migration is explicitly requested', async ({ page }) => {
+      const legacyHtml = '<div class="legacy-gallery" data-brickdata=\'{"selectedImages":[{"id":"legacy-mountain","url":"/images/mountain.jpg","title":"Legacy mountain"}]}\'><img src="/images/mountain.jpg" title="Legacy mountain" alt="Legacy mountain"></div>';
+
+      await page.evaluate((html) => {
+        $('#gallery-a').summernote('code', html);
+        window.destroyGalleryEditor('#gallery-a');
+        window.createGalleryEditor('#gallery-a');
+      }, legacyHtml);
+
+      const editable = page.locator('.note-editable').nth(0);
+      const legacy = editable.locator('[data-brickdata]');
+      await expect(legacy).toHaveCount(1);
+      await expect(legacy.locator('img')).toHaveAttribute('title', 'Legacy mountain');
+      await expect(editable.locator('[data-snb-brick="gallery"]')).toHaveCount(0);
+
+      const persistedHtml = await page.evaluate(() => $('#gallery-a').summernote('code'));
+      expect(persistedHtml).toContain('data-brickdata=');
+      expect(persistedHtml).toContain('Legacy mountain');
+      expect(persistedHtml).not.toContain('data-snb-brick="gallery"');
+    });
+
     test('searches through the source adapter', async ({ page }) => {
       const dialog = await openGalleryDialog(page, 0);
       await dialog.locator('.snb-gallery-v3-form__query').fill('ocean');
