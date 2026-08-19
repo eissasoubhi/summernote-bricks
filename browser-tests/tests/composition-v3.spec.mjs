@@ -16,8 +16,16 @@ async function openBricksMenu(page) {
 for (const variant of variants) {
   test.describe(`Bricks v3 composition on Summernote ${variant.name}`, () => {
     test.beforeEach(async ({ page }) => {
+      const pageErrors = [];
+      page.on('pageerror', (error) => pageErrors.push(error.stack ?? error.message));
+
       await page.goto(variant.path);
       await expect(page.locator('.note-editor')).toHaveCount(1);
+
+      expect(
+        pageErrors,
+        `Summernote ${variant.name} raised a page error during editor/plugin initialization:\n${pageErrors.join('\n\n')}`,
+      ).toEqual([]);
     });
 
     test('composes registered Heading and Gallery buttons in one editor', async ({ page }) => {
