@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-bricks
-          ref: 779210dc9a6d141cbeb9288692c6ca2a83e27e2a
+          ref: 578a65b7a3706458773d2fcebb0ca38b861b2b3c
           path: vendor/summernote-bricks-public
 
       - name: Checkout Heading v3 public package candidate
