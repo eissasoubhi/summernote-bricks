@@ -7,12 +7,14 @@ on:
       - 'agent/v3-gallery-browser'
       - 'agent/v3-composition-browser'
       - 'agent/v3-vite-artifact-browser'
+      - 'agent/v3-bs4-bs3-matrix'
   pull_request:
     branches:
       - agent/modernization-baseline
       - agent/v3-browser-harness
       - agent/v3-gallery-browser
       - agent/v3-composition-browser
+      - agent/v3-vite-artifact-browser
 
 permissions:
   contents: read
