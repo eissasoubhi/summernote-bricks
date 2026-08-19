@@ -10,6 +10,7 @@ on:
       - 'agent/v3-bs4-bs3-matrix'
       - 'agent/v3-bs4-bs3-standalone'
       - 'agent/v3-packed-artifact-browser'
+      - 'agent/v3-public-package-browser'
   pull_request:
     branches:
       - agent/modernization-baseline
@@ -19,31 +20,32 @@ on:
       - agent/v3-vite-artifact-browser
       - agent/v3-bs4-bs3-matrix
       - agent/v3-bs4-bs3-standalone
+      - agent/v3-packed-artifact-browser
 
 permissions:
   contents: read
 
 jobs:
   v3-plugins:
-    name: Summernote 0.9.1 / Heading + Gallery v3 (packed artifacts)
+    name: Summernote 0.9.1 / public Heading + Gallery v3 packages
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout compatibility harness
         uses: actions/checkout@v6
 
-      - name: Checkout Heading v3 Vite proof
+      - name: Checkout Heading v3 public package candidate
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-heading
-          ref: agent/v3-vite-toolchain
+          ref: agent/v3-public-package
           path: vendor/summernote-heading
 
-      - name: Checkout Gallery v3 Vite proof
+      - name: Checkout Gallery v3 public package candidate
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-gallery
-          ref: agent/v3-vite-toolchain
+          ref: agent/v3-public-package
           path: vendor/summernote-gallery
 
       - name: Setup legacy Node for Bricks build
@@ -62,29 +64,41 @@ jobs:
         with:
           node-version: 22
 
-      - name: Build and pack Heading v3 artifact
-        working-directory: vendor/summernote-heading/v3-tooling
+      - name: Build and pack public Heading v3 candidate
         run: |
+          cd vendor/summernote-heading/v3-tooling
           npm install
           npm run check
-          rm -rf .pack ../dist/v3
-          mkdir -p .pack ../dist/v3/packed
-          npm pack --pack-destination .pack >/dev/null
-          tar -xzf .pack/*.tgz -C ../dist/v3/packed
-          test -f ../dist/v3/packed/package/dist/index.umd.cjs
-          cp ../dist/v3/packed/package/dist/index.umd.cjs ../dist/v3/summernote-heading.js
+          cd ..
+          rm -rf .release-stage dist/v3
+          mkdir -p .release-stage/dist dist/v3/packed
+          cp -R v3-tooling/dist/. .release-stage/dist/
+          cp README.md LICENSE .release-stage/
+          cp package.v3.json .release-stage/package.json
+          cd .release-stage
+          npm pack --pack-destination ../dist/v3 >/dev/null
+          cd ..
+          tar -xzf dist/v3/*.tgz -C dist/v3/packed
+          test -f dist/v3/packed/package/dist/index.umd.cjs
+          cp dist/v3/packed/package/dist/index.umd.cjs dist/v3/summernote-heading.js
 
-      - name: Build and pack Gallery v3 artifact
-        working-directory: vendor/summernote-gallery/v3-tooling
+      - name: Build and pack public Gallery v3 candidate
         run: |
+          cd vendor/summernote-gallery/v3-tooling
           npm install
           npm run check
-          rm -rf .pack ../dist/v3
-          mkdir -p .pack ../dist/v3/packed
-          npm pack --pack-destination .pack >/dev/null
-          tar -xzf .pack/*.tgz -C ../dist/v3/packed
-          test -f ../dist/v3/packed/package/dist/index.umd.cjs
-          cp ../dist/v3/packed/package/dist/index.umd.cjs ../dist/v3/summernote-gallery.js
+          cd ..
+          rm -rf .release-stage dist/v3
+          mkdir -p .release-stage/dist dist/v3/packed
+          cp -R v3-tooling/dist/. .release-stage/dist/
+          cp README.md LICENSE .release-stage/
+          cp package.v3.json .release-stage/package.json
+          cd .release-stage
+          npm pack --pack-destination ../dist/v3 >/dev/null
+          cd ..
+          tar -xzf dist/v3/*.tgz -C dist/v3/packed
+          test -f dist/v3/packed/package/dist/index.umd.cjs
+          cp dist/v3/packed/package/dist/index.umd.cjs dist/v3/summernote-gallery.js
 
       - name: Install browser harness
         working-directory: browser-tests
