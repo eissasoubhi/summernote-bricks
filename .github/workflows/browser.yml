@@ -59,7 +59,7 @@ jobs:
       - name: Build Heading v3 Vite artifact
         working-directory: vendor/summernote-heading/v3-tooling
         run: |
-          npm ci
+          npm install
           npm run check
           mkdir -p ../dist/v3
           cp dist/index.umd.cjs ../dist/v3/summernote-heading.js
@@ -67,7 +67,7 @@ jobs:
       - name: Build Gallery v3 Vite artifact
         working-directory: vendor/summernote-gallery/v3-tooling
         run: |
-          npm ci
+          npm install
           npm run check
           mkdir -p ../dist/v3
           cp dist/index.umd.cjs ../dist/v3/summernote-gallery.js
