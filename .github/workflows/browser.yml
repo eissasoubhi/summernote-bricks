@@ -20,6 +20,8 @@ jobs:
     timeout-minutes: 30
     container:
       image: mcr.microsoft.com/playwright:v1.62.0-noble
+    env:
+      HOME: /root
 
     steps:
       - name: Checkout Bricks and compatibility harness
