@@ -8,6 +8,7 @@ on:
       - 'agent/v3-composition-browser'
       - 'agent/v3-vite-artifact-browser'
       - 'agent/v3-bs4-bs3-matrix'
+      - 'agent/v3-bs4-bs3-standalone'
   pull_request:
     branches:
       - agent/modernization-baseline
@@ -15,6 +16,7 @@ on:
       - agent/v3-gallery-browser
       - agent/v3-composition-browser
       - agent/v3-vite-artifact-browser
+      - agent/v3-bs4-bs3-matrix
 
 permissions:
   contents: read
