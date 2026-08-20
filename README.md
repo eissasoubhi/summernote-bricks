@@ -4,9 +4,9 @@ Summernote Bricks is an **optional composer for registered Summernote plugin but
 
 ## v3 status
 
-The `develop` branch contains the consolidated **3.0.0 release-candidate source line**. The historical `master` branch remains the published legacy line until the v3 promotion gates are complete.
+The consolidated **3.0.0 release-candidate source line is now on `master`** after the audited `develop` → `master` promotion completed with green root CI and the full maintained browser matrix.
 
-**No v3 npm package or GitHub Release has been published yet.** Do not assume that `npm install summernote-bricks@3` is available until a release is explicitly approved.
+**No v3 npm package or GitHub Release has been published yet.** Source promotion does not mean that `npm install summernote-bricks@3` is available. Publication remains a separate, explicitly approved release action.
 
 The maintained v3 reference platform is **Summernote 0.9.1**. Browser integration is validated across:
 
@@ -62,7 +62,7 @@ summernote-gallery/dist/index.umd.cjs
 summernote-bricks/dist/summernote-bricks.umd.cjs
 ```
 
-Example once those packages are available from your chosen source:
+Example when consuming those artifacts from source or after an explicitly approved package release:
 
 ```html
 <script src="path/to/jquery.js"></script>
@@ -138,17 +138,18 @@ npm run check
 
 `npm run check` performs typechecking, unit tests, the Vite/TypeScript build and package-shape validation.
 
-The maintained browser harness lives in `browser-tests/` and exercises the real packed Bricks, Heading and Gallery artifacts across the supported Summernote/browser matrix in GitHub Actions.
+The maintained browser harness lives in `browser-tests/` and exercises the real packed Bricks, Heading and Gallery artifacts across the supported Summernote/browser matrix in GitHub Actions. It also runs on a daily schedule so independent Heading or Gallery changes are revalidated against Bricks even when this repository does not change.
 
 ## Architecture and release gates
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — package boundaries and Summernote-native architecture.
 - [`docs/PRODUCT_ROADMAP.md`](docs/PRODUCT_ROADMAP.md) — product direction.
 - [`docs/V3_UPGRADE.md`](docs/V3_UPGRADE.md) — installation, legacy migration and rollback guidance.
+- [`docs/V3_RELEASE_CHECKLIST.md`](docs/V3_RELEASE_CHECKLIST.md) — explicit human-controlled release gate.
 - [`RELEASING.md`](RELEASING.md) — release process.
-- [Issue #3](https://github.com/eissasoubhi/summernote-bricks/issues/3) — authoritative ecosystem roadmap and current promotion gates.
+- [Issue #3](https://github.com/eissasoubhi/summernote-bricks/issues/3) — authoritative ecosystem roadmap and current release-readiness status.
 
-A public v3 release requires green deterministic package validation, the full maintained browser matrix, documented migration/rollback, and explicit release approval. Source consolidation does **not** publish npm packages or GitHub Releases automatically.
+A public v3 release requires green deterministic package validation, the full maintained browser matrix, documented migration/rollback, and explicit release approval. Source promotion to `master` does **not** publish npm packages or GitHub Releases automatically.
 
 ## Repository roles
 
