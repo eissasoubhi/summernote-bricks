@@ -59,6 +59,30 @@ for (const variant of variants) {
       await expect(dialog.getByRole('option', { name: /mountain/i })).toHaveCount(0);
     });
 
+    test('uploads through the host adapter and persists only returned image data', async ({ page }) => {
+      const dialog = await openGalleryDialog(page, 0);
+      const input = dialog.getByLabel('Upload images');
+
+      await input.setInputFiles({
+        name: 'fresh.png',
+        mimeType: 'image/png',
+        buffer: Buffer.from('browser-upload-fixture'),
+      });
+      await dialog.getByRole('button', { name: 'Upload', exact: true }).click();
+
+      await expect.poll(() => page.evaluate(() => window.uploadedFiles)).toEqual(['fresh.png']);
+      const uploaded = dialog.getByRole('option', { name: /fresh\.png/i });
+      await expect(uploaded).toHaveCount(1);
+      await expect(uploaded).toHaveAttribute('aria-selected', 'true');
+
+      await page.locator('.snb-gallery-v3-form__save:visible').click();
+      const firstEditable = page.locator('.note-editable').nth(0);
+      const image = firstEditable.locator('[data-snb-brick="gallery"] img');
+      await expect(image).toHaveAttribute('data-snb-image-id', 'upload-fresh.png');
+      await expect(image).toHaveAttribute('alt', 'fresh.png');
+      await expect(firstEditable.locator('.snb-gallery-v3-form__upload')).toHaveCount(0);
+    });
+
     test('round-trips persisted gallery HTML through destroy and recreate', async ({ page }) => {
       await openGalleryDialog(page, 0);
       await chooseImageAndSave(page, 'Mountain');
