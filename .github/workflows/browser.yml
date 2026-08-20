@@ -96,6 +96,14 @@ jobs:
         working-directory: browser-tests
         run: npm test
 
+      - name: Install minimum supported jQuery peer
+        working-directory: browser-tests
+        run: npm install --no-save --ignore-scripts jquery@3.6.0
+
+      - name: Smoke plugins with jQuery 3.6.0
+        working-directory: browser-tests
+        run: npx playwright test tests/composition-v3.spec.mjs --project=chromium
+
       - name: Upload Playwright failure artifacts
         if: failure()
         uses: actions/upload-artifact@v6
