@@ -209,11 +209,15 @@ jobs:
         working-directory: browser-tests
         run: npx playwright test tests/composition-v3.spec.mjs --project=chromium
 
-      - name: Upload exact compatibility evidence
+      - name: Upload exact browser-tested release bundle
         uses: actions/upload-artifact@v6
         with:
-          name: browser-compatibility-evidence-${{ github.run_id }}-${{ github.run_attempt }}
-          path: browser-tests/evidence/public-heads.json
+          name: browser-tested-release-bundle-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            browser-tests/evidence/public-heads.json
+            .browser-package/*.tgz
+            vendor/summernote-heading/.browser-package/*.tgz
+            vendor/summernote-gallery/.browser-package/*.tgz
           if-no-files-found: error
           retention-days: 30
 
