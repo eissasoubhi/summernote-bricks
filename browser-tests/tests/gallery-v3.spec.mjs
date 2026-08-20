@@ -83,6 +83,34 @@ for (const variant of variants) {
       await expect(firstEditable.locator('.snb-gallery-v3-form__upload')).toHaveCount(0);
     });
 
+    test('navigates source-only folders without persisting folder paths', async ({ page }) => {
+      await page.evaluate(() => {
+        window.galleryImages[0].path = 'nature/alps/mountain.jpg';
+        window.galleryImages[1].path = 'nature/ocean.jpg';
+      });
+
+      const editor = page.locator('.note-editor').nth(0);
+      await editor.getByRole('button', { name: /insert gallery/i }).click();
+      const dialog = page.locator('.snb-gallery-v3-form:visible');
+      const folders = dialog.getByRole('navigation', { name: 'Folders' });
+
+      await expect(folders).toBeVisible();
+      await expect(dialog.locator('.snb-gallery-v3-form__item')).toHaveCount(0);
+      await folders.getByRole('button', { name: 'nature', exact: true }).click();
+      await expect(dialog.getByRole('option', { name: /ocean/i })).toHaveCount(1);
+      await expect(dialog.getByRole('option', { name: /mountain/i })).toHaveCount(0);
+
+      await folders.getByRole('button', { name: 'alps', exact: true }).click();
+      await expect(dialog.getByRole('option', { name: /mountain/i })).toHaveCount(1);
+      await dialog.getByRole('option', { name: /mountain/i }).click();
+      await page.locator('.snb-gallery-v3-form__save:visible').click();
+
+      const persistedHtml = await page.evaluate(() => $('#gallery-a').summernote('code'));
+      expect(persistedHtml).toContain('data-snb-image-id="mountain"');
+      expect(persistedHtml).not.toContain('nature/alps');
+      expect(persistedHtml).not.toContain('data-folder');
+    });
+
     test('round-trips persisted gallery HTML through destroy and recreate', async ({ page }) => {
       await openGalleryDialog(page, 0);
       await chooseImageAndSave(page, 'Mountain');
