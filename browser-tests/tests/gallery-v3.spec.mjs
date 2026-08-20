@@ -93,6 +93,27 @@ for (const variant of variants) {
       await expect(dialog.getByRole('option', { name: /mountain/i })).toHaveCount(0);
     });
 
+    test('switches accessible editor-only grid and gallery views', async ({ page }) => {
+      const dialog = await openGalleryDialog(page, 0);
+      const results = dialog.locator('.snb-gallery-v3-form__results');
+      const grid = dialog.getByRole('button', { name: 'Grid', exact: true });
+      const gallery = dialog.getByRole('button', { name: 'Gallery', exact: true });
+
+      await expect(grid).toHaveAttribute('aria-pressed', 'true');
+      await expect(gallery).toHaveAttribute('aria-pressed', 'false');
+      await expect(results).toHaveAttribute('data-view', 'grid');
+      await expect(results).toHaveCSS('display', 'grid');
+
+      await gallery.click();
+      await expect(grid).toHaveAttribute('aria-pressed', 'false');
+      await expect(gallery).toHaveAttribute('aria-pressed', 'true');
+      await expect(results).toHaveAttribute('data-view', 'gallery');
+      await expect(results).toHaveCSS('display', 'flex');
+
+      await grid.click();
+      await expect(results).toHaveAttribute('data-view', 'grid');
+    });
+
     test('edits a gallery and participates in Summernote undo history', async ({ page }) => {
       await openGalleryDialog(page, 0);
       await chooseImageAndSave(page, 'Mountain');
