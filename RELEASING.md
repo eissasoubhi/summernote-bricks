@@ -24,21 +24,26 @@ When several packages genuinely depend on changes from the same release wave:
 
 Do not require synchronized releases when packages are unaffected.
 
-## v3 promotion gate
+## v3 source promotion status
 
-Before promoting the consolidated v3 `develop` line to `master`:
+The consolidated v3 source has already been promoted from `develop` to public `master` after the exact promotion head passed deterministic root CI and the maintained Summernote 0.9.1 BS3/BS4/BS5/Lite × Chromium/Firefox/WebKit matrix.
 
-- root CI must be green from a clean `npm ci` install;
-- the Bricks package and current public Heading/Gallery heads must build and pass package-shape checks;
-- the maintained Summernote 0.9.1 BS3/BS4/BS5/Lite × Chromium/Firefox/WebKit matrix must pass from packed artifacts;
-- multiple-editor, create/edit, undo, focus/accessibility, destroy/recreate and semantic HTML round-trip contracts must remain green;
-- ESM, CommonJS and browser/script-tag entrypoints must match the documented package layout;
-- legacy Heading/Gallery migration must remain explicit and opt-in;
-- installation, migration and rollback documentation must match the final package contracts;
-- the `develop -> master` diff must be reviewed as an intentional major replacement and checked for accidental removals;
-- the source branch must not move after its authoritative validation without re-running the gates.
+That source promotion is **not** a package release. Before publishing any v3 package or creating a GitHub Release:
 
-The detailed human-controlled checklist lives in `docs/V3_RELEASE_CHECKLIST.md` once that release-readiness change is merged. Issue #3 is the authoritative roadmap for current gate status.
+- run root validation from a clean `npm ci` install;
+- validate the Bricks package and the intended Heading/Gallery package versions from their real tarball candidates;
+- require the maintained browser compatibility matrix to pass;
+- verify ESM, CommonJS and browser/script-tag entrypoints match the documented package layout;
+- confirm legacy Heading/Gallery migration remains explicit and opt-in;
+- review installation, migration and rollback documentation against the exact package versions being released;
+- review package version, tag and release-note intent explicitly;
+- stop if `docs/V3_RELEASE_CHECKLIST.md` has any unresolved item.
+
+The detailed human-controlled checklist lives in `docs/V3_RELEASE_CHECKLIST.md`. Issue #3 is the authoritative ecosystem roadmap and release-readiness status.
+
+## Continuous compatibility before release
+
+The central Bricks browser workflow validates the current public Heading and Gallery heads against Bricks and also runs on a daily schedule. A green scheduled run is a safety signal, not publication authorization; release candidates still require validation of the exact artifacts intended for publication.
 
 ## npm publishing target
 
