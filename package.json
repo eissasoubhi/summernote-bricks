@@ -21,11 +21,12 @@
   },
   "scripts": {
     "typecheck": "tsc -p v3-tooling/tsconfig.json --noEmit",
-    "test": "vitest run v3-tooling/test/index.test.ts",
+    "test": "vitest run v3-tooling/test",
     "build:js": "vite build --config v3-tooling/vite.config.ts",
     "build:types": "tsc -p v3-tooling/tsconfig.build.json",
     "build": "npm run build:js && npm run build:types",
     "pack:check": "node scripts/validate-v3-root-package.mjs",
+    "release:tag-check": "node scripts/validate-release-tag.mjs",
     "check": "npm run typecheck && npm test && npm run build && npm run pack:check"
   },
   "devDependencies": {
