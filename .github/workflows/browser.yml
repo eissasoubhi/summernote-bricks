@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - master
-      - agent/v3-gallery-folder-browser
   pull_request:
     branches:
       - develop
@@ -42,7 +41,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: eissasoubhi/summernote-gallery
-          ref: agent/v3-folder-ui
+          ref: master
           path: vendor/summernote-gallery
 
       - name: Setup Node
