@@ -21,11 +21,25 @@
     const source = {
       list: async ({ query = '' }) => ({ items: images.filter((image) => image.title.toLowerCase().includes(query.toLowerCase())) })
     };
+    window.uploadedFiles = [];
+    const upload = {
+      upload: async (files, signal) => {
+        if (signal && signal.aborted) throw new DOMException('The operation was aborted.', 'AbortError');
+        window.uploadedFiles = files.map((file) => file.name);
+        return files.map((file) => ({
+          id: `upload-${file.name}`,
+          src: '/browser-tests/fixtures/ocean.jpg',
+          alt: file.name,
+          title: file.name,
+          caption: 'Uploaded image'
+        }));
+      }
+    };
     window.createGalleryEditor = function (selector) {
       $(selector).summernote({
         height: 180,
         toolbar: [['insert', ['summernoteGallery']]],
-        summernoteGallery: { source }
+        summernoteGallery: { source, upload }
       });
     };
     window.destroyGalleryEditor = (selector) => $(selector).summernote('destroy');
