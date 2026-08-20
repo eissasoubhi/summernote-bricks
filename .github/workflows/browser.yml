@@ -51,6 +51,72 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
+      - name: Record exact compatibility inputs
+        run: |
+          mkdir -p browser-tests/evidence
+          node <<'NODE'
+          const { execFileSync } = require('node:child_process');
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const readPackage = (cwd) => JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'));
+          const gitSha = (cwd) => execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
+          const root = process.cwd();
+          const headingDir = path.join(root, 'vendor/summernote-heading');
+          const galleryDir = path.join(root, 'vendor/summernote-gallery');
+          const bricksPackage = readPackage(root);
+          const headingPackage = readPackage(headingDir);
+          const galleryPackage = readPackage(galleryDir);
+
+          const evidence = {
+            schemaVersion: 1,
+            generatedAt: new Date().toISOString(),
+            workflow: {
+              repository: process.env.GITHUB_REPOSITORY,
+              runId: process.env.GITHUB_RUN_ID,
+              runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+              event: process.env.GITHUB_EVENT_NAME,
+              url: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+            },
+            editor: {
+              summernote: '0.9.1',
+              primaryJquery: '3.7.1',
+              minimumJquerySmoke: '3.6.0',
+            },
+            packages: {
+              bricks: {
+                repository: 'eissasoubhi/summernote-bricks',
+                ref: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME,
+                sha: gitSha(root),
+                version: bricksPackage.version,
+              },
+              heading: {
+                repository: 'eissasoubhi/summernote-heading',
+                ref: 'main',
+                sha: gitSha(headingDir),
+                version: headingPackage.version,
+              },
+              gallery: {
+                repository: 'eissasoubhi/summernote-gallery',
+                ref: 'master',
+                sha: gitSha(galleryDir),
+                version: galleryPackage.version,
+              },
+            },
+          };
+
+          const output = path.join(root, 'browser-tests/evidence/public-heads.json');
+          fs.writeFileSync(output, `${JSON.stringify(evidence, null, 2)}\n`);
+
+          const rows = Object.entries(evidence.packages)
+            .map(([name, value]) => `| ${name} | \`${value.ref}\` | \`${value.sha}\` | \`${value.version}\` |`)
+            .join('\n');
+          fs.appendFileSync(
+            process.env.GITHUB_STEP_SUMMARY,
+            `## Browser compatibility inputs\n\n| Package | Ref | SHA | Version |\n| --- | --- | --- | --- |\n${rows}\n\nSummernote: \`0.9.1\` · jQuery matrix: \`3.7.1\` · minimum-peer smoke: \`3.6.0\`\n`,
+          );
+          NODE
+
       - name: Build and pack Bricks root package
         run: |
           npm ci
@@ -103,6 +169,14 @@ jobs:
       - name: Smoke plugins with jQuery 3.6.0
         working-directory: browser-tests
         run: npx playwright test tests/composition-v3.spec.mjs --project=chromium
+
+      - name: Upload exact compatibility evidence
+        uses: actions/upload-artifact@v6
+        with:
+          name: browser-compatibility-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: browser-tests/evidence/public-heads.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Upload Playwright failure artifacts
         if: failure()
