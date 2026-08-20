@@ -37,7 +37,8 @@ For every package intended for publication:
 - [ ] ESM `import` entrypoint works from the extracted tarball;
 - [ ] CommonJS `require` entrypoint works from the extracted tarball;
 - [ ] browser/UMD script-tag registration works from the extracted tarball;
-- [ ] peer dependency ranges match the documented host contract.
+- [ ] peer dependency ranges match the documented host contract;
+- [ ] the release-validation workflow fails unless the Git tag is exactly `v${package.json.version}` for Bricks, Heading and Gallery.
 
 ## 3. Browser compatibility
 
@@ -103,6 +104,7 @@ Do **not** publish if any of the following is true:
 
 - a required CI/browser gate is red, cancelled or still running;
 - any public release source branch moved after the last authoritative compatibility run;
+- a release Git tag does not exactly match the package version that passed validation;
 - a package tarball differs from the artifact that passed browser validation;
 - a public entrypoint cannot be imported/required/loaded as documented;
 - legacy migration behavior is ambiguous or destructive by default;
