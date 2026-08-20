@@ -21,7 +21,7 @@
   },
   "scripts": {
     "typecheck": "tsc -p v3-tooling/tsconfig.json --noEmit",
-    "test": "vitest run v3-tooling/test",
+    "test": "vitest run --config v3-tooling/vitest.config.ts",
     "build:js": "vite build --config v3-tooling/vite.config.ts",
     "build:types": "tsc -p v3-tooling/tsconfig.build.json",
     "build": "npm run build:js && npm run build:types",
