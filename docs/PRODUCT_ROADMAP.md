@@ -1,149 +1,126 @@
 # Summernote Bricks product roadmap
 
-This roadmap treats Summernote Bricks, Gallery and Heading as one product ecosystem while preserving independent packages.
+This roadmap treats Summernote Bricks, Gallery and Heading as one product ecosystem while preserving independent packages and repository history.
 
 ## Product principles
 
-1. **Useful alone, better together** — every brick is a standalone Summernote plugin; Bricks adds composition UX.
+1. **Useful alone, better together** — Heading and Gallery remain standalone Summernote plugins; Bricks adds composition UX.
 2. **No backend lock-in** — plugins accept data/adapters instead of assuming Laravel, Symfony, WordPress or a specific API shape.
-3. **Persisted HTML is an API** — markup written into editors may live in databases for years. Changes need versioning/migration thinking.
-4. **Accessibility is part of the component contract** — keyboard, focus, labels and modal behavior are release criteria.
-5. **Compatibility is tested, not advertised from upstream claims** — Summernote/Bootstrap/browser combinations enter the matrix only after browser tests pass.
-6. **Small shared core** — move only genuinely reusable runtime concerns into the core; brick-specific behavior stays local.
+3. **Persisted HTML is an API** — markup written into editors may live in databases for years. Changes require versioning and explicit migration behavior.
+4. **Accessibility is part of the contract** — keyboard, focus, labels and dialog behavior are release criteria.
+5. **Compatibility is tested, not assumed** — Summernote/Bootstrap/browser combinations are documented only after real-browser validation.
+6. **Small shared core** — `SNB-components` stays independent and optional unless concrete shared runtime value justifies coupling.
+7. **Publication is separate from source readiness** — green source/CI never authorizes npm publication or GitHub Releases by itself.
 
-## Phase 0 — maintenance baseline
+## Current v3 baseline — completed
 
-Status: in progress.
+### Toolchain and packages
 
-- CI for all three public repositories.
-- Type/build/package smoke checks.
-- Correct npm entrypoints for Gallery and Heading.
-- Documentation, contribution, security and release policies.
-- Bricks composition through standard Summernote button memos.
-- Remove concrete deep imports and global Summernote monkey-patching from Bricks.
+- strict TypeScript with `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes` across maintained v3 lines;
+- Vite library builds with ESM, CommonJS/browser artifacts and TypeScript declarations;
+- Vitest/jsdom unit and migration coverage;
+- deterministic lockfiles and `npm ci` CI on maintained v3 paths;
+- package `exports`, documented peer dependencies and tarball-first validation;
+- Node 22/24 validation for maintained package/tooling paths.
 
-## Phase 1 — make the ecosystem releaseable
+### Public repository roles
 
-### Modern toolchains
+- `summernote-heading`: standalone semantic Heading v3 plugin on public `main`;
+- `summernote-gallery`: standalone backend-agnostic Gallery v3 plugin on public `master`;
+- `summernote-bricks`: optional composer and central browser compatibility harness on public `master`;
+- `SNB-components`: public independent optional core on `main`; Heading/Gallery do not depend on it.
 
-- Gallery/Heading: move TypeScript and build dependencies to maintained versions.
-- Bricks: replace Webpack 4 / Node 16 tooling and validate Node 22/24.
-- Regenerate lockfiles deliberately and drive known high/critical audit findings down to an acceptable release baseline.
+### Runtime and content contract
 
-### Public shared core
+- Summernote-native plugin lifecycle and UI integration;
+- semantic persisted HTML with `data-snb-brick` / `data-snb-version` metadata where required;
+- editor controls, source metadata and transport details excluded from persisted content;
+- explicit/opt-in legacy migration helpers;
+- multi-editor isolation, create/edit, undo, destroy/recreate and HTML round-trip coverage.
 
-Gallery and Heading currently rely on `snb-components`, whose source repository is private. For a healthy open-source ecosystem, contributors must be able to inspect and evolve the shared runtime.
+### Compatibility baseline
 
-Recommended direction: publish the shared runtime as a clearly named public project/package (for example `@summernote-bricks/core`) once its API is cleaned up. Keep the first public API intentionally small.
+The authoritative browser harness currently proves Summernote 0.9.1 with:
 
-The migration should be semver-aware so existing packages are not broken abruptly.
+- Bootstrap 3 × Chromium / Firefox / WebKit;
+- Bootstrap 4 × Chromium / Firefox / WebKit;
+- Bootstrap 5 × Chromium / Firefox / WebKit;
+- Summernote Lite × Chromium / Firefox / WebKit.
 
-### Package contracts
+The central Bricks workflow validates current public Heading/Gallery heads and also runs daily to detect cross-repository drift.
 
-- expose documented module/browser entrypoints;
-- use package `exports` once consumer compatibility is verified;
-- decide which host libraries belong in `peerDependencies`;
-- validate packed tarballs in CI;
-- stop relying on internal `src/` or `dist/` deep imports across packages.
+## Gallery v3 — completed feature set
 
-## Phase 2 — compatibility and runtime quality
+Completed and browser/package validated:
 
-### Browser test harness
+1. text search;
+2. source-only media/date filtering;
+3. accessible Grid/Gallery view modes;
+4. optional host-provided multi-file upload adapter;
+5. source-only paths and deterministic folder tree;
+6. accessible root/parent/child folder navigation;
+7. loading/error/empty-state contracts;
+8. semantic persistence that excludes upload/folder/filter/view metadata.
 
-Build an ecosystem-level Playwright suite covering:
+Future Gallery work should be treated as new feature scope, not a blocker for the current v3 release candidate. Candidates include responsive image metadata (`srcset`, dimensions), richer keyboard navigation, provider-specific adapters maintained outside the core plugin, and performance work for very large source collections.
 
-- standalone Gallery;
-- standalone Heading;
-- Gallery + Heading composed by Bricks;
-- two editors on the same page;
-- destroy/recreate lifecycle;
-- keyboard/focus behavior;
-- persisted HTML round-trips.
+## Heading v3 — completed baseline
 
-Start with the currently working Bootstrap/Summernote combinations, then add newer versions one at a time.
+Completed and validated:
 
-### Bootstrap adapter
+1. semantic `h1`–`h6` configuration;
+2. optional subtitle;
+3. optional anchor/deep-link support;
+4. safe editing of persisted headings;
+5. explicit legacy migration helpers;
+6. strict omission of absent optional fields rather than serializing `undefined`-shaped state;
+7. accessibility/focus and semantic HTML browser coverage.
 
-The shared runtime currently relies on the jQuery Bootstrap modal API. Introduce a small modal adapter/controller in the shared core:
+Future Heading work should remain semantic-first. Candidates include reusable presentation presets, preview UX, TOC integration and host-provided slug policies.
 
-```text
-open(element)
-close(element)
-onHidden(element, callback)
-```
+## Shared core policy
 
-Implement Bootstrap 3/4 and Bootstrap 5 adapters behind that contract. Concrete bricks should not contain version-specific modal code.
+`SNB-components` is public and independently maintained. It should remain small and optional.
 
-### HTML versioning
+Do **not** move plugin-specific behavior into the core merely to share code. A shared runtime API should be introduced only when at least two concrete consumers need the same stable abstraction and the dependency reduces overall complexity.
 
-Introduce a lightweight brick metadata convention for newly generated markup, for example:
+Potential future shared concerns include narrowly scoped form/accessibility primitives or test helpers. Bootstrap-specific modal abstraction is not currently required because concrete v3 plugins integrate through Summernote rather than direct Bootstrap modal APIs.
 
-```html
-<div data-snb-brick="heading" data-snb-version="1">...</div>
-```
+## Next product opportunities
 
-Do not rewrite existing stored HTML automatically. Use metadata to make future migrations/debugging possible.
+Recommended order favors high utility with controlled persistence risk:
 
-## Phase 3 — improve existing bricks
+1. **Callout / Alert** — low complexity, reusable, good third-plugin validation of the extension contract.
+2. **Button / CTA** — semantic link/button content with host-controlled style presets.
+3. **Media / Embed** — provider/adapter-driven external media with safe URL handling.
+4. **Card** — image + heading + text + optional CTA using proven plugin patterns.
+5. **Table of contents** — consume semantic Heading anchors once host expectations are clear.
+6. **Columns / Layout** — defer until nested persisted structures and responsive behavior have dedicated migration/browser contracts.
 
-### Gallery
+Avoid starting with Columns/Layout: it combines nested editing, responsive markup and migration risk before simpler new bricks have validated the public extension model.
 
-Priority order:
+## Developer experience after another brick proves the contract
 
-1. search/filter UX;
-2. pluggable upload adapter;
-3. folder/navigation adapter;
-4. grid/list view modes;
-5. keyboard navigation and selection accessibility;
-6. loading/error/empty states;
-7. optional responsive image metadata (`alt`, dimensions, `srcset`) where the host provides it.
+After at least one additional independently implemented brick passes the same package/browser gates:
 
-Upload should be an application-provided adapter/interface, not a hard-coded server endpoint.
-
-### Heading
-
-Priority order:
-
-1. accessible semantic level (`h1`–`h6`) configuration;
-2. reusable style presets instead of arbitrary presentation-only fields;
-3. preview inside the modal;
-4. safe editing of existing persisted headings;
-5. optional anchor/slug support for TOCs and deep links.
-
-Heading must preserve semantic HTML rather than becoming a generic visual title widget.
-
-## Phase 4 — new bricks
-
-Recommended sequence, based on utility versus architectural complexity:
-
-1. **Callout / Alert** — low complexity, highly reusable, validates the extension model.
-2. **Button / CTA** — URL, label, target and style preset; useful in CMS content.
-3. **Media / Embed** — provider/adaptor-driven video or external media embeds with safe URL handling.
-4. **Card** — image + heading + text + optional CTA using shared form primitives.
-5. **Columns / Layout** — high value but higher risk because nested editable content and responsive markup affect persistence.
-6. **Table of contents** — can consume semantic heading metadata once Heading supports anchors.
-
-Avoid starting with Columns/Layout: it exercises nested editors, persisted structure and responsive framework coupling before the simpler plugin contract is proven.
-
-## Developer experience after the contract stabilizes
-
-Only after at least three independently implemented bricks use the same stable public contract:
-
-- create a `create-summernote-brick` starter/generator;
-- provide a compatibility test kit for third-party bricks;
+- extract a compatibility test kit for third-party bricks;
 - document a public brick catalogue;
-- consider a scoped npm namespace for ecosystem packages.
+- consider a `create-summernote-brick` starter/generator;
+- consider a scoped npm namespace only if it improves discovery without disrupting existing package identities.
 
-Do not build the generator before the contract is proven; otherwise it freezes accidental architecture into templates.
+Do not freeze a generator around the current internals before a third concrete brick validates which abstractions are genuinely reusable.
 
 ## Release model
 
-Target:
+Current source lines are release-candidate ready, but no autonomous workflow publishes packages.
 
-- semantic versioning per package;
-- changesets/changelog discipline or an equivalent explicit release-note process;
-- Git tags + GitHub Releases;
-- npm trusted publishing through GitHub Actions/OIDC after npm-side trusted publishers are configured;
-- release candidates tested from `npm pack` artifacts before stable publication.
+Before any public release:
 
-Cross-package releases should follow dependency order, but independent patches should remain independent.
+- validate exact package versions from clean `npm pack` artifacts;
+- require deterministic root/package CI and the full browser matrix to be green after the last source change;
+- review `docs/V3_RELEASE_CHECKLIST.md` against the current public branches;
+- obtain explicit maintainer approval for package versions, npm publication and any later GitHub tags/releases;
+- use npm trusted publishing/OIDC with provenance when publication is intentionally enabled;
+- verify published artifacts from a clean consumer project before creating matching Git tags or GitHub Releases.
+
+Independent patches should remain independently releasable; synchronized package releases are required only when actual dependency relationships demand them.
