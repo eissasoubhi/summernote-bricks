@@ -60,7 +60,7 @@ jobs:
           const path = require('node:path');
 
           const readPackage = (cwd) => JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'));
-          const gitSha = (cwd) => execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
+          const gitSha = (cwd) => execFileSync('git', ['-c', `safe.directory=${cwd}`, 'rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
           const root = process.cwd();
           const headingDir = path.join(root, 'vendor/summernote-heading');
           const galleryDir = path.join(root, 'vendor/summernote-gallery');
