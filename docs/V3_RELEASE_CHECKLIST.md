@@ -38,7 +38,8 @@ For every package intended for publication:
 - [ ] CommonJS `require` entrypoint works from the extracted tarball;
 - [ ] browser/UMD script-tag registration works from the extracted tarball;
 - [ ] peer dependency ranges match the documented host contract;
-- [ ] the release-validation workflow fails unless the Git tag is exactly `v${package.json.version}` for Bricks, Heading and Gallery.
+- [ ] the release-validation workflow fails unless the Git tag is exactly `v${package.json.version}` for Bricks, Heading and Gallery;
+- [ ] the same release tag/version rule is exercised by ordinary package CI tests before any real release tag is pushed.
 
 ## 3. Browser compatibility
 
