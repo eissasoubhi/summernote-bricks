@@ -11,16 +11,16 @@ Release candidates:
 - `summernote-gallery@3.0.0-rc.0`
 - `SNB-components` remains independent and must not be added as a dependency unless concrete shared runtime value is demonstrated.
 
-Reference host contract: Summernote 0.9.1 with jQuery 3.x.
+Reference host contract: Summernote 0.9.x, currently validated on 0.9.1, with jQuery 3.x.
 
-## 1. Source promotion
+## 1. Public source state
 
-- [ ] Heading public branch is green and synchronized.
-- [ ] Gallery public branch is green and synchronized.
-- [ ] Bricks `develop` browser gate is green against the current Heading/Gallery public heads.
-- [ ] Bricks `develop -> master` promotion PR has been reviewed as a major replacement, not a patch update.
-- [ ] No accidental deletion exists outside the documented legacy replacement.
-- [ ] Repository history and previous releases/tags remain intact.
+- [ ] Heading `main` is green and synchronized with the exact source intended for release.
+- [ ] Gallery `master` is green and synchronized with the exact source intended for release.
+- [ ] Bricks `master` is green and synchronized with the exact source intended for release.
+- [ ] the permanent Bricks browser gate is green against the current public Heading `main` and Gallery `master` heads.
+- [ ] the latest daily cross-repository compatibility run is green, or an equivalent manual run has been completed after the last public-source change.
+- [ ] repository history and previous releases/tags remain intact.
 
 ## 2. Reproducible packages
 
@@ -73,7 +73,7 @@ The authoritative test must use package artifacts, not source imports.
 - [ ] plugin load order is documented for script-tag users.
 - [ ] ESM/CommonJS usage is documented.
 - [ ] compatibility table reflects only tested combinations.
-- [ ] `V3_UPGRADE.md` matches the promoted branches.
+- [ ] `V3_UPGRADE.md` matches the public branches.
 - [ ] breaking changes from v2 are explicit.
 - [ ] migration and rollback paths are explicit.
 
@@ -102,7 +102,7 @@ These steps are intentionally **never automatic** in the autonomous development 
 Do **not** publish if any of the following is true:
 
 - a required CI/browser gate is red, cancelled or still running;
-- the release branch moved after the last authoritative compatibility run;
+- any public release source branch moved after the last authoritative compatibility run;
 - a package tarball differs from the artifact that passed browser validation;
 - a public entrypoint cannot be imported/required/loaded as documented;
 - legacy migration behavior is ambiguous or destructive by default;
