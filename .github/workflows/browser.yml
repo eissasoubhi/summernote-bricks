@@ -69,7 +69,7 @@ jobs:
           const galleryPackage = readPackage(galleryDir);
 
           const evidence = {
-            schemaVersion: 1,
+            schemaVersion: 2,
             generatedAt: new Date().toISOString(),
             workflow: {
               repository: process.env.GITHUB_REPOSITORY,
@@ -153,6 +153,45 @@ jobs:
           test -f .browser-package/extracted/package/dist/index.umd.cjs
           mkdir -p dist/v3
           cp .browser-package/extracted/package/dist/index.umd.cjs dist/v3/summernote-gallery.js
+
+      - name: Record browser-tested tarball digests
+        run: |
+          node <<'NODE'
+          const crypto = require('node:crypto');
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const root = process.cwd();
+          const evidencePath = path.join(root, 'browser-tests/evidence/public-heads.json');
+          const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+          const tarballFor = (cwd) => {
+            const directory = path.join(cwd, '.browser-package');
+            const names = fs.readdirSync(directory).filter((name) => name.endsWith('.tgz'));
+            if (names.length !== 1) {
+              throw new Error(`Expected exactly one tarball in ${directory}; found ${names.length}`);
+            }
+            const filename = names[0];
+            const file = path.join(directory, filename);
+            return {
+              filename,
+              sha256: crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),
+              bytes: fs.statSync(file).size,
+            };
+          };
+
+          evidence.packages.bricks.tarball = tarballFor(root);
+          evidence.packages.heading.tarball = tarballFor(path.join(root, 'vendor/summernote-heading'));
+          evidence.packages.gallery.tarball = tarballFor(path.join(root, 'vendor/summernote-gallery'));
+          fs.writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
+
+          const rows = Object.entries(evidence.packages)
+            .map(([name, value]) => `| ${name} | \`${value.tarball.filename}\` | \`${value.tarball.sha256}\` | ${value.tarball.bytes} |`)
+            .join('\n');
+          fs.appendFileSync(
+            process.env.GITHUB_STEP_SUMMARY,
+            `\n## Browser-tested package artifacts\n\n| Package | Tarball | SHA-256 | Bytes |\n| --- | --- | --- | ---: |\n${rows}\n`,
+          );
+          NODE
 
       - name: Install browser harness
         working-directory: browser-tests
