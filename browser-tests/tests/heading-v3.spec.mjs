@@ -13,10 +13,10 @@ async function openHeadingDialog(page, editorIndex = 0) {
 
 async function saveHeading(page, data = {}) {
   const form = page.locator('.snb-heading-form:visible');
-  await form.locator('.snb-heading-form__level').selectOption(String(data.level || 2));
-  await form.locator('.snb-heading-form__title').fill(data.title || 'Semantic title');
-  await form.locator('.snb-heading-form__subtitle').fill(data.subtitle || 'Optional subtitle');
-  await form.locator('.snb-heading-form__anchor').fill(data.anchor || 'semantic-title');
+  await form.locator('.snb-heading-form__level').selectOption(String(data.level ?? 2));
+  await form.locator('.snb-heading-form__title').fill(data.title ?? 'Semantic title');
+  await form.locator('.snb-heading-form__subtitle').fill(data.subtitle ?? 'Optional subtitle');
+  await form.locator('.snb-heading-form__anchor').fill(data.anchor ?? 'semantic-title');
   await page.locator('.snb-heading-form__save:visible').click();
 }
 
@@ -42,6 +42,23 @@ for (const variant of variants) {
       await expect(secondEditable.locator('[data-snb-brick="heading"]')).toHaveCount(0);
       await expect(brick.locator('.snb-brick-actions')).toHaveCount(0);
       await expect(brick.locator('style')).toHaveCount(0);
+    });
+
+    test('persists clean semantic HTML when optional fields are omitted', async ({ page }) => {
+      await openHeadingDialog(page, 0);
+      await saveHeading(page, { level: 4, title: 'Minimal heading', subtitle: '', anchor: '' });
+
+      const brick = page.locator('.note-editable').nth(0).locator('[data-snb-brick="heading"][data-snb-version="3"]');
+      const heading = brick.locator('h4');
+
+      await expect(heading).toHaveText('Minimal heading');
+      await expect(heading).not.toHaveAttribute('id', /.+/);
+      await expect(brick.locator('.snb-heading__subtitle')).toHaveCount(0);
+
+      const persistedHtml = await page.evaluate(() => $('#editor-a').summernote('code'));
+      expect(persistedHtml).toContain('<h4 class="snb-heading__title">Minimal heading</h4>');
+      expect(persistedHtml).not.toContain('snb-heading__subtitle');
+      expect(persistedHtml).not.toContain(' id=');
     });
 
     test('moves focus into a labeled heading form', async ({ page }) => {
