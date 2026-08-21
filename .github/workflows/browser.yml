@@ -27,6 +27,7 @@ jobs:
       HOME: /root
       BRICKS_SOURCE_REF: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
       BRICKS_SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      RELEASE_ELIGIBLE: ${{ github.ref == 'refs/heads/master' }}
 
     steps:
       - name: Checkout Bricks and compatibility harness
@@ -71,13 +72,14 @@ jobs:
           const galleryPackage = readPackage(galleryDir);
 
           const evidence = {
-            schemaVersion: 3,
+            schemaVersion: 4,
             generatedAt: new Date().toISOString(),
             workflow: {
               repository: process.env.GITHUB_REPOSITORY,
               runId: process.env.GITHUB_RUN_ID,
               runAttempt: process.env.GITHUB_RUN_ATTEMPT,
               event: process.env.GITHUB_EVENT_NAME,
+              releaseEligible: process.env.RELEASE_ELIGIBLE === 'true',
               url: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
             },
             editor: {
@@ -115,9 +117,10 @@ jobs:
           const rows = Object.entries(evidence.packages)
             .map(([name, value]) => `| ${name} | \`${value.ref}\` | \`${value.sha}\` | ${value.sourceRef ? `\`${value.sourceRef}\` | \`${value.sourceSha}\`` : '— | —'} | \`${value.version}\` |`)
             .join('\n');
+          const artifactClass = evidence.workflow.releaseEligible ? 'release-eligible public-master bundle' : 'CI-only compatibility bundle';
           fs.appendFileSync(
             process.env.GITHUB_STEP_SUMMARY,
-            `## Browser compatibility inputs\n\n| Package | Tested ref | Tested SHA | Source ref | Source SHA | Version |\n| --- | --- | --- | --- | --- | --- |\n${rows}\n\nSummernote: \`0.9.1\` · jQuery matrix: \`3.7.1\` · minimum-peer smoke: \`3.6.0\`\n`,
+            `## Browser compatibility inputs\n\nArtifact class: **${artifactClass}**\n\n| Package | Tested ref | Tested SHA | Source ref | Source SHA | Version |\n| --- | --- | --- | --- | --- | --- |\n${rows}\n\nSummernote: \`0.9.1\` · jQuery matrix: \`3.7.1\` · minimum-peer smoke: \`3.6.0\`\n`,
           );
           NODE
 
@@ -213,10 +216,10 @@ jobs:
         working-directory: browser-tests
         run: npx playwright test tests/composition-v3.spec.mjs --project=chromium
 
-      - name: Upload exact browser-tested release bundle
+      - name: Upload exact browser-tested bundle
         uses: actions/upload-artifact@v6
         with:
-          name: browser-tested-release-bundle-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ env.RELEASE_ELIGIBLE == 'true' && format('browser-tested-release-bundle-{0}-{1}', github.run_id, github.run_attempt) || format('browser-tested-ci-bundle-{0}-{1}', github.run_id, github.run_attempt) }}
           path: |
             browser-tests/evidence/public-heads.json
             .browser-package/*.tgz
@@ -226,16 +229,20 @@ jobs:
           include-hidden-files: true
           retention-days: 30
 
-      - name: Download uploaded release bundle for verification
+      - name: Download uploaded bundle for verification
         uses: actions/download-artifact@v7
         with:
-          name: browser-tested-release-bundle-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ env.RELEASE_ELIGIBLE == 'true' && format('browser-tested-release-bundle-{0}-{1}', github.run_id, github.run_attempt) || format('browser-tested-ci-bundle-{0}-{1}', github.run_id, github.run_attempt) }}
           path: browser-tests/evidence/release-bundle-roundtrip
 
-      - name: Verify uploaded release bundle identities
+      - name: Verify uploaded bundle identities and eligibility
         run: |
-          npm run release:bundle-check -- browser-tests/evidence/release-bundle-roundtrip "$GITHUB_RUN_ID"
-          printf '\n✅ Uploaded release bundle round-trip verified: exactly one evidence JSON and three digest-matching tarballs.\n' >> "$GITHUB_STEP_SUMMARY"
+          npm run release:bundle-check -- browser-tests/evidence/release-bundle-roundtrip "$GITHUB_RUN_ID" "$RELEASE_ELIGIBLE"
+          if [ "$RELEASE_ELIGIBLE" = "true" ]; then
+            printf '\n✅ Release-eligible public-master bundle verified: exactly one evidence JSON and three digest-matching tarballs.\n' >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '\n✅ CI-only compatibility bundle verified. This artifact is not eligible for publication.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload Playwright failure artifacts
         if: failure()
