@@ -219,6 +219,7 @@ jobs:
             vendor/summernote-heading/.browser-package/*.tgz
             vendor/summernote-gallery/.browser-package/*.tgz
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 30
 
       - name: Upload Playwright failure artifacts
