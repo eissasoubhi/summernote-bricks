@@ -4,7 +4,14 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
-export function validateBrowserReleaseBundle(rootDirectory, expectedRunId) {
+function parseExpectedEligibility(value) {
+  if (value === undefined) return undefined;
+  if (value === true || value === 'true') return true;
+  if (value === false || value === 'false') return false;
+  throw new Error(`Expected release eligibility to be true or false; received ${String(value)}`);
+}
+
+export function validateBrowserReleaseBundle(rootDirectory, expectedRunId, expectedReleaseEligible) {
   const root = path.resolve(rootDirectory);
   const walk = (directory) => fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(directory, entry.name);
@@ -20,8 +27,30 @@ export function validateBrowserReleaseBundle(rootDirectory, expectedRunId) {
   }
 
   const evidence = JSON.parse(fs.readFileSync(jsonFiles[0], 'utf8'));
-  if (evidence.schemaVersion !== 3 || String(evidence.workflow?.runId) !== String(expectedRunId)) {
-    throw new Error('Downloaded evidence does not identify this schema-v3 workflow run');
+  if (evidence.schemaVersion !== 4 || String(evidence.workflow?.runId) !== String(expectedRunId)) {
+    throw new Error('Downloaded evidence does not identify this schema-v4 workflow run');
+  }
+
+  const releaseEligible = evidence.workflow?.releaseEligible;
+  if (typeof releaseEligible !== 'boolean') {
+    throw new Error('Downloaded evidence does not declare release eligibility');
+  }
+
+  const expectedEligibility = parseExpectedEligibility(expectedReleaseEligible);
+  if (expectedEligibility !== undefined && releaseEligible !== expectedEligibility) {
+    throw new Error(`Downloaded evidence release eligibility is ${releaseEligible}; expected ${expectedEligibility}`);
+  }
+
+  if (releaseEligible) {
+    const bricks = evidence.packages?.bricks;
+    if (
+      evidence.workflow?.event === 'pull_request'
+      || bricks?.ref !== 'refs/heads/master'
+      || bricks?.sourceRef !== 'master'
+      || bricks?.sha !== bricks?.sourceSha
+    ) {
+      throw new Error('Release-eligible evidence must represent the exact public Bricks master head, not a pull-request or synthetic merge ref');
+    }
   }
 
   const packages = evidence.packages;
@@ -58,8 +87,9 @@ export function validateBrowserReleaseBundle(rootDirectory, expectedRunId) {
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
   const rootDirectory = process.argv[2];
   const expectedRunId = process.argv[3] ?? process.env.GITHUB_RUN_ID;
+  const expectedReleaseEligible = process.argv[4];
   if (!rootDirectory || !expectedRunId) {
-    throw new Error('Usage: node scripts/validate-browser-release-bundle.mjs <bundle-directory> <expected-run-id>');
+    throw new Error('Usage: node scripts/validate-browser-release-bundle.mjs <bundle-directory> <expected-run-id> [expected-release-eligible]');
   }
-  validateBrowserReleaseBundle(rootDirectory, expectedRunId);
+  validateBrowserReleaseBundle(rootDirectory, expectedRunId, expectedReleaseEligible);
 }
