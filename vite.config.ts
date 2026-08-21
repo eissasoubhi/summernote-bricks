@@ -9,7 +9,7 @@ export default defineConfig({
       formats: ['es', 'umd'],
       fileName: (format) => format === 'es' ? 'summernote-bricks.js' : 'summernote-bricks.umd.cjs',
     },
-    outDir: fileURLToPath(new URL('../dist', import.meta.url)),
+    outDir: fileURLToPath(new URL('./dist', import.meta.url)),
     sourcemap: true,
     emptyOutDir: true,
   },

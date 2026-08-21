@@ -157,9 +157,6 @@ function detectBrowserJQuery(): JQueryLike | undefined {
   return globals.jQuery ?? globals.$;
 }
 
-// Script-tag builds register as soon as Summernote's plugin registry exists.
-// Summernote 0.9.x may populate $.summernote.ui later, during editor setup, so
-// UI access is deliberately deferred until the plugin instance initializes.
 const browserJQuery = detectBrowserJQuery();
 if (browserJQuery?.summernote) {
   registerSummernoteBricks(browserJQuery);

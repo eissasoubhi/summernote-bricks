@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   expectedReleaseTag,
   validateReleaseTag,
-} from '../../scripts/validate-release-tag.mjs';
+} from '../scripts/validate-release-tag.mjs';
 
 describe('release tag validation', () => {
   it('derives the exact v-prefixed tag from the package version', () => {
