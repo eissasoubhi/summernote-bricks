@@ -140,6 +140,41 @@ jobs:
           publish_or_verify heading summernote-heading
           publish_or_verify gallery summernote-gallery
 
+      - name: Verify published packages from a clean consumer
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          EVIDENCE="$(find release-bundle -type f -name public-heads.json -print -quit)"
+          BRICKS_VERSION="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages.bricks.version" "$EVIDENCE")"
+          HEADING_VERSION="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages.heading.version" "$EVIDENCE")"
+          GALLERY_VERSION="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages.gallery.version" "$EVIDENCE")"
+
+          mkdir -p "$RUNNER_TEMP/summernote-v3-consumer"
+          cd "$RUNNER_TEMP/summernote-v3-consumer"
+          npm init -y >/dev/null
+          npm install --ignore-scripts --no-audit --no-fund \
+            "summernote-bricks@$BRICKS_VERSION" \
+            "summernote-heading@$HEADING_VERSION" \
+            "summernote-gallery@$GALLERY_VERSION" \
+            jquery@3.7.1 summernote@0.9.1
+
+          node - "$BRICKS_VERSION" "$HEADING_VERSION" "$GALLERY_VERSION" <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const [bricks, heading, gallery] = process.argv.slice(2);
+          const expected = {
+            'summernote-bricks': bricks,
+            'summernote-heading': heading,
+            'summernote-gallery': gallery,
+          };
+          for (const [name, version] of Object.entries(expected)) {
+            const manifest = JSON.parse(fs.readFileSync(path.join('node_modules', name, 'package.json'), 'utf8'));
+            if (manifest.version !== version) throw new Error(`${name}: installed ${manifest.version}; expected ${version}`);
+          }
+          NODE
+          printf '✅ Clean consumer install verified from the public npm registry.\n' >> "$GITHUB_STEP_SUMMARY"
+
       - name: Create or verify matching tags and GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
