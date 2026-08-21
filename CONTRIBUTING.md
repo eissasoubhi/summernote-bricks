@@ -1,41 +1,59 @@
 # Contributing to Summernote Bricks
 
-Summernote Bricks is the optional composer for the Summernote Bricks ecosystem. Changes should keep standalone plugins usable on their own and preserve the documented Summernote integration contract.
+## Local setup
 
-## Development setup
-
-The v3 line uses Node 22/24, strict TypeScript, Vite and Vitest. Install exactly from the committed lockfile and run the complete root package gate:
+Use Node 22 or 24.
 
 ```bash
 npm ci
 npm run check
 ```
 
-For browser-facing integration changes, run the maintained Playwright matrix under `browser-tests/`. It covers Summernote 0.9.1 on BS3, BS4, BS5 and Lite across Chromium, Firefox and WebKit.
+`npm run check` runs strict TypeScript checking, Vitest, the Vite/declaration build, and package validation.
 
-## Architecture rules
+## Repository layout
 
-- The Bricks composer must not own Heading or Gallery runtime behavior.
-- A compatible standalone Summernote plugin should be composable without editing brick-specific core logic.
-- Gallery and Heading remain standalone packages with their own public package contracts.
-- `SNB-components` remains optional; do not introduce coupling unless shared runtime value is demonstrated.
-- Persisted v3 HTML stays semantic and must not contain editor controls, opaque runtime JSON or implementation `<style>` blocks.
-- Legacy migration remains explicit and opt-in.
+```text
+src/            runtime TypeScript
+test/           unit and release-validator tests
+browser-tests/  Playwright compatibility tests
+dist/           generated package artifacts
+scripts/        package and release validators
+docs/           documentation
+```
 
-See `docs/ARCHITECTURE.md` and `docs/V3_UPGRADE.md` before making cross-package or persisted-content changes.
+There is no separate V3 tooling source tree. `src/` and `test/` are the current V3 implementation.
+
+## Design rules
+
+- Keep Heading and Gallery usable without Bricks.
+- Compose standard Summernote buttons instead of importing child-plugin internals.
+- Keep `SNB-components` optional unless a future change demonstrates a real shared-runtime need.
+- Preserve documented package entrypoints, configuration names, and host dependency ranges unless the change is intentionally breaking.
+- Keep persisted-content migrations explicit and controlled by the application.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before changing package boundaries or plugin lifecycle behavior.
 
 ## Tests
 
-Pure registry/configuration behavior needs unit coverage. Browser lifecycle changes require Playwright coverage, including multiple editors and the relevant standalone/composition paths. Packaging changes must keep ESM, CommonJS/browser artifacts and declarations valid through the root package checks.
+For runtime or configuration changes, add/update Vitest coverage.
+
+For browser lifecycle, Summernote compatibility, packaging, or cross-plugin composition changes, the maintained Playwright matrix must stay green.
 
 ## Pull requests
 
-Keep changes focused and synchronized with the target branch before merge. Describe compatibility impact when changing package entrypoints, options, persisted HTML, Summernote/Bootstrap support, migration behavior or the composer contract. Required CI and browser checks must be green before merge.
+Keep a PR focused on one coherent change. Synchronize it with the current target branch before merge and require the relevant CI/browser checks to be green.
+
+## Documentation
+
+Update documentation in the same PR when behavior, configuration, compatibility, installation, or repository structure changes.
+
+Prefer a short working example before a long explanation.
 
 ## Releases
 
-Source promotion does not authorize publication. Follow `RELEASING.md` and `docs/V3_RELEASE_CHECKLIST.md`; npm publication and GitHub Releases require separate explicit maintainer approval.
+Release rules and publication gates live in [RELEASING.md](RELEASING.md) and [docs/V3_RELEASE_CHECKLIST.md](docs/V3_RELEASE_CHECKLIST.md).
 
 ## Security
 
-Do not publish exploitable details in public issues. See `SECURITY.md`.
+See [SECURITY.md](SECURITY.md) for vulnerability reporting.
