@@ -226,6 +226,52 @@ jobs:
           include-hidden-files: true
           retention-days: 30
 
+      - name: Download uploaded release bundle for verification
+        uses: actions/download-artifact@v7
+        with:
+          name: browser-tested-release-bundle-${{ github.run_id }}-${{ github.run_attempt }}
+          path: browser-tests/evidence/release-bundle-roundtrip
+
+      - name: Verify uploaded release bundle identities
+        run: |
+          node <<'NODE'
+          const crypto = require('node:crypto');
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const root = path.resolve('browser-tests/evidence/release-bundle-roundtrip');
+          const walk = (directory) => fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+            const file = path.join(directory, entry.name);
+            return entry.isDirectory() ? walk(file) : [file];
+          });
+          const files = walk(root);
+          const jsonFiles = files.filter((file) => path.basename(file) === 'public-heads.json');
+          const tarballs = files.filter((file) => file.endsWith('.tgz'));
+          if (files.length !== 4 || jsonFiles.length !== 1 || tarballs.length !== 3) {
+            throw new Error(`Expected exactly public-heads.json plus three tarballs; found ${files.map((file) => path.relative(root, file)).join(', ')}`);
+          }
+
+          const evidence = JSON.parse(fs.readFileSync(jsonFiles[0], 'utf8'));
+          if (evidence.schemaVersion !== 3 || evidence.workflow.runId !== process.env.GITHUB_RUN_ID) {
+            throw new Error('Downloaded evidence does not identify this schema-v3 workflow run');
+          }
+
+          for (const [name, value] of Object.entries(evidence.packages)) {
+            const matches = tarballs.filter((file) => path.basename(file) === value.tarball.filename);
+            if (matches.length !== 1) {
+              throw new Error(`Expected one archived tarball for ${name}; found ${matches.length}`);
+            }
+            const file = matches[0];
+            const bytes = fs.statSync(file).size;
+            const sha256 = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+            if (bytes !== value.tarball.bytes || sha256 !== value.tarball.sha256) {
+              throw new Error(`${name} archived tarball identity differs from public-heads.json`);
+            }
+          }
+
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\n✅ Uploaded release bundle round-trip verified: exactly one evidence JSON and three digest-matching tarballs.\n');
+          NODE
+
       - name: Upload Playwright failure artifacts
         if: failure()
         uses: actions/upload-artifact@v6
