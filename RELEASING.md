@@ -45,6 +45,8 @@ The detailed human-controlled checklist lives in `docs/V3_RELEASE_CHECKLIST.md`.
 
 The central Bricks browser workflow validates the current public Heading and Gallery heads against Bricks and also runs on a daily schedule. A green scheduled run is a safety signal, not publication authorization; release candidates still require validation of the exact artifacts intended for publication.
 
+A successful authoritative run archives one `browser-tested-release-bundle-*` artifact containing `public-heads.json` plus the exact Bricks, Heading and Gallery `.tgz` files used by that run. The JSON records each tarball filename, SHA-256 and byte size. When publication is explicitly approved, download that bundle, verify the recorded identities, and publish those archived tarballs directly. Do **not** rebuild replacement tarballs after browser validation, because a rebuilt file is no longer the exact artifact that passed the matrix.
+
 ## npm publishing target
 
 The preferred long-term flow is npm trusted publishing from GitHub Actions using OIDC, with provenance enabled. Configure and verify the trusted publisher in npm before enabling any publish action.
