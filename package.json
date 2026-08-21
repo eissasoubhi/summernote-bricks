@@ -27,6 +27,7 @@
     "build": "npm run build:js && npm run build:types",
     "pack:check": "node scripts/validate-v3-root-package.mjs",
     "release:tag-check": "node scripts/validate-release-tag.mjs",
+    "release:bundle-check": "node scripts/validate-browser-release-bundle.mjs",
     "check": "npm run typecheck && npm test && npm run build && npm run pack:check"
   },
   "devDependencies": {
