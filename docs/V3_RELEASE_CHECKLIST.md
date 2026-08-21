@@ -1,6 +1,6 @@
 # Summernote Bricks v3 release checklist
 
-This checklist defines the final gate for a public v3 release of the Summernote Bricks ecosystem. Source consolidation and ordinary green CI do **not** authorize publishing by themselves. Autonomous development stops at release readiness; npm publication, Git tags and GitHub Releases remain explicit maintainer actions.
+This checklist defines the final gate for a public v3 release of the Summernote Bricks ecosystem. Source consolidation and ordinary green CI do **not** authorize publishing by themselves. Publication is allowed only from an exact release-eligible browser bundle after every automated stop condition below passes.
 
 ## Scope
 
@@ -92,33 +92,37 @@ The authoritative test must use package artifacts, not source imports.
 - [ ] security policy and contribution guidance are current.
 - [ ] active PRs/issues do not contain a known release blocker.
 
-## 7. Manual release boundary
+## 7. Automated publication authorization
 
-These steps are intentionally outside autonomous development:
+The maintainer has explicitly authorized gated automated npm publication and matching GitHub Releases for Bricks, Heading and Gallery. That authorization does **not** bypass any technical release gate.
 
-- [ ] maintainer explicitly approves the package versions and package set to publish;
-- [ ] download the successful `browser-tested-release-bundle-*` whose `public-heads.json` has `workflow.releaseEligible: true`;
-- [ ] re-run the release-bundle validator and verify Bricks `master`, Heading `main` and Gallery `master` still match the recorded SHAs;
-- [ ] verify each archived `.tgz` SHA-256 and byte size against `public-heads.json`; do not rebuild a replacement tarball;
-- [ ] publish the exact archived `.tgz` files (`next` for prereleases, `latest` for stable versions);
-- [ ] verify the published versions from a clean consumer installation;
-- [ ] only after registry verification, create matching `v${version}` tags at the exact recorded source SHAs;
-- [ ] create GitHub Releases and attach the exact tested tarball plus `public-heads.json`;
-- [ ] never publish `SNB-components` as part of this coordinated release unless its role changes explicitly.
+The publication workflow must:
+
+- [ ] run only after a successful `Browser compatibility` completion on the real Bricks `master` branch, never from a pull request;
+- [ ] download the exact `browser-tested-release-bundle-*` produced by that triggering run;
+- [ ] require `workflow.releaseEligible: true` and validate the bundle with the reusable release-bundle validator;
+- [ ] verify Bricks `master`, Heading `main` and Gallery `master` have not moved since the evidence was generated;
+- [ ] verify npm authentication before publication;
+- [ ] publish the archived browser-tested `.tgz` files directly, using `next` for prereleases and `latest` for stable versions;
+- [ ] be idempotent: an already-published version is accepted only when npm registry integrity matches the exact tested tarball;
+- [ ] verify all three published versions from a clean consumer installation before creating GitHub Releases;
+- [ ] create matching `v${version}` tags only at the exact recorded source SHAs;
+- [ ] create or repair matching GitHub Releases and attach the exact package tarball plus `public-heads.json`;
+- [ ] never publish `SNB-components` as part of this coordinated workflow.
 
 ## Stop conditions
 
-Do **not** publish if any of the following is true:
+Do **not** publish, or stop the automated workflow immediately, if any of the following is true:
 
 - a required CI/browser gate is red, cancelled or still running;
-- the browser run is a pull request or does not represent the exact real Bricks `master` head;
+- the triggering browser run is a pull request or does not represent the exact real Bricks `master` head;
 - the only available browser evidence is CI-only or has `workflow.releaseEligible: false`;
 - any public release source branch moved after the release-eligible compatibility run;
+- npm authentication is unavailable;
 - a package/version already exists on npm with registry integrity different from the exact tested tarball;
 - a release Git tag already exists at a SHA different from the package source SHA that passed validation;
 - a package tarball differs from the artifact that passed browser validation;
 - the exact browser-tested `.tgz` files are unavailable or their digests cannot be verified against `public-heads.json`;
 - a public entrypoint cannot be imported/required/loaded as documented;
 - clean consumer installation from the public npm registry fails;
-- legacy migration behavior is ambiguous or destructive by default;
-- the maintainer has not explicitly authorized the publication action being performed.
+- legacy migration behavior is ambiguous or destructive by default.
