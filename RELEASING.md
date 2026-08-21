@@ -4,68 +4,88 @@
 
 - Use semantic versioning.
 - Never publish directly from an unverified working tree.
-- Source consolidation and green CI do **not** authorize publication by themselves.
+- Source consolidation and ordinary green CI do **not** authorize publication by themselves.
 - A release must pass deterministic package validation and the maintained browser compatibility matrix.
 - Breaking changes to options, package entrypoints, persisted brick HTML or the brick contract require a major version.
-- npm publication and GitHub Releases require explicit maintainer approval and remain separate from autonomous source development.
+- Coordinated v3 publication is allowed only from an exact release-eligible public-master browser bundle.
 
 ## Ecosystem independence and order
 
 `summernote-heading` and `summernote-gallery` are standalone Summernote plugins. `summernote-bricks` is an optional composer of already-registered plugin buttons.
 
-`SNB-components` is currently an independent optional core and is **not** a runtime dependency of Heading, Gallery or Bricks. Do not force synchronized versions or publication order around it unless a future implementation introduces demonstrated shared runtime value.
+`SNB-components` is currently an independent optional core and is **not** a runtime dependency of Heading, Gallery or Bricks. It is not part of the coordinated Bricks/Heading/Gallery publication workflow.
 
-When several packages genuinely depend on changes from the same release wave:
+For the coordinated v3 release wave:
 
 1. validate each standalone package from its real npm tarball candidate;
-2. validate Bricks composition against the exact public Heading/Gallery candidates;
-3. publish only the packages explicitly approved by the maintainer;
-4. verify each public registry artifact before creating matching tags or GitHub Releases.
-
-Do not require synchronized releases when packages are unaffected.
+2. validate Bricks composition against the exact Heading/Gallery candidates;
+3. archive the exact three browser-tested tarballs with machine-readable source/digest evidence;
+4. publish only that release-eligible archived bundle;
+5. verify the public npm registry from a clean consumer;
+6. create matching tags and GitHub Releases at the exact tested source SHAs.
 
 ## v3 source promotion status
 
-The consolidated v3 source has already been promoted from `develop` to public `master` after the exact promotion head passed deterministic root CI and the maintained Summernote 0.9.1 BS3/BS4/BS5/Lite × Chromium/Firefox/WebKit matrix.
+The consolidated v3 source has already been promoted to the public branches after deterministic package CI and the maintained Summernote 0.9.1 BS3/BS4/BS5/Lite × Chromium/Firefox/WebKit matrix.
 
-That source promotion is **not** a package release. Before publishing any v3 package or creating a GitHub Release:
+Before the publication workflow is allowed to run:
 
-- run root validation from a clean `npm ci` install;
-- validate the Bricks package and the intended Heading/Gallery package versions from their real tarball candidates;
-- require the maintained browser compatibility matrix to pass;
-- verify ESM, CommonJS and browser/script-tag entrypoints match the documented package layout;
-- confirm legacy Heading/Gallery migration remains explicit and opt-in;
-- review installation, migration and rollback documentation against the exact package versions being released;
-- review package version, tag and release-note intent explicitly;
-- stop if `docs/V3_RELEASE_CHECKLIST.md` has any unresolved item.
+- root validation must pass from clean `npm ci` installs;
+- Bricks, Heading and Gallery must be validated from their exact tarball candidates;
+- the maintained browser compatibility matrix must pass;
+- ESM, CommonJS and browser/script-tag entrypoints must match the documented package layouts;
+- legacy Heading/Gallery migration must remain explicit and opt-in;
+- installation, migration and rollback documentation must match the exact versions being released;
+- `docs/V3_RELEASE_CHECKLIST.md` must have no unresolved technical stop condition.
 
-The detailed human-controlled checklist lives in `docs/V3_RELEASE_CHECKLIST.md`. Issue #3 is the authoritative ecosystem roadmap and release-readiness status.
+Issue #3 remains the authoritative ecosystem roadmap and release-readiness status.
 
-## Continuous compatibility before release
+## Release-eligible browser evidence
 
-The central Bricks browser workflow validates the current public Heading and Gallery heads against Bricks and also runs on a daily schedule. A green scheduled or pull-request run is a safety signal, not publication authorization.
+The central Bricks browser workflow validates the current public Heading and Gallery heads against Bricks and also runs on a daily schedule.
 
 Browser runs produce two intentionally different artifact classes:
 
-- **CI-only compatibility bundle** — produced for pull requests and other non-public-master runs. Its `public-heads.json` has `workflow.releaseEligible: false`, and the artifact name starts with `browser-tested-ci-bundle-`. It proves compatibility and the bundle round-trip mechanism, but it must never be published.
+- **CI-only compatibility bundle** — produced for pull requests and other non-public-master runs. Its `public-heads.json` has `workflow.releaseEligible: false`, and the artifact name starts with `browser-tested-ci-bundle-`. It must never be published.
 - **Release-eligible public-master bundle** — produced only when the workflow tests the exact public Bricks `master` head. Its `public-heads.json` has `workflow.releaseEligible: true`, and the artifact name starts with `browser-tested-release-bundle-`.
 
 The reusable bundle validator rejects release eligibility for pull-request/synthetic refs and requires the tested Bricks ref/SHA to be the exact public `master` source head.
 
-A successful release-eligible public-master run archives one `browser-tested-release-bundle-*` artifact containing `public-heads.json` plus the exact Bricks, Heading and Gallery `.tgz` files used by that run. The JSON records source/tested refs and SHAs, package versions, each tarball filename, SHA-256 and byte size, and the release-eligibility flag.
+A successful release-eligible run archives `public-heads.json` plus the exact Bricks, Heading and Gallery `.tgz` files used by the browser matrix. The JSON records tested/source refs and SHAs, package versions, tarball filenames, SHA-256 values and byte sizes.
 
-When publication is explicitly approved, use only a release-eligible bundle whose recorded public source SHAs still match the intended Bricks `master`, Heading `main` and Gallery `master` heads. Download that bundle, verify the recorded identities, and publish those archived tarballs directly. Do **not** publish a `browser-tested-ci-bundle-*` artifact, and do **not** rebuild replacement tarballs after browser validation, because rebuilt bytes are no longer the exact artifacts that passed the matrix.
+## Automated publication
+
+The maintainer has explicitly authorized automated publication for the coordinated Bricks, Heading and Gallery v3 packages once all release gates pass.
+
+`.github/workflows/publish-release.yml` is triggered only by successful completion of `Browser compatibility`. Its publish job is additionally restricted to the real Bricks `master` branch and excludes pull-request runs before secrets or write operations are used.
+
+The workflow:
+
+1. checks out the exact Bricks SHA tested by the triggering browser run;
+2. downloads that run's exact `browser-tested-release-bundle-*` artifact;
+3. revalidates release eligibility, bundle identities and the triggering Bricks SHA;
+4. verifies Bricks `master`, Heading `main` and Gallery `master` have not moved since browser validation;
+5. authenticates to npm with the configured publication secret;
+6. publishes the exact archived tarballs directly (`next` for prereleases, `latest` for stable versions);
+7. treats reruns idempotently, accepting an existing npm version only when registry integrity equals the tested tarball bytes;
+8. installs all three published versions from npm in a clean consumer project;
+9. creates exact `v${version}` tags and matching GitHub Releases in the three repositories using the configured inter-repository GitHub credential;
+10. attaches each exact tested tarball and `public-heads.json` to its GitHub Release.
+
+If any source branch moves after evidence generation, npm integrity differs, a tag points at the wrong SHA, registry verification fails, or a required credential is unavailable, publication stops.
 
 ## npm publishing target
 
-The preferred long-term flow is npm trusted publishing from GitHub Actions using OIDC, with provenance enabled. Configure and verify the trusted publisher in npm before enabling any publish action.
+Release candidates use the npm `next` dist-tag. Stable versions use `latest`.
 
-Until publication is explicitly approved, automation should stop at package construction/validation. Do not request or store a long-lived npm token merely to complete release-readiness CI.
+The current automation uses the configured npm publication credential. Trusted Publishing/OIDC can replace the token later without changing the tarball-first release model.
 
-For a release candidate, use the intended prerelease version/dist-tag only after explicit approval. Verify the package from the public npm registry in a clean consumer project before treating publication as successful.
+The workflow never rebuilds a replacement tarball after browser validation.
 
 ## Git tags and GitHub Releases
 
-Git tags and GitHub Releases are post-publication actions, not source-consolidation gates. Create them only after the corresponding package/version has been explicitly approved and, when applicable, verified from the public registry.
+Tags and GitHub Releases are created only after all three npm artifacts have been published or independently verified byte-for-byte through npm registry integrity and then installed successfully in a clean consumer project.
 
-Release notes should cover user-visible changes, compatibility, persisted-content/migration requirements, rollback guidance and known limitations.
+Each release tag must be exactly `v${package.json.version}` and point to the exact source SHA recorded in the release-eligible browser evidence. Existing tags at a different SHA are a hard stop.
+
+Release notes link back to migration and compatibility documentation, and release assets contain the exact tested package tarball plus `public-heads.json` evidence.
