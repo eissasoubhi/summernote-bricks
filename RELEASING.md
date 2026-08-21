@@ -43,9 +43,18 @@ The detailed human-controlled checklist lives in `docs/V3_RELEASE_CHECKLIST.md`.
 
 ## Continuous compatibility before release
 
-The central Bricks browser workflow validates the current public Heading and Gallery heads against Bricks and also runs on a daily schedule. A green scheduled run is a safety signal, not publication authorization; release candidates still require validation of the exact artifacts intended for publication.
+The central Bricks browser workflow validates the current public Heading and Gallery heads against Bricks and also runs on a daily schedule. A green scheduled or pull-request run is a safety signal, not publication authorization.
 
-A successful authoritative run archives one `browser-tested-release-bundle-*` artifact containing `public-heads.json` plus the exact Bricks, Heading and Gallery `.tgz` files used by that run. The JSON records each tarball filename, SHA-256 and byte size. When publication is explicitly approved, download that bundle, verify the recorded identities, and publish those archived tarballs directly. Do **not** rebuild replacement tarballs after browser validation, because a rebuilt file is no longer the exact artifact that passed the matrix.
+Browser runs produce two intentionally different artifact classes:
+
+- **CI-only compatibility bundle** — produced for pull requests and other non-public-master runs. Its `public-heads.json` has `workflow.releaseEligible: false`, and the artifact name starts with `browser-tested-ci-bundle-`. It proves compatibility and the bundle round-trip mechanism, but it must never be published.
+- **Release-eligible public-master bundle** — produced only when the workflow tests the exact public Bricks `master` head. Its `public-heads.json` has `workflow.releaseEligible: true`, and the artifact name starts with `browser-tested-release-bundle-`.
+
+The reusable bundle validator rejects release eligibility for pull-request/synthetic refs and requires the tested Bricks ref/SHA to be the exact public `master` source head.
+
+A successful release-eligible public-master run archives one `browser-tested-release-bundle-*` artifact containing `public-heads.json` plus the exact Bricks, Heading and Gallery `.tgz` files used by that run. The JSON records source/tested refs and SHAs, package versions, each tarball filename, SHA-256 and byte size, and the release-eligibility flag.
+
+When publication is explicitly approved, use only a release-eligible bundle whose recorded public source SHAs still match the intended Bricks `master`, Heading `main` and Gallery `master` heads. Download that bundle, verify the recorded identities, and publish those archived tarballs directly. Do **not** publish a `browser-tested-ci-bundle-*` artifact, and do **not** rebuild replacement tarballs after browser validation, because rebuilt bytes are no longer the exact artifacts that passed the matrix.
 
 ## npm publishing target
 
