@@ -1,142 +1,104 @@
-# Summernote Bricks v3 upgrade guide
+# Upgrade to Summernote Bricks V3
 
-This guide documents the intended migration path for the v3 release candidate line. It is release preparation only: the packages must not be published until the release gates in the ecosystem roadmap are complete and explicitly approved.
+This guide is for applications moving from an older Bricks integration to the V3 ecosystem.
 
-## Scope
+## What changed
 
-The v3 ecosystem keeps the existing public package identities:
+V3 uses the normal Summernote plugin lifecycle.
 
-- `summernote-bricks`
-- `summernote-heading`
-- `summernote-gallery`
-- `snb-components` (optional shared core)
+Bricks no longer owns or constructs Heading/Gallery implementations. It only groups buttons that were already registered by standalone plugins.
 
-Heading and Gallery do not currently depend on `snb-components`. Do not add it to an application merely to keep package versions aligned.
+The supported host contract is:
 
-## Host requirements
-
-The integrated v3 packages target:
-
-- jQuery `>=3.6 <4`
+- jQuery `>=3.6.0 <4`
 - Summernote `>=0.9.1 <0.10`
 
-Browser compatibility is proven against Summernote 0.9.1 using the BS3, BS4, BS5 and Lite interfaces on Chromium, Firefox and WebKit.
+The maintained browser matrix covers Summernote BS3, BS4, BS5, and Lite on Chromium, Firefox, and WebKit.
 
-Bootstrap is a Summernote host/interface concern. v3 plugins use `$.summernote.ui` and must not call Bootstrap modal APIs directly.
+## 1. Update dependencies
 
-## Package installation
+When the V3 packages are available on npm, install the host editor and only the plugins you use:
 
-Once an approved v3 release candidate is actually published, applications using npm should install only the plugins they need together with the host editor dependencies.
-
-```sh
-npm install jquery summernote summernote-heading@3 summernote-gallery@3 summernote-bricks@3
+```bash
+npm install jquery summernote summernote-bricks@next
 ```
 
-`summernote-bricks` is optional. Heading and Gallery remain standalone plugins.
+Add `summernote-heading@next` and/or `summernote-gallery@next` when your application uses them.
 
-For script-tag installations, load dependencies in this order:
+`SNB-components` is not required by Bricks, Heading, or Gallery today.
 
-1. jQuery
-2. the chosen Summernote interface and its host CSS/JS requirements
-3. standalone brick scripts such as Heading and Gallery
-4. `summernote-bricks` if the composed Bricks toolbar is wanted
-5. initialize the Summernote editor
+## 2. Fix script load order
 
-The plugin registry may exist before `$.summernote.ui` is populated. v3 browser artifacts therefore register with Summernote without assuming that the UI implementation is already available; UI is resolved during plugin initialization.
+Use this order:
 
-## Basic standalone configuration
+```text
+jQuery
+Summernote
+standalone child plugins
+Summernote Bricks
+initialize the editor
+```
 
-Heading registers `summernoteHeading` and Gallery registers `summernoteGallery` as normal Summernote toolbar buttons.
+Do not initialize the editor before the child plugins are registered.
+
+## 3. Update toolbar configuration
+
+Recommended V3 configuration:
 
 ```js
 $('#editor').summernote({
-  toolbar: [
-    ['insert', ['summernoteHeading', 'summernoteGallery']],
-  ],
+  toolbar: [['extensions', ['summernoteBricks']]],
+  summernoteBricks: {
+    subBricks: ['summernote-heading', 'summernote-gallery'],
+  },
 });
 ```
 
-Gallery requires a source adapter supplied by the host application. The plugin does not prescribe a REST endpoint, framework, storage provider or server response format.
+The friendly aliases map to `summernoteHeading` and `summernoteGallery`. Third-party Summernote button names can be used directly.
 
-## Bricks composition
+## 4. Remove old Bricks-specific construction code
 
-`summernote-bricks` composes buttons that are already registered with Summernote. It does not instantiate Heading or Gallery and does not own their lifecycle.
+Your application should not instantiate Heading/Gallery classes through Bricks or patch `$.fn.summernote` to inject them.
 
-Load the concrete plugin scripts before editor initialization, then configure the Bricks composer with the supported button names/aliases. A missing child plugin should be treated as a configuration error rather than silently skipped.
+Each standalone plugin registers itself with Summernote. Bricks only reads the resulting button memo.
 
-## Persisted HTML contract
+## 5. Treat persisted HTML separately
 
-v3 treats stored HTML as a public API.
+Package migration and stored-content migration are different operations.
 
-New bricks use semantic, versioned markup such as:
+Do not perform a database-wide HTML rewrite just because the JavaScript packages were upgraded. If Heading or Gallery legacy content needs migration, use the migration API provided by that standalone plugin and validate representative documents first.
 
-```html
-<div class="snb-brick snb-heading" data-snb-brick="heading" data-snb-version="3">
-  <h2 class="snb-heading__title">Example heading</h2>
-</div>
-```
+Recommended production sequence:
 
-Persisted v3 content must remain useful without plugin JavaScript. Editor-only controls, transient modal state, opaque runtime JSON and implementation `<style>` blocks must not be stored in the document.
+1. back up persisted editor content;
+2. deploy the V3 packages without bulk rewriting stored HTML;
+3. verify create/edit/undo/destroy-recreate behavior in the real application;
+4. test migration on representative legacy documents;
+5. migrate stored content in controlled batches only when needed;
+6. keep rollback data until the migrated content has been verified.
 
-Before upgrading production data, applications should verify that their sanitizer/HTML-processing pipeline preserves the documented `data-snb-*` attributes and semantic child markup.
+## Troubleshooting
 
-## Legacy content migration
+### A child button is missing
 
-v3 deliberately does **not** rewrite legacy Heading or Gallery markup during editor initialization.
+Confirm the standalone child plugin is loaded before editor initialization and that `subBricks` contains the correct alias or Summernote button name.
 
-The standalone plugins expose explicit parsing/migration helpers for supported pre-v3 persisted schemas. Migration should be an application-controlled operation:
+### Bricks says Summernote is missing
 
-1. read the existing stored HTML;
-2. identify legacy brick nodes;
-3. parse with the relevant legacy parser;
-4. migrate to a new v3 node;
-5. inspect/validate the generated HTML;
-6. persist the migrated content only when the application decides to commit the change.
+Load Summernote before the Bricks bundle.
 
-This avoids a simple editor open/save unexpectedly rewriting years of stored content.
+### The application uses a custom plugin
 
-### Heading
+No Bricks adapter is required if the plugin already registers a standard Summernote button memo. Use that button name directly or configure `brickAliases`.
 
-Legacy Heading content may contain opaque `data-brickdata`, `h1.snb-heading-title` and inline presentation styles. The v3 migration preserves meaningful content such as title/subtitle while dropping editor-era implementation markup that is not part of the semantic v3 contract.
+## Verification before production
 
-### Gallery
+At minimum, verify:
 
-Legacy Gallery content may store selected images in `data-brickdata`. The v3 migration converts supported data into semantic image/figure markup while preserving meaningful image metadata such as source, alt/title/caption and stable IDs when available.
+- the real application can create and destroy multiple editors;
+- Heading/Gallery work standalone if you use them;
+- Bricks composition shows the expected child buttons;
+- undo/change/focus behavior is unchanged for your application;
+- your stored HTML remains valid through the application sanitizer/storage pipeline.
 
-Malformed or unsupported legacy payloads must fail explicitly rather than being guessed into a v3 shape.
-
-## Recommended production rollout
-
-Do not combine package upgrade and database-wide content migration in one irreversible deployment.
-
-A safer sequence is:
-
-1. deploy v3 packages with legacy content left untouched;
-2. verify create/edit/undo/destroy-recreate behavior in the real host application;
-3. validate representative legacy documents using the explicit migration helpers;
-4. back up persisted editor content;
-5. migrate in controlled batches with application-level validation/auditing;
-6. keep rollback capability until migrated documents have been exercised in production.
-
-## Rollback
-
-Package rollback and content rollback are different concerns.
-
-If v3 code is rolled back while stored content has **not** been migrated, the previous application remains responsible for its existing legacy markup as before.
-
-If stored content has been migrated to v3 semantic markup, do not assume an older plugin understands it. Preserve a backup or reversible migration record before committing bulk conversions.
-
-## Release verification checklist
-
-Before publishing or promoting a v3 package, verify:
-
-- strict typecheck/tests/build are green;
-- root package exports and declarations match the files in the npm tarball;
-- ESM and CommonJS entrypoints work where advertised;
-- browser script artifacts register through Summernote's actual lifecycle;
-- standalone and composed browser matrices are green;
-- persisted HTML round-trip and undo/change/focus checks are green;
-- legacy migration behavior is tested and documented;
-- release notes clearly identify v3 as a major persisted-HTML/API change.
-
-The ecosystem roadmap in issue #3 is the source of truth for the current release-gate status.
+For the project-level automated gates, see [V3_RELEASE_CHECKLIST.md](V3_RELEASE_CHECKLIST.md).

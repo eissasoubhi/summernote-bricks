@@ -1,173 +1,125 @@
 # Summernote Bricks
 
-Summernote Bricks is an **optional composer for registered Summernote plugin buttons**. It groups compatible standalone plugins under one toolbar dropdown without owning their runtime or persisted content.
+Summernote Bricks adds one toolbar dropdown that groups buttons from other Summernote plugins.
 
-## v3 status
+It is a **composer**, not a replacement for Summernote and not the runtime owner of Heading, Gallery, or third-party plugins.
 
-The consolidated **3.0.0 release-candidate source line is now on `master`** after the audited `develop` → `master` promotion completed with green root CI and the full maintained browser matrix.
+## Status
 
-**No v3 npm package or GitHub Release has been published yet.** Source promotion does not mean that `npm install summernote-bricks@3` is available. Publication remains a separate, explicitly approved release action.
+The current source line is `3.0.0-rc.0` on `master`.
 
-The maintained v3 reference platform is **Summernote 0.9.1**. Browser integration is validated across:
+Supported host versions:
 
-- Summernote BS3, BS4, BS5 and Lite builds;
-- Chromium, Firefox and WebKit;
-- standalone Heading and Gallery usage;
-- Bricks + Heading + Gallery composition;
-- multiple editors, create/edit, undo, focus/accessibility, destroy/recreate and semantic HTML round-trips.
+- Summernote `>=0.9.1 <0.10`
+- jQuery `>=3.6.0 <4`
+- Summernote BS3, BS4, BS5, and Lite builds
+- Chromium, Firefox, and WebKit in the maintained browser matrix
 
-## Ecosystem model
+## Quick start
 
-```text
-                   standard Summernote plugin API
-                            |
-            +---------------+---------------+
-            |                               |
-  summernote-gallery                 summernote-heading
-  registers button                   registers button
-  summernoteGallery                  summernoteHeading
-            |                               |
-            +---------------+---------------+
-                            |
-                     summernote-bricks
-                   groups existing buttons
-```
-
-A brick must work without `summernote-bricks`. Bricks is convenience UX, not the runtime owner of Gallery, Heading or future plugins.
-
-`SNB-components` is an independent optional shared-core project. Heading and Gallery do not currently depend on it, and v3 does not add that coupling without demonstrated shared runtime value.
-
-## Host dependencies
-
-The v3 package contract declares jQuery and Summernote as host peer dependencies:
-
-```json
-{
-  "jquery": ">=3.6.0 <4",
-  "summernote": ">=0.9.1 <0.10"
-}
-```
-
-Concrete Bootstrap requirements come from the Summernote build you choose. Bricks itself does not call Bootstrap modal APIs directly.
-
-## Browser usage
-
-Load jQuery, the matching Summernote build, each standalone plugin bundle, and then Bricks **before initializing the editor**.
-
-The v3 release-candidate build outputs are:
-
-```text
-summernote-heading/dist/index.umd.cjs
-summernote-gallery/dist/index.umd.cjs
-summernote-bricks/dist/summernote-bricks.umd.cjs
-```
-
-Example when consuming those artifacts from source or after an explicitly approved package release:
+Load jQuery and Summernote first, then the standalone plugins you want to group, then Summernote Bricks.
 
 ```html
-<script src="path/to/jquery.js"></script>
-<script src="path/to/summernote.js"></script>
-<script src="path/to/summernote-heading/dist/index.umd.cjs"></script>
-<script src="path/to/summernote-gallery/dist/index.umd.cjs"></script>
-<script src="path/to/summernote-bricks/dist/summernote-bricks.umd.cjs"></script>
+<script src="jquery.js"></script>
+<script src="summernote.js"></script>
+<script src="summernote-heading/dist/index.umd.cjs"></script>
+<script src="summernote-gallery/dist/index.umd.cjs"></script>
+<script src="summernote-bricks/dist/summernote-bricks.umd.cjs"></script>
 ```
 
-Then configure the normal Summernote toolbar:
+Configure the toolbar normally:
 
 ```js
-$('#summernote').summernote({
+$('#editor').summernote({
   toolbar: [
-    ['extensions', ['summernoteBricks']]
+    ['extensions', ['summernoteBricks']],
   ],
   summernoteBricks: {
-    buttonLabel: '<i class="fa fa-puzzle-piece"></i> Bricks',
     subBricks: [
+      'summernote-heading',
       'summernote-gallery',
-      'summernote-heading'
-    ]
-  }
+    ],
+  },
 });
 ```
 
-The package-style aliases resolve to the standard Summernote button memo names `summernoteGallery` and `summernoteHeading`.
+The built-in aliases resolve to the normal Summernote button names:
 
-## Custom bricks
+- `summernote-heading` → `summernoteHeading`
+- `summernote-gallery` → `summernoteGallery`
 
-Bricks does not need to import or instantiate a custom plugin. If your plugin registers a normal Summernote button memo, list that button name directly:
+## Use a custom plugin
+
+Any plugin that registers a normal Summernote button can be composed directly:
 
 ```js
-// Your plugin registers: context.memo('button.myCompanyBrick', ...)
-
-$('#summernote').summernote({
-  toolbar: [
-    ['extensions', ['summernoteBricks']]
-  ],
+$('#editor').summernote({
+  toolbar: [['extensions', ['summernoteBricks']]],
   summernoteBricks: {
-    subBricks: ['summernoteGallery', 'myCompanyBrick']
-  }
+    subBricks: ['myCompanyButton'],
+  },
 });
 ```
 
-You can also provide a stable alias without changing Bricks core:
+Or define a friendly alias:
 
 ```js
 summernoteBricks: {
-  subBricks: ['my-company-brick'],
+  subBricks: ['my-company-plugin'],
   brickAliases: {
-    'my-company-brick': 'myCompanyBrick'
-  }
+    'my-company-plugin': 'myCompanyButton',
+  },
 }
 ```
 
-This deliberately reuses Summernote's plugin/memo contract instead of publishing a second framework-specific constructor API.
+If a configured child button is missing, Bricks fails with a clear configuration error instead of silently hiding it.
 
-## Persisted content
+## Install from npm
 
-The v3 ecosystem keeps editor implementation details out of saved content. Heading and Gallery persist semantic HTML marked with `data-snb-brick` and `data-snb-version`; editor controls and implementation `<style>` blocks are not persisted.
+When the v3 release candidate is available on npm:
 
-Legacy content conversion is explicit and opt-in. See [`docs/V3_UPGRADE.md`](docs/V3_UPGRADE.md) before migrating existing installations.
+```bash
+npm install jquery summernote summernote-bricks@next
+```
+
+Heading and Gallery are separate packages. Install only the plugins your application uses.
 
 ## Development
-
-The consolidated Bricks v3 root uses strict TypeScript, Vite and Vitest on current Node LTS lines.
 
 ```bash
 npm ci
 npm run check
 ```
 
-`npm run check` performs typechecking, unit tests, the Vite/TypeScript build and package-shape validation.
+The V3 source, tests, and build configuration now live directly at the repository root:
 
-The maintained browser harness lives in `browser-tests/` and exercises the real packed Bricks, Heading and Gallery artifacts across the supported Summernote/browser matrix in GitHub Actions. It also runs on a daily schedule so independent Heading or Gallery changes are revalidated against Bricks even when this repository does not change.
+```text
+src/
+test/
+browser-tests/
+scripts/
+docs/
+package.json
+tsconfig.json
+vite.config.ts
+vitest.config.ts
+```
 
-## Architecture and release gates
+## Documentation
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — package boundaries and Summernote-native architecture.
-- [`docs/PRODUCT_ROADMAP.md`](docs/PRODUCT_ROADMAP.md) — product direction.
-- [`docs/V3_UPGRADE.md`](docs/V3_UPGRADE.md) — installation, legacy migration and rollback guidance.
-- [`docs/V3_RELEASE_CHECKLIST.md`](docs/V3_RELEASE_CHECKLIST.md) — explicit human-controlled release gate.
-- [`RELEASING.md`](RELEASING.md) — release process.
-- [Issue #3](https://github.com/eissasoubhi/summernote-bricks/issues/3) — authoritative ecosystem roadmap and current release-readiness status.
+- [Getting started](docs/GETTING_STARTED.md) — installation, load order, configuration, and troubleshooting
+- [V3 upgrade guide](docs/V3_UPGRADE.md) — moving an existing application to V3
+- [Architecture](docs/ARCHITECTURE.md) — package boundaries and design rules
+- [Contributing](CONTRIBUTING.md) — local development and pull-request expectations
+- [Releasing](RELEASING.md) — release gates and publication process
 
-A public v3 release requires green deterministic package validation, the full maintained browser matrix, documented migration/rollback, and explicit release approval. Source promotion to `master` does **not** publish npm packages or GitHub Releases automatically.
+## Ecosystem
 
-## Repository roles
-
-| Repository | Responsibility |
-| --- | --- |
-| `summernote-bricks` | Optional composition/dropdown UX for registered Summernote plugin buttons |
-| `summernote-gallery` | Standalone backend-agnostic Gallery plugin |
-| `summernote-heading` | Standalone semantic Heading plugin |
-| `SNB-components` | Independent optional shared core |
-
-## Contributing
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md). Future bricks should use standard Summernote plugin registration instead of adding concrete dependencies to Bricks core.
-
-## Security
-
-See [`SECURITY.md`](SECURITY.md).
+- `summernote-heading` — standalone Heading plugin
+- `summernote-gallery` — standalone Gallery plugin
+- `summernote-bricks` — optional composer for registered buttons
+- `SNB-components` — independent optional shared-core project; not required by Bricks, Heading, or Gallery today
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT
