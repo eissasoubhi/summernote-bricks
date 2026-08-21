@@ -38,6 +38,8 @@ For every package intended for publication:
 - [ ] CommonJS `require` entrypoint works from the extracted tarball;
 - [ ] browser/UMD script-tag registration works from the extracted tarball;
 - [ ] peer dependency ranges match the documented host contract;
+- [ ] the authoritative browser run records the exact tarball filename, SHA-256 and byte size for Bricks, Heading and Gallery;
+- [ ] the same successful browser run archives those exact three `.tgz` files together with `public-heads.json` as one release-bundle artifact;
 - [ ] the release-validation workflow fails unless the Git tag is exactly `v${package.json.version}` for Bricks, Heading and Gallery;
 - [ ] the same release tag/version rule is exercised by ordinary package CI tests before any real release tag is pushed.
 
@@ -94,7 +96,9 @@ These steps are intentionally **never automatic** in the autonomous development 
 - [ ] maintainer explicitly approves the version numbers and package set to publish.
 - [ ] maintainer explicitly approves npm publication.
 - [ ] npm package ownership/access is verified before publishing.
-- [ ] publish with the intended dist-tag (`next` for a release candidate unless explicitly changed).
+- [ ] download the successful authoritative browser run's `browser-tested-release-bundle-*` artifact and verify `public-heads.json` matches the intended public source SHAs.
+- [ ] verify each archived `.tgz` SHA-256 and byte size against `public-heads.json`; do not rebuild a replacement tarball for publication.
+- [ ] publish the archived browser-tested `.tgz` files with the intended dist-tag (`next` for a release candidate unless explicitly changed).
 - [ ] verify the package from the public npm registry in a clean consumer project.
 - [ ] only after registry verification, create matching Git tags / GitHub Releases if desired.
 - [ ] verify release notes link to migration and compatibility documentation.
@@ -107,6 +111,7 @@ Do **not** publish if any of the following is true:
 - any public release source branch moved after the last authoritative compatibility run;
 - a release Git tag does not exactly match the package version that passed validation;
 - a package tarball differs from the artifact that passed browser validation;
+- the exact browser-tested `.tgz` files are unavailable or their digests cannot be verified against `public-heads.json`;
 - a public entrypoint cannot be imported/required/loaded as documented;
 - legacy migration behavior is ambiguous or destructive by default;
 - the maintainer has not explicitly approved publication.
