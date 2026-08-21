@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 export function validateBrowserReleaseBundle(rootDirectory, expectedRunId) {
   const root = path.resolve(rootDirectory);
@@ -54,7 +55,7 @@ export function validateBrowserReleaseBundle(rootDirectory, expectedRunId) {
   return evidence;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) {
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
   const rootDirectory = process.argv[2];
   const expectedRunId = process.argv[3] ?? process.env.GITHUB_RUN_ID;
   if (!rootDirectory || !expectedRunId) {
