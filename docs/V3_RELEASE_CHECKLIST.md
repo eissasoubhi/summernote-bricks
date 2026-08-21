@@ -19,7 +19,8 @@ Reference host contract: Summernote 0.9.x, currently validated on 0.9.1, with jQ
 - [ ] Gallery `master` is green and synchronized with the exact source intended for release.
 - [ ] Bricks `master` is green and synchronized with the exact source intended for release.
 - [ ] the permanent Bricks browser gate is green against the current public Heading `main` and Gallery `master` heads.
-- [ ] the latest daily cross-repository compatibility run is green, or an equivalent manual run has been completed after the last public-source change.
+- [ ] the latest daily/manual/push cross-repository run on the exact public Bricks `master` head is green after the last public-source change.
+- [ ] the final publication evidence is explicitly marked `workflow.releaseEligible: true`; a pull-request or other CI-only run is not accepted as release evidence.
 - [ ] repository history and previous releases/tags remain intact.
 
 ## 2. Reproducible packages
@@ -38,8 +39,9 @@ For every package intended for publication:
 - [ ] CommonJS `require` entrypoint works from the extracted tarball;
 - [ ] browser/UMD script-tag registration works from the extracted tarball;
 - [ ] peer dependency ranges match the documented host contract;
-- [ ] the authoritative browser run records the exact tarball filename, SHA-256 and byte size for Bricks, Heading and Gallery;
-- [ ] the same successful browser run archives those exact three `.tgz` files together with `public-heads.json` as one release-bundle artifact;
+- [ ] the release-eligible browser run records the exact tarball filename, SHA-256 and byte size for Bricks, Heading and Gallery;
+- [ ] the same successful release-eligible browser run archives those exact three `.tgz` files together with `public-heads.json` as one `browser-tested-release-bundle-*` artifact;
+- [ ] no `browser-tested-ci-bundle-*` artifact is used for publication;
 - [ ] the release-validation workflow fails unless the Git tag is exactly `v${package.json.version}` for Bricks, Heading and Gallery;
 - [ ] the same release tag/version rule is exercised by ordinary package CI tests before any real release tag is pushed.
 
@@ -80,6 +82,7 @@ The authoritative test must use package artifacts, not source imports.
 - [ ] `V3_UPGRADE.md` matches the public branches.
 - [ ] breaking changes from v2 are explicit.
 - [ ] migration and rollback paths are explicit.
+- [ ] release documentation distinguishes CI-only compatibility bundles from release-eligible public-master bundles.
 
 ## 6. Security and repository hygiene
 
@@ -96,7 +99,8 @@ These steps are intentionally **never automatic** in the autonomous development 
 - [ ] maintainer explicitly approves the version numbers and package set to publish.
 - [ ] maintainer explicitly approves npm publication.
 - [ ] npm package ownership/access is verified before publishing.
-- [ ] download the successful authoritative browser run's `browser-tested-release-bundle-*` artifact and verify `public-heads.json` matches the intended public source SHAs.
+- [ ] download a successful `browser-tested-release-bundle-*` artifact whose `public-heads.json` has `workflow.releaseEligible: true` and verify it represents the exact current public Bricks `master` head.
+- [ ] verify the recorded Heading `main` and Gallery `master` source SHAs match the intended public release sources and have not moved since the release-eligible run.
 - [ ] verify each archived `.tgz` SHA-256 and byte size against `public-heads.json`; do not rebuild a replacement tarball for publication.
 - [ ] publish the archived browser-tested `.tgz` files with the intended dist-tag (`next` for a release candidate unless explicitly changed).
 - [ ] verify the package from the public npm registry in a clean consumer project.
@@ -108,7 +112,8 @@ These steps are intentionally **never automatic** in the autonomous development 
 Do **not** publish if any of the following is true:
 
 - a required CI/browser gate is red, cancelled or still running;
-- any public release source branch moved after the last authoritative compatibility run;
+- the only available browser evidence is a PR/synthetic/CI-only run or has `workflow.releaseEligible: false`;
+- any public release source branch moved after the last release-eligible compatibility run;
 - a release Git tag does not exactly match the package version that passed validation;
 - a package tarball differs from the artifact that passed browser validation;
 - the exact browser-tested `.tgz` files are unavailable or their digests cannot be verified against `public-heads.json`;
