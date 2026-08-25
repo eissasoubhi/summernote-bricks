@@ -8,6 +8,8 @@ This example shows the full relationship between the three standalone packages i
 npm install jquery bootstrap summernote summernote-heading@next summernote-gallery@next summernote-bricks@next
 ```
 
+The three v3 packages expose matching `*.browser.js` files for script-tag usage. Their ESM/CommonJS artifacts remain available for build tools, but they are deliberately kept out of this normal browser path.
+
 ## Full page
 
 Create `index.html` in your application and serve the project directory with your usual local web server.
