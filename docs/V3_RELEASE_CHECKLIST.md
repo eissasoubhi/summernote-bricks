@@ -6,9 +6,9 @@ This checklist defines the final gate for a public v3 release of the Summernote 
 
 Release candidates:
 
-- `summernote-bricks@3.0.0-rc.0`
-- `summernote-heading@3.0.0-rc.0`
-- `summernote-gallery@3.0.0-rc.0`
+- `summernote-bricks@3.0.0-rc.1`
+- `summernote-heading@3.0.0-rc.1`
+- `summernote-gallery@3.0.0-rc.1`
 - `SNB-components` remains independent and is not part of this coordinated publication.
 
 Reference host contract: Summernote 0.9.x, currently validated on 0.9.1, with jQuery 3.x.
