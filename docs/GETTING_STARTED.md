@@ -1,39 +1,54 @@
 # Getting started with Summernote Bricks
 
-This page shows the shortest path from a normal Summernote editor to a Bricks toolbar.
+Summernote Bricks has one job: **take Summernote buttons that already exist and group them into one dropdown**.
 
-## 1. Load the host editor
+It does not ship Heading, Gallery, or third-party plugins. Those plugins stay standalone and work without Bricks.
 
-Summernote Bricks expects:
+## Choose the pieces you need
 
-- jQuery `>=3.6.0 <4`
-- Summernote `>=0.9.1 <0.10`
+- Heading only → install [`summernote-heading`](https://github.com/eissasoubhi/summernote-heading).
+- Gallery only → install [`summernote-gallery`](https://github.com/eissasoubhi/summernote-gallery).
+- Heading + Gallery as separate toolbar buttons → install both; Bricks is optional.
+- Heading + Gallery grouped in one dropdown → install both plus `summernote-bricks`.
 
-Choose the Summernote BS3, BS4, BS5, or Lite build that matches your application.
+## 1. Install
 
-## 2. Load the plugins you want to group
+Example with the complete Heading + Gallery composition:
 
-Bricks does not create Heading, Gallery, or third-party plugins. Each child plugin must register its own Summernote button first.
+```bash
+npm install jquery bootstrap summernote summernote-heading@next summernote-gallery@next summernote-bricks@next
+```
 
-For script tags, use this order:
+Remove any standalone plugin that your application does not use.
+
+## 2. Load Summernote, the child plugins, then Bricks
+
+For script tags, remember this order:
 
 ```text
 jQuery
+Bootstrap (when using a Bootstrap Summernote build)
 Summernote
-Heading / Gallery / other standalone plugins
+standalone child plugins
 Summernote Bricks
 editor initialization
 ```
 
-Example:
+Example with the Bootstrap 5 build:
 
 ```html
-<script src="jquery.js"></script>
-<script src="summernote.js"></script>
-<script src="summernote-heading/dist/index.umd.cjs"></script>
-<script src="summernote-gallery/dist/index.umd.cjs"></script>
-<script src="summernote-bricks/dist/summernote-bricks.umd.cjs"></script>
+<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="node_modules/summernote/dist/summernote-bs5.min.css">
+
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="node_modules/summernote/dist/summernote-bs5.min.js"></script>
+<script src="node_modules/summernote-heading/dist/summernote-heading.browser.js"></script>
+<script src="node_modules/summernote-gallery/dist/summernote-gallery.browser.js"></script>
+<script src="node_modules/summernote-bricks/dist/summernote-bricks.browser.js"></script>
 ```
+
+The browser entrypoints deliberately end in `.browser.js`. ESM and CommonJS files still exist for package managers and build tools, but they are not part of the normal script-tag installation path.
 
 ## 3. Add Bricks to the toolbar
 
@@ -50,7 +65,14 @@ $('#editor').summernote({
 });
 ```
 
-That is enough for the normal Heading + Gallery composition.
+Built-in aliases map the friendly package names to the buttons registered by those standalone plugins:
+
+```text
+summernote-heading -> summernoteHeading
+summernote-gallery -> summernoteGallery
+```
+
+That is all Bricks needs. It does not instantiate, import, or own the child plugins itself.
 
 ## Configuration
 
@@ -61,24 +83,15 @@ That is enough for the normal Heading + Gallery composition.
 | `subBricks` | Child Summernote buttons to show | `[]` |
 | `brickAliases` | Friendly name → Summernote button name | `{}` |
 
-Built-in aliases:
-
-```text
-summernote-heading -> summernoteHeading
-summernote-gallery -> summernoteGallery
-```
-
-You may also use the real Summernote button name directly.
-
 ## Custom plugin example
 
-If your plugin does this:
+If your own Summernote plugin registers:
 
 ```js
 context.memo('button.myCompanyButton', () => /* button */);
 ```
 
-then Bricks can use it without a Bricks-specific adapter:
+Bricks can group it directly:
 
 ```js
 summernoteBricks: {
@@ -86,7 +99,7 @@ summernoteBricks: {
 }
 ```
 
-Or with an alias:
+Or through an alias:
 
 ```js
 summernoteBricks: {
@@ -109,14 +122,15 @@ Load the Summernote script before the Bricks bundle.
 
 ### The dropdown is empty
 
-Add at least one entry to `subBricks` and verify that each child plugin is registered.
+Bricks has no built-in child buttons. Add at least one entry to `subBricks` and load the corresponding standalone plugin before Bricks.
 
 ### Do I need `SNB-components`?
 
-No. It is currently an independent optional project and is not required by Summernote Bricks, Heading, or Gallery.
+No. It is an independent optional project and is not required by Summernote Bricks, Heading, or Gallery.
 
 ## Next steps
 
-- Existing application: read [V3_UPGRADE.md](V3_UPGRADE.md).
-- Internal design details: read [ARCHITECTURE.md](ARCHITECTURE.md).
-- Development: read [CONTRIBUTING.md](../CONTRIBUTING.md).
+- Copy-paste integration: [COMPLETE_EXAMPLE.md](COMPLETE_EXAMPLE.md)
+- Existing application: [V3_UPGRADE.md](V3_UPGRADE.md)
+- Internal design details: [ARCHITECTURE.md](ARCHITECTURE.md)
+- Development: [CONTRIBUTING.md](../CONTRIBUTING.md)
