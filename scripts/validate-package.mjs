@@ -35,7 +35,7 @@ const forbidden = [...files].filter((path) =>
 if (forbidden.length) throw new Error(`Bricks package leaks internal files: ${forbidden.join(', ')}`);
 
 const manifest = JSON.parse(readFileSync(resolve(repoDir, 'package.json'), 'utf8'));
-if (manifest.version !== '3.0.0-rc.0') throw new Error(`Unexpected package version: ${manifest.version}`);
+if (manifest.version !== '3.0.0-rc.1') throw new Error(`Unexpected package version: ${manifest.version}`);
 if (manifest.peerDependencies?.jquery !== '>=3.6.0 <4' || manifest.peerDependencies?.summernote !== '>=0.9.1 <0.10') {
   throw new Error('Unexpected host peer dependency contract.');
 }
