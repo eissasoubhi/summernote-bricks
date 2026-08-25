@@ -20,6 +20,8 @@ const required = [
   'dist/summernote-bricks.js.map',
   'dist/summernote-bricks.umd.cjs',
   'dist/summernote-bricks.umd.cjs.map',
+  'dist/summernote-bricks.browser.js',
+  'dist/summernote-bricks.browser.js.map',
   'dist/index.d.ts',
   'dist/index.d.ts.map',
 ];
@@ -50,34 +52,39 @@ const require = createRequire(import.meta.url);
 const cjs = require(resolve(repoDir, 'dist/summernote-bricks.umd.cjs'));
 if (typeof cjs.registerSummernoteBricks !== 'function') throw new Error('CommonJS entrypoint is invalid.');
 
-const browserJquery = {
-  extend(target, ...sources) { return Object.assign(target, ...sources); },
-  summernote: { plugins: {} },
-};
-const sandbox = { jQuery: browserJquery, $: browserJquery };
-vm.runInNewContext(readFileSync(resolve(repoDir, 'dist/summernote-bricks.umd.cjs'), 'utf8'), sandbox);
-const Plugin = browserJquery.summernote.plugins.summernoteBricks;
-if (typeof Plugin !== 'function') throw new Error('Browser artifact did not register Bricks.');
+function validateBrowserBundle(filename) {
+  const browserJquery = {
+    extend(target, ...sources) { return Object.assign(target, ...sources); },
+    summernote: { plugins: {} },
+  };
+  const sandbox = { jQuery: browserJquery, $: browserJquery };
+  vm.runInNewContext(readFileSync(resolve(repoDir, `dist/${filename}`), 'utf8'), sandbox);
+  const Plugin = browserJquery.summernote.plugins.summernoteBricks;
+  if (typeof Plugin !== 'function') throw new Error(`${filename} did not register Bricks.`);
 
-browserJquery.summernote.ui = {
-  button: () => ({ render: () => ({}) }),
-  dropdown: () => ({}),
-  buttonGroup: () => ({ render: () => ({}) }),
-};
-const memos = new Map();
-const context = {
-  options: {},
-  memo(key, value) {
-    if (arguments.length === 2) {
-      memos.set(key, value);
-      return value;
-    }
-    return memos.get(key);
-  },
-};
-new Plugin(context);
-if (typeof context.memo('button.summernoteBricks') !== 'function') {
-  throw new Error('Browser artifact did not initialize through the Summernote constructor lifecycle.');
+  browserJquery.summernote.ui = {
+    button: () => ({ render: () => ({}) }),
+    dropdown: () => ({}),
+    buttonGroup: () => ({ render: () => ({}) }),
+  };
+  const memos = new Map();
+  const context = {
+    options: {},
+    memo(key, value) {
+      if (arguments.length === 2) {
+        memos.set(key, value);
+        return value;
+      }
+      return memos.get(key);
+    },
+  };
+  new Plugin(context);
+  if (typeof context.memo('button.summernoteBricks') !== 'function') {
+    throw new Error(`${filename} did not initialize through the Summernote constructor lifecycle.`);
+  }
 }
+
+validateBrowserBundle('summernote-bricks.umd.cjs');
+validateBrowserBundle('summernote-bricks.browser.js');
 
 console.log(`Validated summernote-bricks@${manifest.version} (${files.size} package files).`);
