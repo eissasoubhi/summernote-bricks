@@ -35,12 +35,15 @@ const forbidden = [...files].filter((path) =>
 if (forbidden.length) throw new Error(`Bricks package leaks internal files: ${forbidden.join(', ')}`);
 
 const manifest = JSON.parse(readFileSync(resolve(repoDir, 'package.json'), 'utf8'));
-if (manifest.version !== '3.0.0-rc.0') throw new Error(`Unexpected package version: ${manifest.version}`);
+if (manifest.name !== 'summernote-bricks') throw new Error(`Unexpected package name: ${manifest.name}`);
+if (typeof manifest.version !== 'string' || !/^3\.0\.0(?:-rc\.\d+)?$/.test(manifest.version)) {
+  throw new Error(`Unexpected package version: ${manifest.version}`);
+}
 if (manifest.peerDependencies?.jquery !== '>=3.6.0 <4' || manifest.peerDependencies?.summernote !== '>=0.9.1 <0.10') {
   throw new Error('Unexpected host peer dependency contract.');
 }
 
-const esm = await import(pathToFileURL(resolve(repoDir, 'dist/summernote-bricks.js')).href);
+const esm = await import(`${pathToFileURL(resolve(repoDir, 'dist/summernote-bricks.js')).href}?package-check=${Date.now()}`);
 if (typeof esm.registerSummernoteBricks !== 'function') throw new Error('ESM entrypoint is invalid.');
 
 const require = createRequire(import.meta.url);
