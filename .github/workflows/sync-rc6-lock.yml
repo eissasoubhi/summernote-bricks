@@ -1,0 +1,56 @@
+name: Sync rc6 release identity
+
+on:
+  push:
+    branches:
+      - release/bricks-3.0.0-rc.6
+    paths:
+      - .github/workflows/sync-rc6-lock.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: release/bricks-3.0.0-rc.6
+          fetch-depth: 0
+      - name: Align lockfile and release checklist
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          lock = Path('package-lock.json')
+          text = lock.read_text()
+          old = '"version": "3.0.0-rc.5"'
+          new = '"version": "3.0.0-rc.6"'
+          if text.count(old) < 2:
+              raise SystemExit('expected two rc.5 root identity fields in package-lock.json')
+          text = text.replace(old, new, 2)
+          lock.write_text(text)
+
+          checklist = Path('docs/V3_RELEASE_CHECKLIST.md')
+          text = checklist.read_text()
+          old = '`summernote-bricks@3.0.0-rc.5`'
+          new = '`summernote-bricks@3.0.0-rc.6`'
+          if old not in text:
+              raise SystemExit('expected rc.5 checklist entry')
+          checklist.write_text(text.replace(old, new, 1))
+          PY
+          git diff --check
+          git diff --exit-code package-lock.json docs/V3_RELEASE_CHECKLIST.md >/dev/null && {
+            echo 'Expected release identity changes were not produced.' >&2
+            exit 1
+          }
+      - name: Commit synchronized identity
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json docs/V3_RELEASE_CHECKLIST.md
+          git commit -m 'chore: align Bricks rc.6 release identity'
+          git push origin HEAD:release/bricks-3.0.0-rc.6
