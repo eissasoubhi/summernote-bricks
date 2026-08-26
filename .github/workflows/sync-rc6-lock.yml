@@ -30,8 +30,7 @@ jobs:
           new = '"version": "3.0.0-rc.6"'
           if text.count(old) < 2:
               raise SystemExit('expected two rc.5 root identity fields in package-lock.json')
-          text = text.replace(old, new, 2)
-          lock.write_text(text)
+          lock.write_text(text.replace(old, new, 2))
 
           checklist = Path('docs/V3_RELEASE_CHECKLIST.md')
           text = checklist.read_text()
@@ -42,10 +41,10 @@ jobs:
           checklist.write_text(text.replace(old, new, 1))
           PY
           git diff --check
-          git diff --exit-code package-lock.json docs/V3_RELEASE_CHECKLIST.md >/dev/null && {
+          if git diff --quiet -- package-lock.json docs/V3_RELEASE_CHECKLIST.md; then
             echo 'Expected release identity changes were not produced.' >&2
             exit 1
-          }
+          fi
       - name: Commit synchronized identity
         shell: bash
         run: |
