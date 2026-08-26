@@ -1,6 +1,6 @@
 {
   "name": "summernote-bricks",
-  "version": "3.0.0-rc.3",
+  "version": "3.0.0-rc.4",
   "description": "Composable Summernote plugin toolbar for semantic bricks.",
   "type": "module",
   "main": "./dist/summernote-bricks.umd.cjs",
