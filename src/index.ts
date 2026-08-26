@@ -17,12 +17,20 @@ export interface JQueryLike {
   };
 }
 
+export interface BricksPluginToggleOptions {
+  enabled?: boolean;
+  buttonName?: string;
+}
+
+export type BricksPluginToggle = boolean | BricksPluginToggleOptions;
+
 export interface BricksOptions {
   name: string;
   buttonLabel: string;
   tooltip: string;
   subBricks: string[];
   brickAliases: Record<string, string>;
+  plugins: Record<string, BricksPluginToggle>;
 }
 
 export type SummernotePluginConstructor = new (context: SummernoteContext) => object;
@@ -38,6 +46,7 @@ const DEFAULT_OPTIONS: BricksOptions = {
   tooltip: 'Summernote bricks',
   subBricks: [],
   brickAliases: {},
+  plugins: {},
 };
 
 export class BrickRegistry {
@@ -101,7 +110,34 @@ function mergedOptions(context: SummernoteContext, configured: Partial<BricksOpt
       ...(configured.brickAliases ?? {}),
       ...((local as Partial<BricksOptions>).brickAliases ?? {}),
     },
+    plugins: {
+      ...DEFAULT_OPTIONS.plugins,
+      ...(configured.plugins ?? {}),
+      ...((local as Partial<BricksOptions>).plugins ?? {}),
+    },
   };
+}
+
+function configuredBrickNames(options: BricksOptions, loader: BrickButtonLoader): string[] {
+  const names = [...options.subBricks];
+
+  Object.entries(options.plugins).forEach(([name, toggle]) => {
+    const enabled = typeof toggle === 'boolean' ? toggle : toggle.enabled !== false;
+
+    if (typeof toggle === 'object' && toggle.buttonName) {
+      loader.register(name, toggle.buttonName);
+    }
+
+    const existingIndex = names.indexOf(name);
+    if (!enabled) {
+      if (existingIndex >= 0) names.splice(existingIndex, 1);
+      return;
+    }
+
+    if (existingIndex < 0) names.push(name);
+  });
+
+  return names;
 }
 
 export function createSummernoteBricksPlugin(
@@ -121,7 +157,7 @@ export function createSummernoteBricksPlugin(
       context.memo(`button.${name}`, () => {
         const options = mergedOptions(context, configured);
         Object.entries(options.brickAliases).forEach(([alias, buttonName]) => loader.register(alias, buttonName));
-        const components = options.subBricks.map((brick) => loader.load(context, brick));
+        const components = configuredBrickNames(options, loader).map((brick) => loader.load(context, brick));
         return ui.buttonGroup([
           ui.button({
             className: 'dropdown-toggle',
