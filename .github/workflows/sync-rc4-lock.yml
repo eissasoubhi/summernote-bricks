@@ -1,0 +1,42 @@
+name: Sync rc4 lock identity
+
+on:
+  push:
+    branches:
+      - release/v3-rc4
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: release/v3-rc4
+      - name: Synchronize root lockfile identity only
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('package-lock.json')
+          s = p.read_text()
+          needle = '"version": "3.0.0-rc.3"'
+          replacement = '"version": "3.0.0-rc.4"'
+          assert s.count(needle) == 2, f'expected exactly 2 rc.3 root identity occurrences, found {s.count(needle)}'
+          s = s.replace(needle, replacement, 2)
+          p.write_text(s)
+          PY
+          git diff --check
+          git diff -- package-lock.json
+      - name: Commit lockfile-only change
+        shell: bash
+        run: |
+          test "$(git diff --name-only | tr '\n' ' ')" = "package-lock.json "
+          git config user.name "Eissa Soubhi"
+          git config user.email "eissa.soubhi@gmail.com"
+          git add package-lock.json
+          git commit -m "chore: sync Bricks rc.4 lockfile identity"
+          git push origin HEAD:release/v3-rc4
