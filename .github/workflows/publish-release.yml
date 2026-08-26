@@ -88,6 +88,49 @@ jobs:
           }
           NODE
 
+      - name: Preflight npm registry identities for all coordinated packages
+        run: |
+          set -euo pipefail
+          EVIDENCE="$(find release-bundle -type f -name public-heads.json -print -quit)"
+          test -n "$EVIDENCE"
+          conflicts=0
+
+          preflight_registry_identity() {
+            local key="$1"
+            local package_name="$2"
+            local version filename tarball local_integrity existing_integrity
+            version="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].version" "$EVIDENCE")"
+            filename="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].tarball.filename" "$EVIDENCE")"
+            tarball="$(find release-bundle -type f -name "$filename" -print -quit)"
+            test -n "$tarball"
+
+            local_integrity="$(node -e "const fs=require('fs'),c=require('crypto');process.stdout.write('sha512-'+c.createHash('sha512').update(fs.readFileSync(process.argv[1])).digest('base64'))" "$tarball")"
+            existing_integrity="$(npm view "$package_name@$version" dist.integrity --json 2>/dev/null | tr -d '\"' || true)"
+
+            if [ -z "$existing_integrity" ]; then
+              printf '✅ `%s@%s` is vacant on npm.\n' "$package_name" "$version" >> "$GITHUB_STEP_SUMMARY"
+              return
+            fi
+
+            if [ "$existing_integrity" = "$local_integrity" ]; then
+              printf '✅ `%s@%s` already matches the exact tested tarball.\n' "$package_name" "$version" >> "$GITHUB_STEP_SUMMARY"
+              return
+            fi
+
+            echo "::error::$package_name@$version already exists on npm with different registry integrity"
+            printf '❌ `%s@%s` exists with different registry integrity; coordinated publication is blocked before any package is published.\n' "$package_name" "$version" >> "$GITHUB_STEP_SUMMARY"
+            conflicts=1
+          }
+
+          preflight_registry_identity bricks summernote-bricks
+          preflight_registry_identity heading summernote-heading
+          preflight_registry_identity gallery summernote-gallery
+
+          if [ "$conflicts" -ne 0 ]; then
+            echo "One or more coordinated package identities conflict with npm; refusing partial publication." >&2
+            exit 1
+          fi
+
       - name: Authenticate npm publisher
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
