@@ -6,7 +6,7 @@ This checklist defines the final gate for a public v3 release of the Summernote 
 
 Release candidates:
 
-- `summernote-bricks@3.0.0-rc.8`
+- `summernote-bricks@3.0.0-rc.9`
 - `summernote-heading@3.0.0-rc.1`
 - `summernote-gallery@3.0.0-rc.1`
 - `SNB-components` remains independent and is not part of this coordinated publication.
