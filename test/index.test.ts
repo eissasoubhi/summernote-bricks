@@ -102,6 +102,62 @@ describe('Summernote Bricks plugin', () => {
     expect(rendered.children).toHaveLength(2);
   });
 
+  it('adds and removes plugins through the composition toggle API without breaking subBricks', () => {
+    const jquery = fakeJquery();
+    const plugin = createSummernoteBricksPlugin(jquery, {
+      subBricks: ['summernote-heading', 'legacyButton'],
+      plugins: {
+        'summernote-heading': false,
+        'summernote-gallery': true,
+        customFeature: { enabled: true, buttonName: 'thirdParty' },
+      },
+    });
+    const context = contextWithButtons({
+      summernoteHeading: () => ({ id: 'heading' }),
+      summernoteGallery: () => ({ id: 'gallery' }),
+      legacyButton: () => ({ id: 'legacy' }),
+      thirdParty: () => ({ id: 'custom' }),
+    });
+
+    instantiate(plugin.summernoteBricks, context);
+    const factory = context.memo('button.summernoteBricks') as () => {
+      children: Array<{ kind: string; options: Record<string, unknown> }>;
+    };
+    const rendered = factory();
+    const dropdown = rendered.children[1];
+    const contents = dropdown?.options.contents as Array<{ id: string }>;
+
+    expect(contents.map((component) => component.id)).toEqual(['legacy', 'gallery', 'custom']);
+  });
+
+  it('allows editor-local options to override configured plugin toggles', () => {
+    const jquery = fakeJquery();
+    const plugin = createSummernoteBricksPlugin(jquery, {
+      plugins: { 'summernote-heading': true, 'summernote-gallery': true },
+    });
+    const context = contextWithButtons(
+      {
+        summernoteHeading: () => ({ id: 'heading' }),
+        summernoteGallery: () => ({ id: 'gallery' }),
+      },
+      {
+        summernoteBricks: {
+          plugins: { 'summernote-heading': false },
+        },
+      },
+    );
+
+    instantiate(plugin.summernoteBricks, context);
+    const factory = context.memo('button.summernoteBricks') as () => {
+      children: Array<{ kind: string; options: Record<string, unknown> }>;
+    };
+    const rendered = factory();
+    const dropdown = rendered.children[1];
+    const contents = dropdown?.options.contents as Array<{ id: string }>;
+
+    expect(contents.map((component) => component.id)).toEqual(['gallery']);
+  });
+
   it('fails clearly when a configured child plugin was not registered', () => {
     const jquery = fakeJquery();
     const plugin = createSummernoteBricksPlugin(jquery, { subBricks: ['summernote-gallery'] });
