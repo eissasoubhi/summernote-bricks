@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "types": ["vitest/globals"]
   },
-  "include": ["src", "test", "packages/core/src", "vite.config.ts"]
+  "include": ["src", "test", "packages/core/src", "packages/heading/src", "packages/heading/test", "vite.config.ts"]
 }
