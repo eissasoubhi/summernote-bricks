@@ -28,9 +28,10 @@
     "pack:check": "node scripts/validate-package.mjs",
     "heading:build": "vite build --config packages/heading/vite.config.ts && tsc -p packages/heading/tsconfig.build.json && node packages/heading/scripts/create-browser-alias.mjs",
     "heading:cutover-check": "npm run heading:build && node scripts/validate-heading-cutover.mjs",
+    "heading:tarball-check": "node scripts/validate-heading-tarball.mjs",
     "release:tag-check": "node scripts/validate-release-tag.mjs",
     "release:bundle-check": "node scripts/validate-browser-release-bundle.mjs",
-    "check": "npm run typecheck && npm test && npm run build && npm run pack:check && npm run heading:cutover-check"
+    "check": "npm run typecheck && npm test && npm run build && npm run pack:check && npm run heading:cutover-check && npm run heading:tarball-check"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
