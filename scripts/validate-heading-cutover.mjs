@@ -11,7 +11,7 @@ const expectedStandalone = {
   version: '3.0.0-rc.1',
   main: './dist/index.umd.cjs',
   module: './dist/index.js',
-  browser: './dist/summernote-heading.browser.js',
+  browser: './dist/index.umd.cjs',
   types: './dist/types/index.d.ts',
   peerDependencies: {
     jquery: '>=3.6.0 <4',
@@ -37,7 +37,7 @@ assert(packageJson.version === expectedStandalone.version, 'Heading staged versi
 assert(packageJson.private === true, 'Heading must remain private until build/tarball equivalence is proven.');
 assert(packageJson.main === expectedStandalone.main, 'Heading CommonJS entrypoint differs from standalone.');
 assert(packageJson.module === expectedStandalone.module, 'Heading ESM entrypoint differs from standalone.');
-assert(packageJson.browser === expectedStandalone.browser, 'Heading browser entrypoint differs from the staged cutover contract.');
+assert(packageJson.browser === expectedStandalone.browser, 'Heading browser entrypoint differs from standalone.');
 assert(packageJson.types === expectedStandalone.types, 'Heading declaration entrypoint differs from standalone.');
 assert(
   JSON.stringify(packageJson.peerDependencies) === JSON.stringify(expectedStandalone.peerDependencies),
@@ -91,13 +91,13 @@ for (const file of declarationFiles) {
 
 const esm = await readFile(join(headingRoot, 'dist', 'index.js'), 'utf8');
 const cjs = await readFile(join(headingRoot, 'dist', 'index.umd.cjs'), 'utf8');
-const browser = await readFile(join(headingRoot, 'dist', 'summernote-heading.browser.js'), 'utf8');
+const browserAlias = await readFile(join(headingRoot, 'dist', 'summernote-heading.browser.js'), 'utf8');
 assert(esm.includes('Summernote must be loaded before summernote-heading.'), 'Heading ESM bundle lost the Summernote load-order guard.');
 assert(cjs.includes('Summernote must be loaded before summernote-heading.'), 'Heading CommonJS bundle lost the Summernote load-order guard.');
-assert(browser.includes('Summernote must be loaded before summernote-heading.'), 'Heading browser bundle lost the Summernote load-order guard.');
-assert(browser.includes('summernoteHeading'), 'Heading browser bundle lost plugin registration.');
+assert(browserAlias.includes('Summernote must be loaded before summernote-heading.'), 'Heading browser alias lost the Summernote load-order guard.');
+assert(browserAlias.includes('summernoteHeading'), 'Heading browser alias lost plugin registration.');
 
 console.log('Heading cutover build/package gate passed.');
 console.log(`Pinned standalone identity: ${expectedStandalone.name}@${expectedStandalone.version}`);
-console.log('Verified ESM, CommonJS, browser and declaration entrypoints with no private SNB Core leakage.');
+console.log('Verified ESM, CommonJS, browser metadata/alias and declaration entrypoints with no private SNB Core leakage.');
 console.log('Publication remains disabled until tarball and clean-consumer equivalence are proven.');
