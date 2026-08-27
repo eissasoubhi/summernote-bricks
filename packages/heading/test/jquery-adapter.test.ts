@@ -118,8 +118,10 @@ function createFixture() {
     },
   };
 
-  const jquery = ((target: object) => target === document.body ? body : new FakeQuery()) as HeadingJQueryFactory;
-  Object.defineProperty(jquery, 'summernote', { value: { ui } });
+  const jquery: HeadingJQueryFactory = Object.assign(
+    (target: object) => target === document.body ? body : new FakeQuery(),
+    { summernote: { ui } },
+  );
 
   const memo = new Map<string, () => unknown>();
   const invoke = vi.fn();
