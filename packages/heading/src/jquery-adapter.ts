@@ -2,7 +2,7 @@ import type {
   SummernoteButtonOptions,
   SummernoteDialogOptions,
   SummernoteUiAdapter,
-} from '../../core/src/summernote';
+} from './summernote-contract';
 import { parseHeading, renderHeading, type HeadingData } from './heading';
 import {
   resolveHeadingOptions,
