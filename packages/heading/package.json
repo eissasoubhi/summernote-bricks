@@ -1,7 +1,6 @@
 {
   "name": "summernote-heading",
   "version": "3.0.0-rc.1",
-  "private": true,
   "description": "Native Summernote plugin for creating and editing semantic heading blocks.",
   "type": "module",
   "main": "./dist/index.umd.cjs",

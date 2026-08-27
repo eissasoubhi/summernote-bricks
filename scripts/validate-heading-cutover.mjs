@@ -34,7 +34,7 @@ async function assertFile(relativePath) {
 
 assert(packageJson.name === expectedStandalone.name, 'Heading package name drifted from standalone npm identity.');
 assert(packageJson.version === expectedStandalone.version, 'Heading staged version drifted from the pinned standalone baseline.');
-assert(packageJson.private === true, 'Heading must remain private until build/tarball equivalence is proven.');
+assert(packageJson.private !== true, 'Heading publishability cutover regressed: package is private again.');
 assert(packageJson.main === expectedStandalone.main, 'Heading CommonJS entrypoint differs from standalone.');
 assert(packageJson.module === expectedStandalone.module, 'Heading ESM entrypoint differs from standalone.');
 assert(packageJson.browser === expectedStandalone.browser, 'Heading browser entrypoint differs from standalone.');
@@ -97,7 +97,7 @@ assert(cjs.includes('Summernote must be loaded before summernote-heading.'), 'He
 assert(browserAlias.includes('Summernote must be loaded before summernote-heading.'), 'Heading browser alias lost the Summernote load-order guard.');
 assert(browserAlias.includes('summernoteHeading'), 'Heading browser alias lost plugin registration.');
 
-console.log('Heading cutover build/package gate passed.');
+console.log('Heading publishability cutover gate passed.');
 console.log(`Pinned standalone identity: ${expectedStandalone.name}@${expectedStandalone.version}`);
-console.log('Verified ESM, CommonJS, browser metadata/alias and declaration entrypoints with no private SNB Core leakage.');
-console.log('Publication remains disabled until tarball and clean-consumer equivalence are proven.');
+console.log('Verified publishable metadata, ESM, CommonJS, browser metadata/alias and declarations with no private SNB Core leakage.');
+console.log('This gate makes the package publishable but does not publish it or transfer release workflow ownership by itself.');
