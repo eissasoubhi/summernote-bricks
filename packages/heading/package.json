@@ -6,7 +6,7 @@
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.js",
-  "browser": "./dist/summernote-heading.browser.js",
+  "browser": "./dist/index.umd.cjs",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
