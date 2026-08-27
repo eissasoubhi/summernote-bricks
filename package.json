@@ -26,7 +26,8 @@
     "build:types": "tsc -p tsconfig.build.json",
     "build": "npm run build:js && npm run build:types",
     "pack:check": "node scripts/validate-package.mjs",
-    "heading:cutover-check": "node scripts/validate-heading-cutover.mjs",
+    "heading:build": "vite build --config packages/heading/vite.config.ts && tsc -p packages/heading/tsconfig.build.json && node packages/heading/scripts/create-browser-alias.mjs",
+    "heading:cutover-check": "npm run heading:build && node scripts/validate-heading-cutover.mjs",
     "release:tag-check": "node scripts/validate-release-tag.mjs",
     "release:bundle-check": "node scripts/validate-browser-release-bundle.mjs",
     "check": "npm run typecheck && npm test && npm run build && npm run pack:check && npm run heading:cutover-check"
