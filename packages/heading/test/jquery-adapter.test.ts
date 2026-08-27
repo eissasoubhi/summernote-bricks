@@ -146,8 +146,14 @@ function createFixture() {
     instance,
     getButtonOptions: () => buttonOptions,
     getDialogOptions: () => dialogOptions,
-    fireShown: () => shownCallback?.(),
-    fireHidden: () => hiddenCallback?.(),
+    fireShown: () => {
+      const callback = shownCallback as (() => void) | null;
+      callback?.();
+    },
+    fireHidden: () => {
+      const callback = hiddenCallback as (() => void) | null;
+      callback?.();
+    },
   };
 }
 
