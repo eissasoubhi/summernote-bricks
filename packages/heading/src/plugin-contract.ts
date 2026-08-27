@@ -1,5 +1,5 @@
 import type { HeadingLevel } from './heading';
-import type { SummernotePluginContext } from '../../core/src/summernote';
+import type { SummernotePluginContext } from './summernote-contract';
 
 export interface HeadingV3Options {
   buttonLabel: string;
