@@ -69,6 +69,27 @@ try {
   );
   assert(forbidden.length === 0, `Heading tarball leaks internal files: ${forbidden.join(', ')}`);
 
+  const manifest = JSON.parse(await readFile(join(headingRoot, 'package.json'), 'utf8'));
+  const expectedEntrypoints = {
+    main: './dist/index.umd.cjs',
+    module: './dist/index.js',
+    browser: './dist/index.umd.cjs',
+    types: './dist/types/index.d.ts',
+  };
+  for (const [key, value] of Object.entries(expectedEntrypoints)) {
+    assert(manifest[key] === value, `Heading ${key} drifted from standalone metadata: ${manifest[key]}`);
+  }
+  assert(
+    JSON.stringify(manifest.exports) === JSON.stringify({
+      '.': {
+        types: './dist/types/index.d.ts',
+        import: './dist/index.js',
+        require: './dist/index.umd.cjs',
+      },
+    }),
+    'Heading exports map drifted from standalone metadata.',
+  );
+
   await writeFile(
     join(consumerDir, 'package.json'),
     JSON.stringify({ name: 'heading-clean-consumer', private: true, type: 'module' }, null, 2),
@@ -147,7 +168,7 @@ if (cjsSummernote.plugins.summernoteHeading !== cjs.SummernoteHeadingV3) {
   );
 
   console.log(`Heading tarball/consumer gate passed: ${basename(tarball)} (${files.size} files).`);
-  console.log('Verified exact file set, ESM/CommonJS clean-consumer loading, browser alias and persisted v3 HTML.');
+  console.log('Verified standalone metadata, exact file set, ESM/CommonJS clean-consumer loading, browser alias and persisted v3 HTML.');
   console.log('Publication remains disabled; package is still private.');
 } finally {
   delete globalThis.$;
