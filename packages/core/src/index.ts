@@ -1,3 +1,5 @@
+export * from './summernote';
+
 export interface BricksPluginContext {
   readonly summernote: unknown;
   readonly jquery: unknown;
