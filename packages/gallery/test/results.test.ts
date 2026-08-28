@@ -31,6 +31,20 @@ describe('Gallery results contract', () => {
     );
   });
 
+  it('escapes attribute-sensitive source characters and renders unselected ARIA state', () => {
+    const unsafe: GalleryImage = {
+      src: 'https://example.test/"quoted"?a=1&b=2',
+      title: 'Rock & "Roll"',
+    };
+
+    expect(renderGalleryResultItem(unsafe, 0, false)).toBe(
+      '<button type="button" class="snb-gallery-v3-form__item" data-index="0" role="option" aria-selected="false">' +
+        '<img src="https://example.test/&quot;quoted&quot;?a=1&amp;b=2" alt="">' +
+        '<span>Rock &amp; &quot;Roll&quot;</span>' +
+        '</button>',
+    );
+  });
+
   it('toggles selection by the stable Gallery image key', () => {
     const selected = new Map<string, GalleryImage>();
     expect(toggleGallerySelection(selected, image)).toBe(true);
