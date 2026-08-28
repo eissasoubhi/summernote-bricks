@@ -12,6 +12,7 @@ function makeBundle(runId = '123', releaseEligible = false) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'summernote-bricks-release-bundle-'));
   temporaryDirectories.push(root);
 
+  const bricksSha = releaseEligible ? 'public-master-sha' : 'source-branch-sha';
   const packages = Object.fromEntries(['bricks', 'heading', 'gallery'].map((name) => {
     const filename = `${name}-3.0.0-rc.0.tgz`;
     const contents = Buffer.from(`${name}-archive`);
@@ -20,9 +21,18 @@ function makeBundle(runId = '123', releaseEligible = false) {
       ...(name === 'bricks' ? {
         ref: releaseEligible ? 'refs/heads/master' : 'refs/pull/1/merge',
         sha: releaseEligible ? 'public-master-sha' : 'synthetic-merge-sha',
+        sourceRepository: 'eissasoubhi/summernote-bricks',
         sourceRef: releaseEligible ? 'master' : 'agent/example',
-        sourceSha: releaseEligible ? 'public-master-sha' : 'source-branch-sha',
-      } : {}),
+        sourceSha: bricksSha,
+      } : {
+        repository: name === 'heading' ? 'eissasoubhi/summernote-heading' : 'eissasoubhi/summernote-gallery',
+        ref: name === 'heading' ? 'main' : 'master',
+        sha: `${name}-compatibility-sha`,
+        sourceRepository: 'eissasoubhi/summernote-bricks',
+        sourceRef: releaseEligible ? 'master' : 'agent/example',
+        sourceSha: bricksSha,
+        sourcePath: `packages/${name}`,
+      }),
       tarball: {
         filename,
         sha256: crypto.createHash('sha256').update(contents).digest('hex'),
@@ -61,7 +71,7 @@ describe('browser-tested release bundle validator', () => {
     expect(validate(makeBundle(), '123', false)).not.toThrow();
   });
 
-  it('accepts release-eligible evidence only for the exact public Bricks master head', () => {
+  it('accepts release-eligible evidence only for the exact public Bricks master head and monorepo-owned feature artifacts', () => {
     expect(validate(makeBundle('123', true), '123', true)).not.toThrow();
   });
 
@@ -78,6 +88,17 @@ describe('browser-tested release bundle validator', () => {
     evidence.packages.bricks.sha = 'synthetic-merge-sha';
     fs.writeFileSync(evidencePath, JSON.stringify(evidence));
     expect(validate(root, '123', true)).toThrow(/exact public Bricks master head/);
+  });
+
+  it('rejects release-eligible Heading or Gallery artifacts that are not sourced from the exact Bricks master package path', () => {
+    const root = makeBundle('123', true);
+    const evidencePath = path.join(root, 'public-heads.json');
+    const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+    evidence.packages.heading.sourceRepository = 'eissasoubhi/summernote-heading';
+    evidence.packages.heading.sourceSha = 'heading-compatibility-sha';
+    delete evidence.packages.heading.sourcePath;
+    fs.writeFileSync(evidencePath, JSON.stringify(evidence));
+    expect(validate(root, '123', true)).toThrow(/heading release artifact must come from packages\/heading/);
   });
 
   it('rejects a tarball whose bytes changed after evidence was recorded', () => {
