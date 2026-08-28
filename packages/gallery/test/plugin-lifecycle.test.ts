@@ -138,7 +138,7 @@ describe('Gallery plugin lifecycle', () => {
     expect(mocks.bindRuntime).toHaveBeenCalledTimes(1);
     expect(mocks.bindActivation).toHaveBeenCalledTimes(1);
 
-    const target = document.createElement('div');
+    const target = {} as HTMLElement;
     plugin.show(target);
     expect(controller.reset).toHaveBeenCalledWith(target, 'grid');
     expect(runtime.render).toHaveBeenCalled();
