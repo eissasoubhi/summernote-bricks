@@ -15,6 +15,39 @@ permissions:
   contents: read
 
 jobs:
+  sync-release-lock:
+    name: Synchronize rc.12 release lock
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'release/rc12-monorepo-artifacts'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Synchronize root package-lock identity
+        run: npm version 3.0.0-rc.12 --no-git-tag-version --allow-same-version
+
+      - name: Commit synchronized lock metadata when needed
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo 'Release lock identity is already synchronized.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json package-lock.json
+          git commit -m 'release: synchronize Bricks rc.12 lock identity'
+          git push origin HEAD:${{ github.head_ref }}
+
   quality:
     name: Node ${{ matrix.node }}
     runs-on: ubuntu-latest
