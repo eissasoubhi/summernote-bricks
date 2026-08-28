@@ -70,6 +70,12 @@ jobs:
           if (evidence.workflow?.releaseEligible !== true) throw new Error('Release bundle is not release-eligible');
           if (evidence.packages?.bricks?.sha !== expectedBricksSha) throw new Error('Browser evidence does not match the triggering Bricks master SHA');
           if (evidence.packages?.bricks?.sourceSha !== expectedBricksSha) throw new Error('Bricks source SHA differs from the triggering public master SHA');
+          for (const key of ['heading', 'gallery']) {
+            const value = evidence.packages?.[key];
+            if (value?.sourceRepository !== 'eissasoubhi/summernote-bricks' || value?.sourceSha !== expectedBricksSha) {
+              throw new Error(`${key} artifact source does not match the triggering Bricks master SHA`);
+            }
+          }
           NODE
 
           BRICKS_SHA="$(gh api repos/eissasoubhi/summernote-bricks/branches/master --jq .commit.sha)"
@@ -83,7 +89,7 @@ jobs:
           const expected = { bricks: bricksSha, heading: headingSha, gallery: gallerySha };
           for (const [name, sha] of Object.entries(expected)) {
             if (evidence.packages?.[name]?.sha !== sha) {
-              throw new Error(`${name} public source moved after browser validation: evidence=${evidence.packages?.[name]?.sha} current=${sha}`);
+              throw new Error(`${name} public compatibility/source head moved after browser validation: evidence=${evidence.packages?.[name]?.sha} current=${sha}`);
             }
           }
           NODE
@@ -229,9 +235,12 @@ jobs:
             local key="$1"
             local package_name="$2"
             local repo="$3"
-            local version sha filename tarball tag prerelease existing_tag notes
+            local version sha source_repo source_sha source_path filename tarball tag prerelease existing_tag notes
             version="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].version" "$EVIDENCE")"
             sha="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].sha" "$EVIDENCE")"
+            source_repo="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].sourceRepository || JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].repository" "$EVIDENCE")"
+            source_sha="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].sourceSha || JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].sha" "$EVIDENCE")"
+            source_path="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].sourcePath || '.'" "$EVIDENCE")"
             filename="$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1])).packages['$key'].tarball.filename" "$EVIDENCE")"
             tarball="$(find release-bundle -type f -name "$filename" -print -quit)"
             tag="v$version"
@@ -239,7 +248,7 @@ jobs:
 
             existing_tag="$(gh api "repos/$repo/git/ref/tags/$tag" --jq .object.sha 2>/dev/null || true)"
             if [ -n "$existing_tag" ] && [ "$existing_tag" != "$sha" ]; then
-              echo "$repo tag $tag already points to $existing_tag instead of tested source $sha" >&2
+              echo "$repo tag $tag already points to $existing_tag instead of recorded compatibility/history SHA $sha" >&2
               exit 1
             fi
             if [ -z "$existing_tag" ]; then
@@ -250,9 +259,12 @@ jobs:
             cat > "$notes" <<EOF
           $package_name $version release candidate.
 
-          This release uses the exact npm tarball validated by the Summernote 0.9.1 cross-browser compatibility gate (Bootstrap 3/4/5 and Lite on Chromium, Firefox and WebKit), including the minimum jQuery 3.6.0 smoke test.
+          npm artifact source: $source_repo@$source_sha ($source_path).
+          GitHub release repository/history anchor: $repo@$sha.
 
-          The attached public-heads.json records the exact source SHAs and tarball digest/size used for publication.
+          The attached tarball is the exact artifact validated by the Summernote 0.9.1 cross-browser compatibility gate (Bootstrap 3/4/5 and Lite on Chromium, Firefox and WebKit), including the minimum jQuery 3.6.0 smoke test. For Heading/Gallery, the standalone repository SHA is retained as an explicit compatibility/history baseline while the maintained package artifact is built from the Bricks monorepo source recorded above.
+
+          The attached public-heads.json records both compatibility/history SHAs and exact artifact source SHAs/paths plus tarball digest/size.
 
           Migration and compatibility documentation: https://github.com/eissasoubhi/summernote-bricks/blob/master/docs/V3_UPGRADE.md
           EOF
@@ -265,7 +277,7 @@ jobs:
               fi
             fi
             gh release upload "$tag" "$tarball" "$EVIDENCE" --repo "$repo" --clobber
-            printf '✅ GitHub Release `%s` verified for `%s` at `%s`.\n' "$tag" "$repo" "$sha" >> "$GITHUB_STEP_SUMMARY"
+            printf '✅ GitHub Release `%s` verified for `%s`; artifact source `%s@%s` (`%s`), history anchor `%s`.\n' "$tag" "$repo" "$source_repo" "$source_sha" "$source_path" "$sha" >> "$GITHUB_STEP_SUMMARY"
           }
 
           release_package bricks summernote-bricks eissasoubhi/summernote-bricks
