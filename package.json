@@ -14,7 +14,11 @@
       "require": "./dist/summernote-bricks.umd.cjs"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "peerDependencies": {
     "jquery": ">=3.6.0 <4",
     "summernote": ">=0.9.1 <0.10"
@@ -41,7 +45,13 @@
     "vite": "^8.0.0",
     "vitest": "^4.0.0"
   },
-  "keywords": ["summernote", "summernote-plugin", "wysiwyg", "editor", "bricks"],
+  "keywords": [
+    "summernote",
+    "summernote-plugin",
+    "wysiwyg",
+    "editor",
+    "bricks"
+  ],
   "homepage": "https://github.com/eissasoubhi/summernote-bricks#readme",
   "bugs": "https://github.com/eissasoubhi/summernote-bricks/issues",
   "repository": "https://github.com/eissasoubhi/summernote-bricks",
