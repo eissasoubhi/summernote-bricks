@@ -6,15 +6,14 @@ import { renderGalleryDialogSnapshot } from '../src/dialog-presenter';
 import type {
   GalleryAdapterBoundary,
   GalleryJQueryElement,
-  GalleryJQueryEvent,
   GalleryJQueryFactory,
 } from '../src/jquery-adapter';
 import { defaultGalleryOptions } from '../src/options';
 import type { GallerySummernoteContext, GallerySummernoteUi } from '../src/summernote-contract';
 
 interface StubElement extends GalleryJQueryElement {
-  readonly children: Map<string, StubElement>;
-  readonly attributes: Map<string, string>;
+  children: Map<string, StubElement>;
+  attributes: Map<string, string>;
   readonly node?: HTMLElement;
   textValue: string;
   htmlValue: string;
