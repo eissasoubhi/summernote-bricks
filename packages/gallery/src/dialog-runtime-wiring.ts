@@ -10,6 +10,10 @@ export interface GalleryDialogRuntimeBinding {
   dispose(): void;
 }
 
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export function bindGalleryDialogRuntime(
   boundary: GalleryAdapterBoundary,
   dialog: GalleryJQueryElement,
@@ -23,12 +27,12 @@ export function bindGalleryDialogRuntime(
 
   const load = async (query = ''): Promise<void> => {
     setError('');
-    const result = await controller.load(query);
-    if (result.status === 'failed') {
-      setError(result.error instanceof Error ? result.error.message : String(result.error));
-      return;
+    try {
+      const result = await controller.load(query);
+      if (result.status === 'loaded') render();
+    } catch (error) {
+      setError(errorMessage(error));
     }
-    if (result.status !== 'aborted') render();
   };
 
   const unbindControls = bindGalleryDialogControls(boundary, dialog, {
@@ -53,14 +57,12 @@ export function bindGalleryDialogRuntime(
 
       setError('');
       void controller.upload(Array.from(input.files)).then((result) => {
-        if (result.status === 'failed') {
-          setError(result.error instanceof Error ? result.error.message : String(result.error));
-          return;
-        }
         if (result.status === 'uploaded') {
           input.value = '';
           render();
         }
+      }).catch((error: unknown) => {
+        setError(errorMessage(error));
       });
     },
   });
