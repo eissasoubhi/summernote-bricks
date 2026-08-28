@@ -41,21 +41,38 @@ export function validateBrowserReleaseBundle(rootDirectory, expectedRunId, expec
     throw new Error(`Downloaded evidence release eligibility is ${releaseEligible}; expected ${expectedEligibility}`);
   }
 
+  const packages = evidence.packages;
+  if (!packages || typeof packages !== 'object' || Array.isArray(packages)) {
+    throw new Error('Downloaded evidence does not contain package identities');
+  }
+
   if (releaseEligible) {
-    const bricks = evidence.packages?.bricks;
+    const bricks = packages.bricks;
     if (
       evidence.workflow?.event === 'pull_request'
       || bricks?.ref !== 'refs/heads/master'
       || bricks?.sourceRef !== 'master'
       || bricks?.sha !== bricks?.sourceSha
+      || bricks?.sourceRepository !== 'eissasoubhi/summernote-bricks'
     ) {
       throw new Error('Release-eligible evidence must represent the exact public Bricks master head, not a pull-request or synthetic merge ref');
     }
-  }
 
-  const packages = evidence.packages;
-  if (!packages || typeof packages !== 'object' || Array.isArray(packages)) {
-    throw new Error('Downloaded evidence does not contain package identities');
+    const monorepoPackages = {
+      heading: 'packages/heading',
+      gallery: 'packages/gallery',
+    };
+    for (const [name, sourcePath] of Object.entries(monorepoPackages)) {
+      const value = packages[name];
+      if (
+        value?.sourceRepository !== 'eissasoubhi/summernote-bricks'
+        || value?.sourceRef !== 'master'
+        || value?.sourceSha !== bricks.sourceSha
+        || value?.sourcePath !== sourcePath
+      ) {
+        throw new Error(`${name} release artifact must come from ${sourcePath} on the exact release-eligible Bricks master SHA`);
+      }
+    }
   }
 
   const packageEntries = Object.entries(packages);
