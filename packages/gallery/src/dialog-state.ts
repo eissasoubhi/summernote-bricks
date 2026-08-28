@@ -1,4 +1,4 @@
-import { type GalleryImage } from './gallery';
+import { galleryImageKey, type GalleryImage } from './gallery';
 import { seedGallerySelection } from './runtime';
 import {
   buildGalleryFolderTree,
@@ -21,6 +21,7 @@ export interface GalleryDialogStateRuntime {
   snapshot(): GalleryDialogStateSnapshot;
   reset(target?: Element | null, defaultView?: unknown): GalleryDialogStateSnapshot;
   replaceAvailableImages(images: readonly GallerySourceImage[]): GalleryDialogStateSnapshot;
+  mergeUploadedImages(images: readonly GallerySourceImage[]): GalleryDialogStateSnapshot;
   selectItem(index: number): GalleryDialogStateSnapshot;
   setFolder(path: string): GalleryDialogStateSnapshot;
   setView(value: unknown): GalleryDialogStateSnapshot;
@@ -63,6 +64,17 @@ export function createGalleryDialogStateRuntime(
     replaceAvailableImages(images: readonly GallerySourceImage[]): GalleryDialogStateSnapshot {
       availableImages = [...images];
       ensureValidFolder();
+      return snapshot();
+    },
+    mergeUploadedImages(images: readonly GallerySourceImage[]): GalleryDialogStateSnapshot {
+      const byKey = new Map(availableImages.map((image) => [galleryImageKey(image), image]));
+      for (const image of images) {
+        const key = galleryImageKey(image);
+        byKey.set(key, image);
+        selectedImages.set(key, image);
+      }
+      availableImages = Array.from(byKey.values());
+      currentFolderPath = '';
       return snapshot();
     },
     selectItem(index: number): GalleryDialogStateSnapshot {
