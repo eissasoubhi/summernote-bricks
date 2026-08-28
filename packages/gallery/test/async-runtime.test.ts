@@ -3,7 +3,7 @@ import { createGalleryAsyncRuntime } from '../src/async-runtime';
 import type { GallerySourceAdapter, GalleryUploadAdapter } from '../src/source';
 
 function image(src: string, title?: string) {
-  return title ? { src, title } : { src };
+  return title ? { src, alt: '', title } : { src, alt: '' };
 }
 
 describe('createGalleryAsyncRuntime', () => {
