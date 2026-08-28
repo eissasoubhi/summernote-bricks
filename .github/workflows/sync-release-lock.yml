@@ -1,0 +1,34 @@
+name: Sync coordinated release lock
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  sync-lock:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'release/coordinated-rc11-rc2'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Synchronize root lock identity only
+        run: npm version 3.0.0-rc.11 --no-git-tag-version --allow-same-version
+      - name: Commit synchronized lock metadata when needed
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo 'Release lock identity is already synchronized.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json package-lock.json
+          git commit -m 'release: synchronize Bricks lock identity'
+          git push origin HEAD:${{ github.head_ref }}
