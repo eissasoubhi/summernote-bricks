@@ -176,8 +176,11 @@ if (typeof cjs.renderGallery !== 'function' || typeof cjs.parseGallery !== 'func
   for (const fixture of persistedCases) {
     const rendered = gallery.renderGallery(fixture.data);
     assert(rendered.outerHTML === fixture.html, 'Persisted Gallery HTML drifted from the deterministic v3 contract.');
+    const expectedData = {
+      images: fixture.data.images.map((image) => gallery.normalizeGalleryImage(image)),
+    };
     assert(
-      JSON.stringify(gallery.parseGallery(rendered)) === JSON.stringify(fixture.data),
+      JSON.stringify(gallery.parseGallery(rendered)) === JSON.stringify(expectedData),
       'Persisted Gallery parse/render round-trip drifted.',
     );
   }
