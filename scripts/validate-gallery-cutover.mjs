@@ -36,7 +36,7 @@ async function assertFile(relativePath) {
 
 assert(packageJson.name === standaloneBaseline.name, 'Gallery package name drifted from standalone npm identity.');
 assert(packageJson.version === standaloneBaseline.version, 'Gallery staged version drifted from the pinned standalone baseline.');
-assert(packageJson.private === true, 'Gallery must remain private until the remaining tarball/consumer/persisted-HTML gates are complete.');
+assert(packageJson.private !== true, 'Gallery publishability cutover regressed: package is private again.');
 assert(packageJson.main === standaloneBaseline.main, 'Gallery CommonJS entrypoint differs from standalone.');
 assert(packageJson.module === standaloneBaseline.module, 'Gallery ESM entrypoint differs from standalone.');
 assert(packageJson.browser === standaloneBaseline.browser, 'Gallery browser entrypoint differs from standalone.');
@@ -103,8 +103,8 @@ for (const [label, bundle] of [['ESM', esm], ['CommonJS', cjs], ['browser', brow
   assert(bundle.includes('summernoteGallery'), `Gallery ${label} bundle lost Summernote plugin registration.`);
 }
 
-console.log('Gallery staged cutover gate passed.');
+console.log('Gallery publishability cutover gate passed.');
 console.log(`Pinned standalone baseline: ${standaloneBaseline.repository}@${standaloneBaseline.commit}`);
 console.log(`Pinned standalone package.json blob: ${standaloneBaseline.packageJsonBlob}`);
-console.log('Verified metadata/entrypoints, build outputs and declaration ABI isolation while the monorepo Gallery package remains private.');
-console.log('Publishability still requires deterministic behavior parity, exact tarball/file-set, clean consumers and persisted-HTML proof.');
+console.log('Verified publishable metadata, ESM, CommonJS, browser entrypoints and declaration ABI isolation from private SNB Core.');
+console.log('This gate makes the package publishable but does not publish it or transfer release workflow ownership by itself.');
