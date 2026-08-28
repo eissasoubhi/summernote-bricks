@@ -17,10 +17,10 @@ import { defaultGalleryOptions } from '../src/options';
 import type { GallerySummernoteContext, GallerySummernoteUi } from '../src/summernote-contract';
 
 interface StubElement extends GalleryJQueryElement {
-  readonly onCalls: Array<{ eventName: string; selector?: string }>;
-  readonly offCalls: string[];
-  readonly appendTargets: GalleryJQueryElement[];
-  readonly handlers: Array<(event: GalleryJQueryEvent) => void>;
+  onCalls: Array<{ eventName: string; selector?: string }>;
+  offCalls: string[];
+  appendTargets: GalleryJQueryElement[];
+  handlers: Array<(event: GalleryJQueryEvent) => void>;
   removed: boolean;
 }
 
