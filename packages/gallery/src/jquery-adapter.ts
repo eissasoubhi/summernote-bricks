@@ -30,6 +30,7 @@ export interface GalleryJQueryFactory {
   (target: object): GalleryJQueryElement;
   readonly summernote: {
     readonly ui: GallerySummernoteUi<GalleryJQueryElement>;
+    readonly plugins?: Record<string, unknown>;
   };
 }
 
