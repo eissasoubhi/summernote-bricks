@@ -6,7 +6,7 @@ const root = process.cwd();
 const headingRoot = join(root, 'packages', 'heading');
 const packageJson = JSON.parse(await readFile(join(headingRoot, 'package.json'), 'utf8'));
 
-const expectedStandalone = {
+const standaloneBaseline = {
   name: 'summernote-heading',
   version: '3.0.0-rc.1',
   main: './dist/index.umd.cjs',
@@ -18,6 +18,7 @@ const expectedStandalone = {
     summernote: '>=0.9.1 <0.10',
   },
 };
+const expectedReleaseVersion = '3.0.0-rc.2';
 
 function assert(condition, message) {
   if (!condition) {
@@ -32,20 +33,20 @@ async function assertFile(relativePath) {
   return fullPath;
 }
 
-assert(packageJson.name === expectedStandalone.name, 'Heading package name drifted from standalone npm identity.');
-assert(packageJson.version === expectedStandalone.version, 'Heading staged version drifted from the pinned standalone baseline.');
+assert(packageJson.name === standaloneBaseline.name, 'Heading package name drifted from standalone npm identity.');
+assert(packageJson.version === expectedReleaseVersion, `Heading release identity must be ${expectedReleaseVersion}.`);
 assert(packageJson.private !== true, 'Heading publishability cutover regressed: package is private again.');
-assert(packageJson.main === expectedStandalone.main, 'Heading CommonJS entrypoint differs from standalone.');
-assert(packageJson.module === expectedStandalone.module, 'Heading ESM entrypoint differs from standalone.');
-assert(packageJson.browser === expectedStandalone.browser, 'Heading browser entrypoint differs from standalone.');
-assert(packageJson.types === expectedStandalone.types, 'Heading declaration entrypoint differs from standalone.');
+assert(packageJson.main === standaloneBaseline.main, 'Heading CommonJS entrypoint differs from standalone.');
+assert(packageJson.module === standaloneBaseline.module, 'Heading ESM entrypoint differs from standalone.');
+assert(packageJson.browser === standaloneBaseline.browser, 'Heading browser entrypoint differs from standalone.');
+assert(packageJson.types === standaloneBaseline.types, 'Heading declaration entrypoint differs from standalone.');
 assert(
-  JSON.stringify(packageJson.peerDependencies) === JSON.stringify(expectedStandalone.peerDependencies),
+  JSON.stringify(packageJson.peerDependencies) === JSON.stringify(standaloneBaseline.peerDependencies),
   'Heading peer dependency contract differs from the standalone package.',
 );
-assert(packageJson.exports?.['.']?.types === expectedStandalone.types, 'Heading exports.types differs from standalone.');
-assert(packageJson.exports?.['.']?.import === expectedStandalone.module, 'Heading exports.import differs from standalone.');
-assert(packageJson.exports?.['.']?.require === expectedStandalone.main, 'Heading exports.require differs from standalone.');
+assert(packageJson.exports?.['.']?.types === standaloneBaseline.types, 'Heading exports.types differs from standalone.');
+assert(packageJson.exports?.['.']?.import === standaloneBaseline.module, 'Heading exports.import differs from standalone.');
+assert(packageJson.exports?.['.']?.require === standaloneBaseline.main, 'Heading exports.require differs from standalone.');
 
 const sourceDir = join(headingRoot, 'src');
 const sourceFiles = (await readdir(sourceDir)).filter((file) => file.endsWith('.ts'));
@@ -98,6 +99,7 @@ assert(browserAlias.includes('Summernote must be loaded before summernote-headin
 assert(browserAlias.includes('summernoteHeading'), 'Heading browser alias lost plugin registration.');
 
 console.log('Heading publishability cutover gate passed.');
-console.log(`Pinned standalone identity: ${expectedStandalone.name}@${expectedStandalone.version}`);
+console.log(`Pinned standalone identity baseline: ${standaloneBaseline.name}@${standaloneBaseline.version}`);
+console.log(`Prepared coordinated release identity: ${standaloneBaseline.name}@${expectedReleaseVersion}`);
 console.log('Verified publishable metadata, ESM, CommonJS, browser metadata/alias and declarations with no private SNB Core leakage.');
 console.log('This gate makes the package publishable but does not publish it or transfer release workflow ownership by itself.');

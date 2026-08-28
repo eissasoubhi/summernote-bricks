@@ -6,10 +6,12 @@ This checklist defines the final gate for a public v3 release of the Summernote 
 
 Release candidates:
 
-- `summernote-bricks@3.0.0-rc.10`
-- `summernote-heading@3.0.0-rc.1`
-- `summernote-gallery@3.0.0-rc.1`
+- `summernote-bricks@3.0.0-rc.11`
+- `summernote-heading@3.0.0-rc.2`
+- `summernote-gallery@3.0.0-rc.2`
 - `SNB-components` remains independent and is not part of this coordinated publication.
+
+The previous immutable npm identities `summernote-bricks@3.0.0-rc.10`, `summernote-heading@3.0.0-rc.1` and `summernote-gallery@3.0.0-rc.1` already exist with registry integrity different from the monorepo-tested artifacts and must never be reused.
 
 Reference host contract: Summernote 0.9.x, currently validated on 0.9.1, with jQuery 3.x.
 
@@ -27,7 +29,7 @@ Reference host contract: Summernote 0.9.x, currently validated on 0.9.1, with jQ
 
 For every package intended for publication:
 
-- [ ] committed lockfile is present for the maintained v3 build path;
+- [ ] committed lockfile is present for the maintained v3 build path and its root package identity matches `package.json`;
 - [ ] clean `npm ci` succeeds on supported Node LTS versions;
 - [ ] strict TypeScript check succeeds;
 - [ ] unit/migration tests succeed;
@@ -102,6 +104,7 @@ The publication workflow must:
 - [ ] download the exact `browser-tested-release-bundle-*` produced by that triggering run;
 - [ ] require `workflow.releaseEligible: true` and validate the bundle with the reusable release-bundle validator;
 - [ ] verify Bricks `master`, Heading `main` and Gallery `master` have not moved since the evidence was generated;
+- [ ] preflight all three candidate npm package/version identities before npm authentication or any publication;
 - [ ] verify npm authentication before publication;
 - [ ] publish the archived browser-tested `.tgz` files directly, using `next` for prereleases and `latest` for stable versions;
 - [ ] be idempotent: an already-published version is accepted only when npm registry integrity matches the exact tested tarball;

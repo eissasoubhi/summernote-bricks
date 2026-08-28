@@ -22,6 +22,7 @@ const standaloneBaseline = {
     summernote: '>=0.9.1 <0.10',
   },
 };
+const expectedReleaseVersion = '3.0.0-rc.2';
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -35,7 +36,7 @@ async function assertFile(relativePath) {
 }
 
 assert(packageJson.name === standaloneBaseline.name, 'Gallery package name drifted from standalone npm identity.');
-assert(packageJson.version === standaloneBaseline.version, 'Gallery staged version drifted from the pinned standalone baseline.');
+assert(packageJson.version === expectedReleaseVersion, `Gallery release identity must be ${expectedReleaseVersion}.`);
 assert(packageJson.private !== true, 'Gallery publishability cutover regressed: package is private again.');
 assert(packageJson.main === standaloneBaseline.main, 'Gallery CommonJS entrypoint differs from standalone.');
 assert(packageJson.module === standaloneBaseline.module, 'Gallery ESM entrypoint differs from standalone.');
@@ -105,6 +106,8 @@ for (const [label, bundle] of [['ESM', esm], ['CommonJS', cjs], ['browser', brow
 
 console.log('Gallery publishability cutover gate passed.');
 console.log(`Pinned standalone baseline: ${standaloneBaseline.repository}@${standaloneBaseline.commit}`);
+console.log(`Pinned standalone package identity baseline: ${standaloneBaseline.name}@${standaloneBaseline.version}`);
+console.log(`Prepared coordinated release identity: ${standaloneBaseline.name}@${expectedReleaseVersion}`);
 console.log(`Pinned standalone package.json blob: ${standaloneBaseline.packageJsonBlob}`);
 console.log('Verified publishable metadata, ESM, CommonJS, browser entrypoints and declaration ABI isolation from private SNB Core.');
 console.log('This gate makes the package publishable but does not publish it or transfer release workflow ownership by itself.');
