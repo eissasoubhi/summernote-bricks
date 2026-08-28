@@ -34,6 +34,7 @@ describe('Gallery results contract', () => {
   it('escapes attribute-sensitive source characters and renders unselected ARIA state', () => {
     const unsafe: GalleryImage = {
       src: 'https://example.test/"quoted"?a=1&b=2',
+      alt: '',
       title: 'Rock & "Roll"',
     };
 
