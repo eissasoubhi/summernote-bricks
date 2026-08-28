@@ -10,49 +10,50 @@ import {
 import type {
   GalleryAdapterBoundary,
   GalleryJQueryElement,
+  GalleryJQueryEvent,
   GalleryJQueryFactory,
 } from '../src/jquery-adapter';
 import { defaultGalleryOptions } from '../src/options';
 import type { GallerySummernoteContext, GallerySummernoteUi } from '../src/summernote-contract';
 
 interface StubElement extends GalleryJQueryElement {
-  readonly onCalls: Array<[string, string | undefined]>;
+  readonly onCalls: Array<{ eventName: string; selector?: string }>;
   readonly offCalls: string[];
   readonly appendTargets: GalleryJQueryElement[];
-  readonly handlers: Array<(event: { currentTarget: EventTarget | null; preventDefault(): void }) => void>;
+  readonly handlers: Array<(event: GalleryJQueryEvent) => void>;
   removed: boolean;
 }
 
 function elementStub(): StubElement {
-  const onCalls: Array<[string, string | undefined]> = [];
-  const offCalls: string[] = [];
-  const appendTargets: GalleryJQueryElement[] = [];
-  const handlers: Array<(event: { currentTarget: EventTarget | null; preventDefault(): void }) => void> = [];
-  const element = {
-    onCalls,
-    offCalls,
-    appendTargets,
-    handlers,
-    removed: false,
-    appendTo(target: GalleryJQueryElement) { appendTargets.push(target); return element; },
-    find: () => element,
-    get: () => undefined,
-    val: ((value?: string) => value === undefined ? '' : element) as GalleryJQueryElement['val'],
-    text: () => element,
-    html: () => element,
-    empty: () => element,
-    prop: () => element,
-    attr: ((name: string, value?: string) => value === undefined ? undefined : element) as GalleryJQueryElement['attr'],
-    trigger: () => element,
-    on: ((eventName: string, selectorOrHandler: string | ((event: { currentTarget: EventTarget | null; preventDefault(): void }) => void), maybeHandler?: (event: { currentTarget: EventTarget | null; preventDefault(): void }) => void) => {
-      onCalls.push([eventName, typeof selectorOrHandler === 'string' ? selectorOrHandler : undefined]);
-      handlers.push(typeof selectorOrHandler === 'function' ? selectorOrHandler : maybeHandler!);
-      return element;
-    }) as GalleryJQueryElement['on'],
-    off(eventName: string) { offCalls.push(eventName); return element; },
-    each: () => element,
-    remove() { element.removed = true; },
-  } satisfies StubElement;
+  const element = {} as StubElement;
+  element.onCalls = [];
+  element.offCalls = [];
+  element.appendTargets = [];
+  element.handlers = [];
+  element.removed = false;
+  element.appendTo = (target) => { element.appendTargets.push(target); return element; };
+  element.find = () => element;
+  element.get = () => undefined;
+  element.val = ((value?: string) => value === undefined ? '' : element) as GalleryJQueryElement['val'];
+  element.text = () => element;
+  element.html = () => element;
+  element.empty = () => element;
+  element.prop = () => element;
+  element.attr = ((name: string, value?: string) => value === undefined ? undefined : element) as GalleryJQueryElement['attr'];
+  element.trigger = () => element;
+  element.on = ((eventName: string, selectorOrHandler: string | ((event: GalleryJQueryEvent) => void), maybeHandler?: (event: GalleryJQueryEvent) => void) => {
+    if (typeof selectorOrHandler === 'string') {
+      element.onCalls.push({ eventName, selector: selectorOrHandler });
+      if (maybeHandler) element.handlers.push(maybeHandler);
+    } else {
+      element.onCalls.push({ eventName });
+      element.handlers.push(selectorOrHandler);
+    }
+    return element;
+  }) as GalleryJQueryElement['on'];
+  element.off = (eventName) => { element.offCalls.push(eventName); return element; };
+  element.each = () => element;
+  element.remove = () => { element.removed = true; };
   return element;
 }
 
@@ -70,21 +71,18 @@ function boundary(dialogsInBody = false) {
     onDialogShown: (_dialog, callback) => callback(),
     onDialogHidden: (_dialog, callback) => callback(),
   };
-  const jquery = Object.assign((target: object) => target === document.body ? body : editor, { summernote: { ui } }) as GalleryJQueryFactory;
+  const jquery = Object.assign(
+    (target: object) => target === document.body ? body : editor,
+    { summernote: { ui } },
+  ) as GalleryJQueryFactory;
   const context: GallerySummernoteContext<GalleryJQueryElement> = {
-    options: { dialogsInBody },
+    options: dialogsInBody ? { dialogsInBody: true } : {},
     layoutInfo: { editable, editor },
     memo: () => undefined,
     invoke: () => undefined,
   };
-  return {
-    boundary: { context, jquery, ui } satisfies GalleryAdapterBoundary,
-    editor,
-    editable,
-    dialog,
-    body,
-    hideDialog,
-  };
+  const adapterBoundary: GalleryAdapterBoundary = { context, jquery, ui };
+  return { boundary: adapterBoundary, editor, editable, dialog, body, hideDialog };
 }
 
 describe('Gallery adapter wiring', () => {
@@ -105,7 +103,7 @@ describe('Gallery adapter wiring', () => {
     const target = document.createElement('div');
 
     expect(fixture.editable.onCalls).toEqual([
-      ['dblclick.snbGalleryV3', '[data-snb-brick="gallery"]'],
+      { eventName: 'dblclick.snbGalleryV3', selector: '[data-snb-brick="gallery"]' },
     ]);
     fixture.editable.handlers[0]?.({ currentTarget: target, preventDefault() {} });
     expect(callback).toHaveBeenCalledWith(target);
