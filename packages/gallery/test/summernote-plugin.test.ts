@@ -4,36 +4,43 @@ import type { GalleryJQueryElement, GalleryJQueryFactory } from '../src/jquery-a
 import { createSummernoteGalleryPlugin, galleryPluginName, type GallerySummernotePluginHost } from '../src/summernote-plugin';
 import type { GallerySummernoteContext } from '../src/summernote-contract';
 
+type ButtonOptions = { contents: string; tooltip: string; click: () => void };
+
 function elementStub(): GalleryJQueryElement {
-  const element: GalleryJQueryElement = {
-    appendTo: () => element,
-    find: () => element,
+  const raw = {
+    appendTo: () => elementStub(),
+    find: () => elementStub(),
     get: () => undefined,
-    val: (value?: string) => value === undefined ? '' : element,
-    text: () => element,
-    html: () => element,
-    empty: () => element,
-    prop: () => element,
-    attr: (_name: string, value?: string) => value === undefined ? undefined : element,
-    trigger: () => element,
-    on: () => element,
-    off: () => element,
-    each: () => element,
+    val: () => '',
+    text: () => elementStub(),
+    html: () => elementStub(),
+    empty: () => elementStub(),
+    prop: () => elementStub(),
+    attr: () => undefined,
+    trigger: () => elementStub(),
+    on: () => elementStub(),
+    off: () => elementStub(),
+    each: () => elementStub(),
     remove: () => undefined,
   };
-  return element;
+  return raw as unknown as GalleryJQueryElement;
 }
 
 describe('Gallery Summernote adapter', () => {
   it('registers the standalone-compatible button and delegates lifecycle methods', () => {
     const renderedButton = elementStub();
-    let buttonOptions: { contents: string; tooltip: string; click: () => void } | null = null;
+    const captured: {
+      buttonOptions: ButtonOptions | null;
+      memoFactory: (() => GalleryJQueryElement) | null;
+    } = {
+      buttonOptions: null,
+      memoFactory: null,
+    };
     let memoKey = '';
-    let memoFactory: (() => GalleryJQueryElement) | null = null;
 
     const ui = {
-      button: (options: { contents: string; tooltip: string; click: () => void }) => {
-        buttonOptions = options;
+      button: (options: ButtonOptions) => {
+        captured.buttonOptions = options;
         return { render: () => renderedButton };
       },
       dialog: () => ({ render: () => elementStub() }),
@@ -62,7 +69,7 @@ describe('Gallery Summernote adapter', () => {
       },
       memo: (key, factory) => {
         memoKey = key;
-        memoFactory = factory;
+        captured.memoFactory = factory;
       },
       invoke: vi.fn(),
     };
@@ -75,13 +82,13 @@ describe('Gallery Summernote adapter', () => {
     expect(typeof host.show).toBe('function');
     expect(typeof host.save).toBe('function');
     expect(memoKey).toBe(`button.${galleryPluginName}`);
-    expect(memoFactory?.()).toBe(renderedButton);
-    expect(buttonOptions?.contents).toBe('Media');
-    expect(buttonOptions?.tooltip).toBe('Choose images');
+    expect(captured.memoFactory?.()).toBe(renderedButton);
+    expect(captured.buttonOptions?.contents).toBe('Media');
+    expect(captured.buttonOptions?.tooltip).toBe('Choose images');
 
     const show = vi.fn();
     host.show = show;
-    buttonOptions?.click();
+    captured.buttonOptions?.click();
     expect(show).toHaveBeenCalledTimes(1);
   });
 });
