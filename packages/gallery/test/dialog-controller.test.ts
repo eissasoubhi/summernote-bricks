@@ -12,8 +12,8 @@ describe('Gallery dialog controller', () => {
         expect(request.query).toBe('event');
         return {
           items: [
-            { id: 'root', src: '/root.jpg', path: 'root.jpg' },
-            { id: 'a', src: '/a.jpg', path: 'events/a.jpg' },
+            { id: 'root', src: '/root.jpg', alt: 'Root', path: 'root.jpg' },
+            { id: 'a', src: '/a.jpg', alt: 'Event A', path: 'events/a.jpg' },
           ],
         };
       },
@@ -34,8 +34,8 @@ describe('Gallery dialog controller', () => {
       async list() {
         return {
           items: [
-            { id: 'root', src: '/root.jpg', path: 'root.jpg' },
-            { id: 'a', src: '/a.jpg', path: 'events/a.jpg' },
+            { id: 'root', src: '/root.jpg', alt: 'Root', path: 'root.jpg' },
+            { id: 'a', src: '/a.jpg', alt: 'Event A', path: 'events/a.jpg' },
           ],
         };
       },
@@ -63,7 +63,7 @@ describe('Gallery dialog controller', () => {
     const persisted: GalleryImage = { id: 'persisted', src: '/persisted.jpg', alt: 'Persisted' };
     const source: GallerySourceAdapter = {
       async list() {
-        return { items: [{ id: 'source', src: '/source.jpg' }] };
+        return { items: [{ id: 'source', src: '/source.jpg', alt: 'Source' }] };
       },
     };
     const controller = createGalleryDialogController(source);
