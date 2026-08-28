@@ -85,15 +85,15 @@ export function renderGallery(data: GalleryData): HTMLElement {
     figure.className = 'snb-gallery__item';
 
     const img = document.createElement('img');
-    img.src = image.src;
-    img.alt = image.alt;
-    img.loading = 'lazy';
-    img.decoding = 'async';
+    img.setAttribute('src', image.src);
+    img.setAttribute('alt', image.alt);
+    img.setAttribute('loading', 'lazy');
+    img.setAttribute('decoding', 'async');
 
     if (image.id) img.setAttribute('data-snb-image-id', image.id);
-    if (image.title) img.title = image.title;
-    if (image.width) img.width = image.width;
-    if (image.height) img.height = image.height;
+    if (image.title) img.setAttribute('title', image.title);
+    if (image.width) img.setAttribute('width', String(image.width));
+    if (image.height) img.setAttribute('height', String(image.height));
 
     figure.appendChild(img);
 
