@@ -68,7 +68,7 @@ describe('Gallery dialog state runtime', () => {
     expect(state.currentFolderPath).toBe('events/2026');
     expect(state.visibleImages.map((image) => image.id)).toEqual(['a', 'b']);
 
-    state = runtime.replaceAvailableImages([images[0]]);
+    state = runtime.replaceAvailableImages([images[0]!]);
     expect(state.currentFolderPath).toBe('');
     expect(state.visibleImages.map((image) => image.id)).toEqual(['root']);
   });
