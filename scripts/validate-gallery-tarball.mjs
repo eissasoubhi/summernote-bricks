@@ -80,7 +80,7 @@ try {
   assert(forbidden.length === 0, `Gallery tarball leaks internal files: ${forbidden.join(', ')}`);
 
   const manifest = JSON.parse(await readFile(join(galleryRoot, 'package.json'), 'utf8'));
-  assert(manifest.private === true, 'Gallery must remain private until the final publishability cutover.');
+  assert(manifest.private !== true, 'Gallery publishability cutover regressed: packed package is private again.');
   assert(manifest.main === './dist/index.umd.cjs', 'Gallery CommonJS entrypoint drifted.');
   assert(manifest.module === './dist/index.js', 'Gallery ESM entrypoint drifted.');
   assert(manifest.browser === './dist/index.umd.cjs', 'Gallery browser entrypoint drifted.');
@@ -213,7 +213,7 @@ if (typeof cjs.renderGallery !== 'function' || typeof cjs.parseGallery !== 'func
 
   console.log(`Gallery tarball/consumer gate passed: ${basename(tarball)} (${files.size} files).`);
   console.log('Verified exact file set, ESM/CommonJS clean-consumer loading, browser alias, deterministic v3 persisted HTML and legacy migration round-trip.');
-  console.log('Publication remains disabled; Gallery is still private until final publishability cutover.');
+  console.log('Publishability is enabled, but publication remains disabled until the coordinated release train uses a new immutable version.');
 } finally {
   delete globalThis.$;
   delete globalThis.window;
