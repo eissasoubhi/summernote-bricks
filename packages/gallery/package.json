@@ -1,6 +1,6 @@
 {
   "name": "summernote-gallery",
-  "version": "3.0.0-rc.1",
+  "version": "3.0.0-rc.2",
   "description": "Native Summernote gallery plugin with backend-agnostic image sources and semantic persisted HTML.",
   "type": "module",
   "main": "./dist/index.umd.cjs",
