@@ -13,6 +13,14 @@ export interface GalleryDialogBinding {
   dispose(): void;
 }
 
+export interface GalleryDialogControlCallbacks {
+  onItem(index: number): void;
+  onFolder(path: string): void;
+  onView(value: unknown): void;
+  onSearch(query: string): void;
+  onUpload(): void;
+}
+
 export function createGalleryDialog(
   boundary: GalleryAdapterBoundary,
   options: GalleryOptions,
@@ -44,6 +52,42 @@ export function bindGalleryActivation(
   });
 
   return () => editable.off(EVENT_NAMESPACE);
+}
+
+export function bindGalleryDialogControls(
+  boundary: GalleryAdapterBoundary,
+  dialog: GalleryJQueryElement,
+  callbacks: GalleryDialogControlCallbacks,
+): () => void {
+  const { jquery } = boundary;
+
+  dialog.on(`click${EVENT_NAMESPACE}`, '.snb-gallery-v3-form__item', (event) => {
+    callbacks.onItem(Number(jquery(event.currentTarget as object).attr('data-index')));
+  });
+
+  dialog.on(`click${EVENT_NAMESPACE}`, '.snb-gallery-v3-form__folder', (event) => {
+    callbacks.onFolder(String(jquery(event.currentTarget as object).attr('data-folder-path') || ''));
+  });
+
+  dialog.on(`click${EVENT_NAMESPACE}`, '.snb-gallery-v3-form__view', (event) => {
+    callbacks.onView(jquery(event.currentTarget as object).attr('data-view'));
+  });
+
+  dialog.on(`click${EVENT_NAMESPACE}`, '.snb-gallery-v3-form__search-button', () => {
+    callbacks.onSearch(String(dialog.find('.snb-gallery-v3-form__query').val() || ''));
+  });
+
+  dialog.on(`click${EVENT_NAMESPACE}`, '.snb-gallery-v3-form__upload-button', () => {
+    callbacks.onUpload();
+  });
+
+  dialog.on(`keydown${EVENT_NAMESPACE}`, '.snb-gallery-v3-form__query', (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    callbacks.onSearch(String(jquery(event.currentTarget as object).val() || ''));
+  });
+
+  return () => dialog.off(EVENT_NAMESPACE);
 }
 
 export function disposeGalleryDialog(
